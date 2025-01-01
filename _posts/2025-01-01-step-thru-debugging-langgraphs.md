@@ -9,33 +9,33 @@ Most of the details required are already covered in langgraph tutorial here: htt
 *Key points covered there are:*
 
 1.  Install LangGraph CLI
-    bash
+    ```bash
     pip install --upgrade "langgraph-cli[inmem]"
-    
+    ```
 2.  Install the dependencies
-    bash
+    ```bash
     pip install -e .
-    
+    ```
 3.  Use the CLI to run langGraph server
-    bash
+    ```bash
     langgraph dev
-    
-4.  You may now use LangGraph Studio Web UI at: https://smith.langchain.com/studio/?baseUrl=http://locahost:2024
+    ```
+4.  You may now use LangGraph Studio Web UI at: [https://smith.langchain.com/studio/?baseUrl=http://locahost:2024](https://smith.langchain.com/studio/?baseUrl=http://locahost:2024)
 
 *Here are the additions to enable step-thru-debugging:*
 
 1.  Install debugpy in your virtual environment for the langgraph project
-    bash
+    ```bash
     pip install debugpy
-    
+    ```
 
 2.  Start langgraph API server in debug mode. In the following we are telling langgraph-cli to allow clients to listen on Port 2025 for debugger events
-    bash
+    ```bash
     langgraph dev --debug-port 2025
-    
+    ```
 
 3.  Attach to debugger from your IDE. E.g., in here's my VS Code launch config:
-    json
+    ```json
     {
         "version": "0.2.0",
         "configurations": [
@@ -58,6 +58,6 @@ Most of the details required are already covered in langgraph tutorial here: htt
             }
         ]
     }
-    
+    ```
 
 4.  I can now put a breakpoint on any of my langgraph code files and step-thru the execution!
