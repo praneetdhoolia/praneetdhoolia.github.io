@@ -1,0 +1,20 @@
+title: Praneet Dhoolia
+
+author:
+  name: Praneet Dhoolia
+  email: praneet.dhoolia@gmail.com
+
+remote_theme: jekyll/minima
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+header_pages:
+  - about.md
+
+minima:
+  skin: classic
+  social_links:
+    - { platform: github, user_url: "https://github.com/praneetdhoolia"}
+    - { platform: linkedin, user_url: "https://www.linkedin.com/in/praneet-dhoolia"}
