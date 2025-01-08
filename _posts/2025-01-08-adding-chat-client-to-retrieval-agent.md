@@ -9,9 +9,9 @@ date: 2025-01-08
 The following are required before deploying the chat client:
 1. An existing [node.js installation](https://nodejs.org/en/download).
 2. An active deployment on the [LangGraph Cloud API Server](https://langchain-ai.github.io/langgraph/cloud/quick_start/).
-Assistant UI can be also be installed in an existing React Project, as covered in the [assistant-ui langgraph cloud documentation](https://www.assistant-ui.com/docs/runtimes/langgraph).
+Assistant UI can be also be installed in an existing React Project, as covered in the [assistant-ui langgraph cloud docs](https://www.assistant-ui.com/docs/runtimes/langgraph).
 
-To create a new project, I'll follow these steps:
+To create a new chat client, I'll follow these steps:
 
 1. Ensure `npx` is installed.
     ```bash
@@ -25,7 +25,7 @@ To create a new project, I'll follow these steps:
 
 3. Create a new assistant for your graph on LangSmith using LangGraph Studio or the API Docs.
 
-![Create a new assistant](/media/create-assistant.png)
+    ![Create a new assistant](/media/create-assistant.png)
 
 4. Create an `.env.local` file in your project with the following variables:
     ```bash
@@ -37,11 +37,12 @@ To create a new project, I'll follow these steps:
 5. Ensure the LangChain API Key is also present in your [LangSmith API Keys](https://smith.langchain.com/settings/workspaces/apikeys) to allow access to your deployments.
 
 6. Navigate to the `assistant-ui` project root folder and start the node.js server.
-```bash
-npm run dev
-```
+    ```bash
+    npm run dev
+    ```
 
 7. You can now use the Chat Client using the server's port! (https://localhost:3000 in my case)
-![Assistant Demo](/media/assistant-demo.gif)
+
+    ![Assistant Demo](/media/assistant-demo.gif)
 
 
