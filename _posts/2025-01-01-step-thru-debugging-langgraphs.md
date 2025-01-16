@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Step-thru Debugging Your LangGraphs
+title: Step-thru Debugging your LangGraphs
 date: 2025-01-01
 ---
 
