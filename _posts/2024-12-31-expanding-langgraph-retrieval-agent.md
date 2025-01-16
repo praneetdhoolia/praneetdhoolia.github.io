@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Expanding the LangGraph Retrieval Agent Template
+title: Expanding the LangGraph Retrieval Agent
 date: 2024-12-31
 ---
 

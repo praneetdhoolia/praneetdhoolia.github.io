@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Further Improvements to the Retrieval Agent Template
+title: Improvements to the Retrieval Agent
 date: 2025-01-16
 ---
 

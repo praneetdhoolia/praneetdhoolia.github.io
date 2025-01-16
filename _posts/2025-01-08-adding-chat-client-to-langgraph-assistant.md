@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Adding a Chat Client to a Retrieval Agent
+title: Adding a Chat Client to a LangGraph Assistant
 date: 2025-01-08
 ---
 
