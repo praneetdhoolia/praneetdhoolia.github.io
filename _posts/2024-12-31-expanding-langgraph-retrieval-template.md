@@ -106,7 +106,7 @@ def make_milvus_retriever(
         connection_args={"uri": os.environ["MILVUS_DB"]},
         auto_id=True
     )
-    yield vstore.as_retriever()
+    yield vstore.as_retriever(search_kwargs=configuration.search_kwargs)
 ```
 
 and then use this in the factory method
