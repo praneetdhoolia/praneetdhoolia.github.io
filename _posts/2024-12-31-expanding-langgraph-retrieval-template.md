@@ -165,11 +165,7 @@ async def index_docs(
         configuration = IndexConfiguration.from_runnable_config(config)
         if not state.docs and configuration.starter_urls:
             print(f"starting crawl ...")
-            state.docs = await crawl (
-                configuration.user_id,
-                configuration.parse_starter_urls(),
-                configuration.hops
-            )
+            state.docs = await crawl (configuration)
         # rest remains the same as before
         stamped_docs = ensure_docs_have_user_id(state.docs, config)
         if configuration.retriever_provider == "milvus":
@@ -181,7 +177,10 @@ async def index_docs(
 
 Add the following functions that wrap around the new [`Crawler component`](https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/src/retrieval_graph/crawler.py)
 ```python
-async def crawl(tenant: str, starter_urls: list, hops: int):
+async def crawl(configuration: IndexConfiguration):
+    tenant = configuration.user_id
+    starter_urls = configuration.parse_starter_urls()
+    hops = configuration.hops
     allowed_domains = set(urlparse(url).netloc for url in starter_urls)
     crawler = WebCrawler(starter_urls, hops, allowed_domains, tenant)
     await crawler.crawl()
@@ -218,37 +217,26 @@ I added an **APIfy** based crawl to `index_graph.py`. Here are the enhancements:
 import json
 
 from langchain_community.utilities import ApifyWrapper
-from langchain_community.document_loaders import ApifyDatasetLoader
 
 # ... existing code
 
-def load_site_dataset_map() -> dict:
-    with open("sites_dataset_map.json", 'r', encoding='utf-8') as file:
-        return json.load(file)
-
-def apify_crawl(tenant: str, starter_urls: list, hops: int):
-    site_dataset_map = load_site_dataset_map()
-    if dataset_id := site_dataset_map.get(tenant):
-        loader = ApifyDatasetLoader(
-            dataset_id=dataset_id,
-            dataset_mapping_function=lambda item: Document(
-                page_content=item["html"] or "", metadata={"url": item["url"]}
-            ),
-        )
-    else:
-        apify = ApifyWrapper()
-        loader = apify.call_actor(
-            actor_id="apify/website-content-crawler",
-            run_input={
-                "startUrls": starter_urls,
-                "saveHtml": True,
-                "htmlTransformer": "none"
-            },
-            dataset_mapping_function=lambda item: Document(
-                page_content=item["html"] or "", metadata={"url": item["url"]}
-            ),
-        )
-        print(f"Site: {tenant} crawled and loaded into Apify dataset: {loader.dataset_id}")
+def apify_crawl(configuration: IndexConfiguration):
+    tenant = configuration.user_id
+    starter_urls = [{"url": url} for url in configuration.parse_starter_urls()]
+    hops = configuration.hops
+    apify = ApifyWrapper()
+    loader = apify.call_actor(
+        actor_id="apify/website-content-crawler",
+        run_input={
+            "startUrls": starter_urls,
+            "saveHtml": True,
+            "htmlTransformer": "none"
+        },
+        dataset_mapping_function=lambda item: Document(
+            page_content=item["html"] or "", metadata={"url": item["url"]}
+        ),
+    )
+    print(f"Site: {tenant} crawled and loaded into Apify dataset: {loader.dataset_id}")
 
     return loader.load()
 
@@ -263,16 +251,7 @@ async def index_docs(
         configuration = IndexConfiguration.from_runnable_config(config)
         if not state.docs and configuration.starter_urls:
             print(f"starting crawl ...")
-            # state.docs = await crawl (
-            #     configuration.user_id,
-            #     configuration.parse_starter_urls(),
-            #     configuration.hops
-            # )
-            state.docs = apify_crawl (
-                configuration.user_id,
-                [{"url": url} for url in configuration.parse_starter_urls()],
-                configuration.hops
-            )
+            state.docs = apify_crawl (configuration)
         # rest remains the same as before
         stamped_docs = ensure_docs_have_user_id(state.docs, config)
         if configuration.retriever_provider == "milvus":
