@@ -109,4 +109,4 @@ The assistant graph is implemented in [`assistant_graph.py`](https://github.com/
 
 Here's an end to end video!
 
-https://github.com/user-attachments/assets/cf5b9932-33a0-4627-98ca-022979bfb2e7
+<iframe src="https://www.youtube.com/embed/y6MG-aZqmFw" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
