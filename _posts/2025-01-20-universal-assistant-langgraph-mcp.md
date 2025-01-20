@@ -4,7 +4,7 @@ title: Building a Universal Assistant with LangGraph and MCP
 date: 2025-01-20
 ---
 
-My brother (who happens to be a UQ alumni) started this project on combining LangGraph with Anthropic's standardization effort: Model Context Protocol (MCP), to build a *universal assistant*. It was fun to contribute to it! This blog is a summary of [that project](https://github.com/esxr/langgraph-mcp).
+My brother (a UQ alumni) started this project on combining LangGraph with Anthropic's standardization effort: Model Context Protocol (MCP), to build a *universal assistant*. It was fun to contribute to it! This blog is a summary of [that project](https://github.com/esxr/langgraph-mcp).
 
 ---
 
@@ -18,7 +18,7 @@ In [this previous BLOG]({% link _posts/2024-12-31-expanding-langgraph-retrieval-
 
 Assistant receives the user message and decides the agent to use. The agent node decides the right tool to use, and calls the tool on the MCP server. Since all our agents are based on MCP, a single MCP-Agent node is sufficient for LLM based orchestraion, and another single node is sufficient to work with MCP servers to invoke their tools.
 
-## Our Implementation Walk-thru
+## Our Implementation Walk-through
 
 There are 3 main parts to our implementation:
 1. Building the Router
@@ -27,7 +27,7 @@ There are 3 main parts to our implementation:
 
 ### Building the Router
 
-Our graph to build the router is implemented in [`build_router_graph.py`](src/langgraph_mcp/build_router_graph.py). It collects routing information based on tools, prompts, and resources offered by each MCP server using our [`mcp_wrapper.py`](src/langgraph_mcp/mcp_wrapper.py). It indexes this routing information for each server in a vector database.
+Our graph to build the router is implemented in [`build_router_graph.py`](https://github.com/esxr/langgraph-mcp/blob/main/src/langgraph_mcp/build_router_graph.py). It collects routing information based on tools, prompts, and resources offered by each MCP server using our [`mcp_wrapper.py`](https://github.com/esxr/langgraph-mcp/blob/main/src/langgraph_mcp/mcp_wrapper.py). It indexes this routing information for each server in a vector database.
 
 <!--
 ```mermaid
@@ -56,13 +56,12 @@ sequenceDiagram
 
 ### The Assistant
 
-The assistant graph is implemented in [`assistant_graph.py`](src/langgraph_mcp/assistant_graph.py). The following animation describes the role of various nodes and the flow of control thru it, with the help of an example
+The assistant graph is implemented in [`assistant_graph.py`](https://github.com/esxr/langgraph-mcp/blob/main/src/langgraph_mcp/assistant_graph.py). The following animation describes the role of various nodes and the flow of control thru it, with the help of an example
 
 ![Assistant workflow explained with example](/media/langgraph-assistant-mcp.gif)
-
 ### A Generic MCP Wrapper
 
-[`mcp_wrapper.py`](src/langgraph_mcp/mcp_wrapper.py) employs a Strategy Pattern using an abstract base class (`MCPSessionFunction`) to define a common interface for executing various operations on MCP servers. The pattern includes:
+[`mcp_wrapper.py`](https://github.com/esxr/langgraph-mcp/blob/main/src/langgraph_mcp/mcp_wrapper.py) employs a Strategy Pattern using an abstract base class (`MCPSessionFunction`) to define a common interface for executing various operations on MCP servers. The pattern includes:
 1.  Abstract Interface:
     - `MCPSessionFunction` defines an async `__call__` method as a contract for all session functions.
 2.  Concrete Implementations:
@@ -104,7 +103,7 @@ The assistant graph is implemented in [`assistant_graph.py`](src/langgraph_mcp/a
 
     Add your `OPENAI_API_KEY`, `GITHUB_PERSONAL_ACCESS_TOKEN` etc. to the `.env`
 
-    **Note**: We have added support for *Milvus Lite Retriever* (support file based URI). Milvus Lite won't work on Windows. For Windows you may need to use Milvus Server (Easy to start using Docker), and change the `MILVUS_DB` config to the server based URI. You may also enhance the [retriever.py](src/langgraph_mcp/retriever.py) to add retrievers for your choice of vector databases!
+    **Note**: We have added support for *Milvus Lite Retriever* (support file based URI). Milvus Lite won't work on Windows. For Windows you may need to use Milvus Server (Easy to start using Docker), and change the `MILVUS_DB` config to the server based URI. You may also enhance the [retriever.py](https://github.com/esxr/langgraph-mcp/blob/main/src/langgraph_mcp/retriever.py) to add retrievers for your choice of vector databases!
 
 ## A Demonstration!
 
