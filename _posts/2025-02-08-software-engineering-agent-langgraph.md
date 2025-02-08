@@ -8,7 +8,7 @@ date: 2025-02-08
 
 First step towards creating a software engineering agent is to understand its role and responsibilities. Here's a rough sketch:
 
-![Roles and responsibilities](media/role-responsilities.excalidraw.png)
+![Roles and responsibilities](/media/role-responsilities.excalidraw.png)
 
 Broadly, we expect a software engineer to develop new features, fix bugs, and deploy. For those tasks the engineer is expected to receive inputs from enterprise internal or external resources. Let's term these: the *digital fabric*.
 
@@ -70,9 +70,9 @@ Let's now understand the agent workflows!
 
 ### Onboarding Workflow
 
-![Figure - Onboarding Graph](media/onboard-graph.excalidraw.png)
+![Figure - Onboarding Graph](/media/onboard-graph.excalidraw.png)
 
-See [`src/se_agent/onboard_graph.py`](src/se_agent/onboard_graph.py) for implementation details.
+See [`src/se_agent/onboard_graph.py`](https://github.com/praneetdhoolia/langgraph-se-agent/blob/main/src/se_agent/onboard_graph.py) for implementation details.
 
 One aspect of the implementation worth highlighting is that we generate semantic undertanding for code files in **parallel**. E.g., if a repository has 1000 files. We make 1000 parallel LLM calls for semantic summary generation, effectively completing it in a single call's time. This saves a significant amount of time.
 
@@ -102,9 +102,9 @@ Similarly we generate semantic understanding for higher order packages also in p
 
 ### Assist Workflow
 
-![Figure - Assist Graph](media/assist-graph.excalidraw.png)
+![Figure - Assist Graph](/media/assist-graph.excalidraw.png)
 
-See [`src/se_agent/assist_graph.py`](src/se_agent/assist_graph.py) for implementation details.
+See [`src/se_agent/assist_graph.py`](https://github.com/praneetdhoolia/langgraph-se-agent/blob/main/src/se_agent/assist_graph.py) for implementation details.
 
 We follow a hierarchical approach to localize the issue being discussed in the user conversation to the most relevant files, and then generate a resolution using those files.
 
