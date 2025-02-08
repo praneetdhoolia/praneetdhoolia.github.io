@@ -4,8 +4,6 @@ title: Building a Software Engineering Agent with LangGraph
 date: 2025-02-08
 ---
 
-# Software Engineering Agent as a set of langGraph(s)
-
 First step towards creating a software engineering agent is to understand its role and responsibilities. Here's a rough sketch:
 
 ![Roles and responsibilities](/media/role-responsilities.excalidraw.png)
@@ -13,7 +11,7 @@ First step towards creating a software engineering agent is to understand its ro
 Broadly, we expect a software engineer to develop new features, fix bugs, and deploy. For those tasks the engineer is expected to receive inputs from enterprise internal or external resources. Let's term these: the *digital fabric*.
 
 In this work we implement an agent that may perform these tasks using Large Language Models (LLMs). Emulating the behavior of a human agent, we implement onboarding workflows to let our agent gain fine grain understanding at the level of code files, and a higher-order understanding at the level of packages. We also implement runtime workflows where the agent uses this hierarchical understanding to resolve user issues regarding bugs, enhancements, etc.
-
+---
 ## How to use this repository
 
 ### Clone, install, and run
@@ -63,7 +61,7 @@ In this work we implement an agent that may perform these tasks using Large Lang
 1. Use the onboarding configurations.
 
 2. Chat with the agent!
-
+---
 ## Implementation
 
 Let's now understand the agent workflows!

@@ -18,7 +18,7 @@ In [this previous BLOG]({% link _posts/2024-12-31-expanding-langgraph-retrieval-
 
 Assistant receives the user message and decides the agent to use. The agent node decides the right tool to use, and calls the tool on the MCP server. Since all our agents are based on MCP, a single MCP-Agent node is sufficient for LLM based orchestraion, and another single node is sufficient to work with MCP servers to invoke their tools.
 
-## Our Implementation Walk-through
+## Implementation
 
 There are 3 main parts to our implementation:
 1. Building the Router
