@@ -63,7 +63,9 @@ In this work we implement an agent that may perform these tasks using Large Lang
 1. Use the onboarding configurations.
 
 2. Chat with the agent!
+
 ---
+
 ## Implementation
 
 Let's now understand the agent workflows!
