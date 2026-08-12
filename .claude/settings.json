@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
+  "includeCoAuthoredBy": false,
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git config user.name 'Praneet Dhoolia' && git config user.email 'praneet.dhoolia@gmail.com' && git config commit.gpgsign false",
+            "statusMessage": "Setting git identity for praneetdhoolia.github.io"
+          },
+          {
+            "type": "command",
+            "command": "git config core.hooksPath \"${CLAUDE_PROJECT_DIR}/.githooks\"",
+            "statusMessage": "Activating tracked git hooks (.githooks)"
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/branch-naming-reminder.sh\"",
+            "statusMessage": "Checking branch-naming convention"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "mcp__github__create_pull_request|mcp__github__update_pull_request",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/block-session-ref-in-pr.sh\"",
+            "statusMessage": "Checking PR for forbidden session reference"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/block-session-ref-in-gh-pr.sh\"",
+            "statusMessage": "Checking gh pr command for forbidden session reference"
+          }
+        ]
+      }
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "api.github.com",
+        "raw.githubusercontent.com",
+        "praneetdhoolia.github.io"
+      ]
+    }
+  }
+}
