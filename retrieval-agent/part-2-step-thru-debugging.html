@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Step-thru Debugging your LangGraphs &mdash; Praneet Dhoolia</title>
+<meta name="description" content="Running the LangGraph API server in debug mode and attaching a VS Code debugger to breakpoint inside graph nodes.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/retrieval-agent/part-2-step-thru-debugging.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="home" href="/">Praneet Dhoolia</a>
+    <nav>
+      <a href="/">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="post-header">
+    <p class="eyebrow"><a href="/retrieval-agent/">Building a Retrieval Agent with LangGraph</a> &middot; Part 2 of 5</p>
+    <h1>Step-thru Debugging your LangGraphs</h1>
+    <p class="date"><time datetime="2025-01-01">January 1, 2025</time></p>
+  </div>
+
+  <article class="post-body">
+    <p>Most of the details required are already covered in langgraph tutorial here: https://langchain-ai.github.io/langgraph/tutorials/langgraph-platform/local-server/</p>
+    <p><em>Key points covered there are:</em></p>
+    <ol>
+    <li>Install LangGraph CLI<pre><code class="language-bash">pip install --upgrade &quot;langgraph-cli[inmem]&quot;
+</code></pre>
+    </li>
+    <li>Install the dependencies<pre><code class="language-bash">pip install -e .
+</code></pre>
+    </li>
+    <li>Use the CLI to run langGraph server<pre><code class="language-bash">langgraph dev
+</code></pre>
+    </li>
+    <li>You may now use LangGraph Studio Web UI at: <a href="https://smith.langchain.com/studio/?baseUrl=http://locahost:2024">https://smith.langchain.com/studio/?baseUrl=http://locahost:2024</a></li>
+    </ol>
+    <p><em>Here are the additions to enable step-thru-debugging:</em></p>
+    <ol>
+    <li>
+    <p>Install debugpy in your virtual environment for the langgraph project</p>
+    <pre><code class="language-bash">pip install debugpy
+</code></pre>
+    </li>
+    <li>
+    <p>Start langgraph API server in debug mode. In the following we are telling langgraph-cli to allow clients to listen on Port 2025 for debugger events</p>
+    <pre><code class="language-bash">langgraph dev --debug-port 2025
+</code></pre>
+    </li>
+    <li>
+    <p>Attach to debugger from your IDE. E.g., in here's my VS Code launch config:</p>
+    <pre><code class="language-json">{
+    &quot;version&quot;: &quot;0.2.0&quot;,
+    &quot;configurations&quot;: [
+
+        {
+            &quot;name&quot;: &quot;Python Debugger: Remote Attach&quot;,
+            &quot;type&quot;: &quot;debugpy&quot;,
+            &quot;request&quot;: &quot;attach&quot;,
+            &quot;connect&quot;: {
+                &quot;host&quot;: &quot;localhost&quot;,
+                &quot;port&quot;: 2025
+            },
+            &quot;pathMappings&quot;: [
+                {
+                    &quot;localRoot&quot;: &quot;${workspaceFolder}&quot;,
+                    &quot;remoteRoot&quot;: &quot;.&quot;
+                }
+            ],
+            &quot;justMyCode&quot;: false
+        }
+    ]
+}
+</code></pre>
+    </li>
+    <li>
+    <p>I can now put a breakpoint on any of my langgraph code files and step-thru the execution!</p>
+    </li>
+    </ol>
+  </article>
+
+  <nav class="pager">
+    <a class="prev" href="/retrieval-agent/part-1-expanding-the-template.html"><span class="dir">&larr; Part 1</span><span class="ttl">Expanding the LangGraph Retrieval Agent</span></a>
+    <a class="next" href="/retrieval-agent/part-3-deploying-to-langgraph-cloud.html"><span class="dir">Part 3 &rarr;</span><span class="ttl">Deploying to LangGraph Cloud</span></a>
+  </nav>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+</body>
+</html>

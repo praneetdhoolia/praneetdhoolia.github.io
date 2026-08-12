@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Expanding the LangGraph Retrieval Agent &mdash; Praneet Dhoolia</title>
+<meta name="description" content="Starting from LangGraph's RAG template and extending it with multi-hop crawling and a Milvus retriever.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/retrieval-agent/part-1-expanding-the-template.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="home" href="/">Praneet Dhoolia</a>
+    <nav>
+      <a href="/">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="post-header">
+    <p class="eyebrow"><a href="/retrieval-agent/">Building a Retrieval Agent with LangGraph</a> &middot; Part 1 of 5</p>
+    <h1>Expanding the LangGraph Retrieval Agent</h1>
+    <p class="date"><time datetime="2024-12-31">December 31, 2024</time></p>
+  </div>
+
+  <article class="post-body">
+    <h2>Motivation</h2>
+    <p>As a developer I want to get a feel of what it is like to create an AI solution using langgraph for a well known usecase of QA based on website content.
+    I want to explore the following:</p>
+    <ol>
+    <li>Jump start the solution (e.g., using ready solution templates)</li>
+    <li>Extending the solution</li>
+    <li>Debugging the solution</li>
+    <li>And finally deploying the solution in cloud</li>
+    </ol>
+    <p>Langgraph had a ready template for Retrieval Augmented Generation (RAG) solutions. So I started with that and extended it for my specific requirements:</p>
+    <ol>
+    <li><strong>Crawl</strong> from <strong>starter_urls</strong> list within a certain number of <strong>hops</strong> to build vector index</li>
+    <li>Use open source vector DB - Milvus as a retriever</li>
+    </ol>
+    <p>Here's a snapshot of how I modified the template solution.</p>
+    <p><img src="/media/index_graph_enh.png" alt="Enhanced configurations LangGraph studio UI" /></p>
+    <h2>Process</h2>
+    <h3>Create a new project using langGraph's retrieval agent template</h3>
+    <p>Install the LangGraph CLI</p>
+    <pre><code class="language-bash">pip install langgraph-cli --upgrade
+</code></pre>
+    <p>Create a new app from a template</p>
+    <pre><code class="language-bash">langgraph new
+</code></pre>
+    <p><img src="/media/create-app-langgraph-template.png" alt="Create new langraph app using retrieval agent template" /></p>
+    <h3>Enhance the configurations</h3>
+    <p>Add <strong>starter_urls</strong>, and <strong>hops</strong> to <code>IndexConfiguration</code> in <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/src/retrieval_graph/configuration.py"><code>configuration.py</code></a>. Let's also add a method to get the list of urls from the comma-separated <code>starter_urls</code> string.</p>
+    <pre><code class="language-python">    starter_urls: str = field(
+        default=&quot;https://zohlar.com&quot;,
+        metadata={
+            &quot;description&quot;: &quot;Comma-separated string of starter URLs to crawl for indexing web pages.&quot;
+        },
+    )
+
+    hops: int = field(
+        default=2,
+        metadata={
+            &quot;description&quot;: &quot;Maximum number of hops to traverse pages linked to the starter URLs.&quot;
+        },
+    )
+
+    def parse_starter_urls(self) -&gt; list[str]:
+        &quot;&quot;&quot;Parse the starter URLs into a list.
+
+        Returns:
+            list[str]: A list of URLs parsed from the comma-separated string.
+        &quot;&quot;&quot;
+        return [url.strip() for url in self.starter_urls.split(&quot;,&quot;) if url.strip()]
+</code></pre>
+    <p>Let's also add <code>milvus</code> to <code>retriever_provider</code> list</p>
+    <pre><code class="language-python">    retriever_provider: Annotated[
+        Literal[&quot;elastic&quot;, &quot;elastic-local&quot;, &quot;pinecone&quot;, &quot;mongodb&quot;, &quot;milvus&quot;],
+        {&quot;__template_metadata__&quot;: {&quot;kind&quot;: &quot;retriever&quot;}},
+    ] = field(
+        default=&quot;milvus&quot;,
+        metadata={
+            &quot;description&quot;: &quot;The vector store provider to use for retrieval. Options are 'elastic', 'pinecone', 'mongodb', or, 'milvus'.&quot;
+        },
+    )
+</code></pre>
+    <h3>Enhance to add Milvus (lite) retriever</h3>
+    <h4>Dependencies</h4>
+    <p>Let's begin by adding <code>langchain-milvus</code> as a dependency in <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/pyproject.toml"><code>pyproject.toml</code></a></p>
+    <h4>Retriever</h4>
+    <p>Let's add a new method to create a milvus retriever in <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/src/retrieval_graph/retrieval.py"><code>retrieval.py</code></a></p>
+    <pre><code class="language-python">@contextmanager
+def make_milvus_retriever(
+    configuration: IndexConfiguration, embedding_model: Embeddings
+) -&gt; Generator[VectorStoreRetriever, None, None]:
+    &quot;&quot;&quot;Configure this agent to use milvus lite file based uri to store the vector index.&quot;&quot;&quot;
+    from langchain_milvus.vectorstores import Milvus
+
+    vstore = Milvus (
+        embedding_function=embedding_model,
+        collection_name=configuration.user_id,
+        connection_args={&quot;uri&quot;: os.environ[&quot;MILVUS_DB&quot;]},
+        auto_id=True
+    )
+    yield vstore.as_retriever(search_kwargs=configuration.search_kwargs)
+</code></pre>
+    <p>and then use this in the factory method</p>
+    <pre><code class="language-python">@contextmanager
+def make_retriever(
+    config: RunnableConfig,
+) -&gt; Generator[VectorStoreRetriever, None, None]:
+    # ... same code as before
+
+    match configuration.retriever_provider:
+        # ... same code as before
+        case &quot;milvus&quot;:
+            with make_milvus_retriever(configuration, embedding_model) as retriever:
+                yield retriever
+
+        case _:
+            # ... as before
+</code></pre>
+    <h4>.env</h4>
+    <p>For milvus lite we'll use the following file uri to store the vector index:</p>
+    <pre><code class="language-bash">## Milvus
+MILVUS_DB=milvus.db
+</code></pre>
+    <h5>Windows</h5>
+    <p><strong>Note:</strong> While Milvus Lite (file based URI) worked fine on MacOS, it didn't work on Windows :(.
+    Here's how I worked around that for windows:</p>
+    <ol>
+    <li>Installed <a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a>.</li>
+    <li>My windows machine has Nvidia GPU, therefore, I downloaded the <a href="https://github.com/milvus-io/milvus/blob/master/deployments/docker/gpu/standalone/docker-compose.yml">milvus-io/milvus/deployments/docker/gpu/standalone/docker-compose.yml</a>. As an alternative one may use the <a href="https://github.com/milvus-io/milvus/blob/master/deployments/docker/standalone/docker-compose.yml">standalone/docker-compose.yml (without GPI)</a>.</li>
+    <li>Run <code>docker compose up -d</code> to downloaded all the required images and start the container. This starts <code>milvus standalone</code> along with its dependencies <code>etcd</code> and <code>minio</code>. From this point on I used the docker destop to check logs, or stop / restart milvus as I needed.</li>
+    </ol>
+    <p>In this case we'll set the following milvus standalone URI:</p>
+    <pre><code class="language-bash">MILVUS_DB=http://localhost:19530
+</code></pre>
+    <h3>Enhance index_graph</h3>
+    <p>Out of the box implementation of <code>index_graph</code> (in <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/src/retrieval_graph/index_graph.py">index_graph.py</a>) expects as input all the documents to be indexed. Since we are enhancing the graph to include an ingestion pipeline that crawls starting at the specified URL, we'll modify the <code>index_docs</code> node to kick start the crawl if docs list in the state is empty and <code>starter_urls</code> configuration has been provided.</p>
+    <pre><code class="language-python">async def index_docs(
+    state: IndexState, *, config: Optional[RunnableConfig] = None
+) -&gt; dict[str, str]:
+    # ... as before
+    with retrieval.make_retriever(config) as retriever:
+        # code to kick start crawl if required
+        configuration = IndexConfiguration.from_runnable_config(config)
+        if not state.docs and configuration.starter_urls:
+            print(f&quot;starting crawl ...&quot;)
+            state.docs = await crawl (configuration)
+        # rest remains the same as before
+        stamped_docs = ensure_docs_have_user_id(state.docs, config)
+        if configuration.retriever_provider == &quot;milvus&quot;:
+            retriever.add_documents(stamped_docs)
+        else:
+            await retriever.aadd_documents(stamped_docs)
+    return {&quot;docs&quot;: &quot;delete&quot;}
+</code></pre>
+    <p>Add the following functions that wrap around the new <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/src/retrieval_graph/crawler.py"><code>Crawler component</code></a></p>
+    <pre><code class="language-python">async def crawl(configuration: IndexConfiguration):
+    tenant = configuration.user_id
+    starter_urls = configuration.parse_starter_urls()
+    hops = configuration.hops
+    allowed_domains = set(urlparse(url).netloc for url in starter_urls)
+    crawler = WebCrawler(starter_urls, hops, allowed_domains, tenant)
+    await crawler.crawl()
+    return [
+        Document(page_content=get_file_content(page[&quot;local_filepath&quot;]), metadata={&quot;url&quot;: page[&quot;url&quot;]})
+        for page in crawler.crawled_pages
+    ]
+
+def get_file_content(file_path: str) -&gt; str:
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return file.read()
+</code></pre>
+    <h4>Dependencies</h4>
+    <p>The <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/src/retrieval_graph/crawler.py"><code>Crawler component</code></a> uses <a href="https://playwright.dev/python/"><code>playwright</code></a>, which uses headless browsers. Let's add <code>playwright</code> &amp; <code>requests</code> as dependencies in <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/pyproject.toml"><code>pyproject.toml</code></a>.</p>
+    <p>Just adding <code>playwright</code> package to the python environment is not sufficient. The headless browser, and its dependencies also need to be installed. So we need to run <code>playright install</code>, and <code>playwright install-deps</code> as well.</p>
+    <p><strong>Note:</strong> You may use LangGraph Studio app on mac, using docker to locally deploy your graphs. In this case <code>playwright install</code> and <code>playwright install-deps</code> need to happen in the docker. For that we'll add the following to <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/langgraph.json"><code>langgraph.json</code></a></p>
+    <pre><code class="language-json">&quot;dockerfile_lines&quot;: [&quot;RUN pip install playwright&quot;, &quot;RUN python -m playwright install&quot;, &quot;RUN python -m playwright install-deps&quot;],
+</code></pre>
+    <h4>Windows issues with playwright</h4>
+    <p>While my <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/src/retrieval_graph/crawler.py"><code>Crawler component</code></a> worked well on MacOS, Playwright event loop on windows doesn't play well with asyncio event loop used by LangGraph. I wasn't able to resolve playwright issues on Windows. On windows, LangGraph Studio app is not available as well, so instead of docker, I was using <code>langgraph-cli</code> for local deployment of langgraph api.</p>
+    <p>I added an <strong>APIfy</strong> based crawl to <code>index_graph.py</code>. Here are the enhancements:</p>
+    <pre><code class="language-python"># new imports
+import json
+
+from langchain_community.utilities import ApifyWrapper
+
+# ... existing code
+
+def apify_crawl(configuration: IndexConfiguration):
+    tenant = configuration.user_id
+    starter_urls = [{&quot;url&quot;: url} for url in configuration.parse_starter_urls()]
+    hops = configuration.hops
+    apify = ApifyWrapper()
+    loader = apify.call_actor(
+        actor_id=&quot;apify/website-content-crawler&quot;,
+        run_input={
+            &quot;startUrls&quot;: starter_urls,
+            &quot;saveHtml&quot;: True,
+            &quot;htmlTransformer&quot;: &quot;none&quot;
+        },
+        dataset_mapping_function=lambda item: Document(
+            page_content=item[&quot;html&quot;] or &quot;&quot;, metadata={&quot;url&quot;: item[&quot;url&quot;]}
+        ),
+    )
+    print(f&quot;Site: {tenant} crawled and loaded into Apify dataset: {loader.dataset_id}&quot;)
+
+    return loader.load()
+
+# ... existing code
+
+async def index_docs(
+    state: IndexState, *, config: Optional[RunnableConfig] = None
+) -&gt; dict[str, str]:
+    # ... as before
+    with retrieval.make_retriever(config) as retriever:
+        # code to kick start crawl if required
+        configuration = IndexConfiguration.from_runnable_config(config)
+        if not state.docs and configuration.starter_urls:
+            print(f&quot;starting crawl ...&quot;)
+            state.docs = apify_crawl (configuration)
+        # rest remains the same as before
+        stamped_docs = ensure_docs_have_user_id(state.docs, config)
+        if configuration.retriever_provider == &quot;milvus&quot;:
+            retriever.add_documents(stamped_docs)
+        else:
+            await retriever.aadd_documents(stamped_docs)
+    return {&quot;docs&quot;: &quot;delete&quot;}
+
+# ... existing code
+
+</code></pre>
+    <p>I changed default values for parameters <code>saveHtml</code>, and <code>htmlTransformer</code> because, OpenAI embedding models understand HTML very well, and the clean up performed by html transformer loses some useful information.</p>
+    <h4>Index State</h4>
+    <p>The <code>index_docs</code> node (in <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/src/retrieval_graph/index_graph.py">index_graph.py</a>) takes <code>IndexState</code> (in <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/src/retrieval_graph/state.py">state.py</a>) as input. Let's add the following logic in the reducer function (<code>reduce_docs</code>) to empower the user to ask for crawl.</p>
+    <pre><code class="language-python">def reduce_docs(
+    existing: Optional[Sequence[Document]],
+    new: Union[
+        Sequence[Document],
+        Sequence[dict[str, Any]],
+        Sequence[str],
+        str,
+        Literal[&quot;delete&quot;],
+    ],
+) -&gt; Sequence[Document]:
+    if new == &quot;crawl&quot;
+        return []
+    # rest if as before
+</code></pre>
+    <p>With this enhancement, the user may just set <code>docs</code> to <code>&quot;crawl&quot;</code> as follows:
+    <img src="/media/trigger_crawl.png" alt="User triggers crawl" /></p>
+  </article>
+
+  <nav class="pager">
+    <a class="next" href="/retrieval-agent/part-2-step-thru-debugging.html"><span class="dir">Part 2 &rarr;</span><span class="ttl">Step-thru Debugging your LangGraphs</span></a>
+  </nav>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+</body>
+</html>

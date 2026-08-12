@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building a Universal Assistant with LangGraph and MCP &mdash; Praneet Dhoolia</title>
+<meta name="description" content="A router, an MCP-agent node and a tool-invocation node — one assistant that reaches any capability that speaks Model Context Protocol.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/universal-assistant-langgraph-mcp.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="home" href="/">Praneet Dhoolia</a>
+    <nav>
+      <a href="/">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="post-header">
+    <p class="eyebrow">MCP</p>
+    <h1>Building a Universal Assistant with LangGraph and MCP</h1>
+    <p class="date"><time datetime="2025-01-20">January 20, 2025</time></p>
+  </div>
+
+  <article class="post-body">
+    <p>My brother (a UQ alumni) started this project on combining LangGraph with Anthropic's standardization effort: Model Context Protocol (MCP), to build a <em>universal assistant</em>. It was fun to contribute to it! This blog is a summary of <a href="https://github.com/esxr/langgraph-mcp">that project</a>.</p>
+    <hr />
+    <p><a href="https://modelcontextprotocol.io/introduction">MCP</a> is an open protocol that enables seamless integration between LLM applications and external data sources and tools. Whether you're building an AI-powered IDE, enhancing a chat interface, or creating custom AI workflows, MCP provides a standardized way to connect LLMs with the context they need. Think of MCP like a USB-C port for AI applications. Just as USB-C provides a standardized way to connect your devices to various peripherals and accessories, MCP provides a standardized way to connect AI models to different data sources and tools.</p>
+    <p><a href="https://langchain-ai.github.io/langgraph/">LangGraph</a> is a framework designed to enable seamless integration of language models into complex workflows and applications. It emphasizes modularity and flexibility. Workflows are represented as graphs. Nodes correspond to actions, tools, or model queries. Edges define the flow of information between them. LangGraph provides a structured yet dynamic way to execute tasks, making it ideal for writing AI applications involving natural language understanding, automation, and decision-making.</p>
+    <p>In <a href="/retrieval-agent/part-1-expanding-the-template.html">this previous BLOG</a> I enhanced LangGraph's retrieval agent template to develop and deploy an AI solution. We start with that enhanced template and build a universal assistant combining it with MCP. We follow a multi-agent flow.</p>
+    <p><img src="/media/assistant-flow.excalidraw.png" alt="Basic assistant flow" /></p>
+    <p>Assistant receives the user message and decides the agent to use. The agent node decides the right tool to use, and calls the tool on the MCP server. Since all our agents are based on MCP, a single MCP-Agent node is sufficient for LLM based orchestraion, and another single node is sufficient to work with MCP servers to invoke their tools.</p>
+    <h2>Implementation</h2>
+    <p>There are 3 main parts to our implementation:</p>
+    <ol>
+    <li>Building the Router</li>
+    <li>The Assistant</li>
+    <li>A generic MCP wrapper</li>
+    </ol>
+    <h3>Building the Router</h3>
+    <p>Our graph to build the router is implemented in <a href="https://github.com/esxr/langgraph-mcp/blob/main/src/langgraph_mcp/build_router_graph.py"><code>build_router_graph.py</code></a>. It collects routing information based on tools, prompts, and resources offered by each MCP server using our <a href="https://github.com/esxr/langgraph-mcp/blob/main/src/langgraph_mcp/mcp_wrapper.py"><code>mcp_wrapper.py</code></a>. It indexes this routing information for each server in a vector database.</p>
+    <!--
+    ```mermaid
+    sequenceDiagram
+      participant G as Build-Router<br/>Graph
+      participant MW as MCP Wrapper
+      participant MS as MCP Servers
+      participant V as Vector Index
+
+      loop for all mcp-servers in config
+      G ->> MW: Get Routing Information (server-config)
+      MW ->> MS: list_tools
+      MS --) MW: tools
+      MW ->> MS: list_resources
+      MS --) MW: resources
+      MW ->> MS: list_prompts
+      MS --) MW: prompts
+      MW --) G: routing_information 𝒇(tools, resources, prompts)
+      end
+      G ->> V: Build Vector Index (list(Document(page_content=routing_information, metadata{id: mcp_server_name})))
+    ```
+    -->
+    <p><img src="/media/build-router-sequence.excalidraw.png" alt="Build Router Sequence Diagram" /></p>
+    <h3>The Assistant</h3>
+    <p>The assistant graph is implemented in <a href="https://github.com/esxr/langgraph-mcp/blob/main/src/langgraph_mcp/assistant_graph.py"><code>assistant_graph.py</code></a>. The following animation describes the role of various nodes and the flow of control thru it, with the help of an example</p>
+    <p><img src="/media/langgraph-assistant-mcp.gif" alt="Assistant workflow explained with example" /></p>
+    <h3>A Generic MCP Wrapper</h3>
+    <p><a href="https://github.com/esxr/langgraph-mcp/blob/main/src/langgraph_mcp/mcp_wrapper.py"><code>mcp_wrapper.py</code></a> employs a Strategy Pattern using an abstract base class (<code>MCPSessionFunction</code>) to define a common interface for executing various operations on MCP servers. The pattern includes:</p>
+    <ol>
+    <li>Abstract Interface:
+    <ul>
+    <li><code>MCPSessionFunction</code> defines an async <code>__call__</code> method as a contract for all session functions.</li>
+    </ul>
+    </li>
+    <li>Concrete Implementations:
+    <ul>
+    <li><code>RoutingDescription</code> class implements fetching routing information based on tools, prompts, and resources.</li>
+    <li><code>GetTools</code> class implements fetching tools for the MCP server and transforming them to the format consumable by LangGraph.</li>
+    <li><code>RunTool</code> class implements invoking a tool on MCP server and returning its output.</li>
+    </ul>
+    </li>
+    <li>Processor Function:
+    <ul>
+    <li><code>apply</code> serves as a unified executor. It:</li>
+    <li>Initializes a session using <code>stdio_client</code> from <code>mcp</code> library.</li>
+    <li>Delegates the actual operation to the provided <code>MCPSessionFunction</code> instance via <code>await fn(server_name, session)</code>.</li>
+    </ul>
+    </li>
+    <li>Extensibility:
+    <ul>
+    <li>New operations can be added by subclassing <code>MCPSessionFunction</code> without modifying the cor    e processor logic. for e.g. we should be able to add support for getting tools and executing tools using this pattern.</li>
+    </ul>
+    </li>
+    </ol>
+    <h2>Setting it up</h2>
+    <ol>
+    <li>
+    <p>Create and activate a virtual environment</p>
+    <pre><code class="language-bash">git clone https://github.com/esxr/langgraph-mcp.git
+cd langgraph-mcp
+python3 -m venv .venv
+source .venv/bin/activate
+</code></pre>
+    </li>
+    <li>
+    <p>Install Langgraph CLI</p>
+    <pre><code class="language-bash">pip install -U &quot;langgraph-cli[inmem]&quot;
+</code></pre>
+    <p>Note: &quot;inmem&quot; extra(s) are needed to run LangGraph API server in development mode (without requiring Docker installation)</p>
+    </li>
+    <li>
+    <p>Install the dependencies</p>
+    <pre><code class="language-bash">pip install -e .
+</code></pre>
+    </li>
+    <li>
+    <p>Configure environment variables</p>
+    <pre><code class="language-bash">cp env.example .env
+</code></pre>
+    <p>Add your <code>OPENAI_API_KEY</code>, <code>GITHUB_PERSONAL_ACCESS_TOKEN</code> etc. to the <code>.env</code></p>
+    <p><strong>Note</strong>: We have added support for <em>Milvus Lite Retriever</em> (support file based URI). Milvus Lite won't work on Windows. For Windows you may need to use Milvus Server (Easy to start using Docker), and change the <code>MILVUS_DB</code> config to the server based URI. You may also enhance the <a href="https://github.com/esxr/langgraph-mcp/blob/main/src/langgraph_mcp/retriever.py">retriever.py</a> to add retrievers for your choice of vector databases!</p>
+    </li>
+    </ol>
+    <h2>A Demonstration!</h2>
+    <p>Here's an end to end video!</p>
+    <iframe src="https://www.youtube.com/embed/y6MG-aZqmFw" frameborder="0" allow="autoplay; encrypted-media" style="width: 100%; aspect-ratio: 16 / 9;" allowfullscreen></iframe>
+  </article>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+</body>
+</html>

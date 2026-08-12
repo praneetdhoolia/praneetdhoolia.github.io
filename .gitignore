@@ -12,3 +12,6 @@ vendor/
 
 # Node (only if a build step is added later)
 node_modules/
+
+# Browser-tooling scratch output (Playwright MCP screenshots, console logs)
+.playwright-mcp/

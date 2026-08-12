@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adding a Chat Client to a LangGraph Assistant &mdash; Praneet Dhoolia</title>
+<meta name="description" content="Pointing an assistant-ui chat client at the deployed graph.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/retrieval-agent/part-4-adding-a-chat-client.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="home" href="/">Praneet Dhoolia</a>
+    <nav>
+      <a href="/">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="post-header">
+    <p class="eyebrow"><a href="/retrieval-agent/">Building a Retrieval Agent with LangGraph</a> &middot; Part 4 of 5</p>
+    <h1>Adding a Chat Client to a LangGraph Assistant</h1>
+    <p class="date"><time datetime="2025-01-08">January 8, 2025</time></p>
+  </div>
+
+  <article class="post-body">
+    <p><a href="/retrieval-agent/part-3-deploying-to-langgraph-cloud.html">Previously</a>, I deployed an enhanced retrieval template to langgraph cloud. Now, I want to point a chat client to it using <a href="https://www.assistant-ui.com/"><strong>assistant-ui</strong></a>.</p>
+    <p>The following are required before deploying the chat client:</p>
+    <ol>
+    <li>An existing <a href="https://nodejs.org/en/download">node.js installation</a>.</li>
+    <li>An active deployment on the <a href="https://langchain-ai.github.io/langgraph/cloud/quick_start/">LangGraph Cloud API Server</a>.
+    Assistant UI can be also be installed in an existing React Project, as covered in the <a href="https://www.assistant-ui.com/docs/runtimes/langgraph">assistant-ui langgraph cloud docs</a>.</li>
+    </ol>
+    <p>To create a new chat client, I'll follow these steps:</p>
+    <ol>
+    <li>
+    <p>Ensure <code>npx</code> is installed.</p>
+    <pre><code class="language-bash">npm install -g npx
+</code></pre>
+    </li>
+    <li>
+    <p>Create a new project based on the LangGraph assistant-ui template</p>
+    <pre><code class="language-bash">npx create-assistant-ui@latest -t langgraph my-app
+</code></pre>
+    </li>
+    <li>
+    <p>Create a new assistant for your graph on LangSmith using LangGraph Studio or the API Docs.</p>
+    <p><img src="/media/create-assistant.png" alt="Create a new assistant" /></p>
+    </li>
+    <li>
+    <p>Create an <code>.env.local</code> file in your project with the following variables:</p>
+    <pre><code class="language-bash">LANGCHAIN_API_KEY=your_api_key
+LANGGRAPH_API_URL=your_api_url
+NEXT_PUBLIC_LANGGRAPH_ASSISTANT_ID=your_assistant_id
+</code></pre>
+    </li>
+    <li>
+    <p>Ensure the LangChain API Key is also present in your <a href="https://smith.langchain.com/settings/workspaces/apikeys">LangSmith API Keys</a> to allow access to your deployments.</p>
+    </li>
+    <li>
+    <p>Navigate to the <code>assistant-ui</code> project root folder and start the node.js server.</p>
+    <pre><code class="language-bash">npm run dev
+</code></pre>
+    </li>
+    <li>
+    <p>You can now use the Chat Client using the server's port! (https://localhost:3000 in my case)</p>
+    <p><img src="/media/assistant-demo.gif" alt="Assistant Demo" /></p>
+    </li>
+    </ol>
+  </article>
+
+  <nav class="pager">
+    <a class="prev" href="/retrieval-agent/part-3-deploying-to-langgraph-cloud.html"><span class="dir">&larr; Part 3</span><span class="ttl">Deploying to LangGraph Cloud</span></a>
+    <a class="next" href="/retrieval-agent/part-5-improvements.html"><span class="dir">Part 5 &rarr;</span><span class="ttl">Improvements to the Retrieval Agent</span></a>
+  </nav>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+</body>
+</html>

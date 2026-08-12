@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Praneet Dhoolia</title>
+<meta name="description" content="Working notes on building agents with LangGraph and MCP — retrieval agents, universal assistants, and software engineering agents.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<main class="wrap">
+
+  <header class="masthead">
+    <p class="kicker">Praneet Dhoolia</p>
+    <h1>Notes on building agents</h1>
+    <p class="standfirst">Working notes from building retrieval agents, MCP-based assistants and
+      software engineering agents with LangGraph — written while figuring them out.</p>
+    <p class="links">
+      <a href="/about/">About</a>
+      <a href="https://github.com/praneetdhoolia">GitHub</a>
+      <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a>
+      <a href="/docs/Profile.pdf">CV</a>
+    </p>
+  </header>
+
+  <ol class="notes">
+
+    <li class="note">
+      <p class="meta"><span class="tag">Agent Design</span><span>February 8, 2025</span></p>
+      <h2><a href="/software-engineering-agent-langgraph.html">Building a Software Engineering Agent with LangGraph</a></h2>
+      <p class="summary">Sending a whole codebase with every request does not scale. This agent
+        onboards a repository the way a new engineer would — summarising every file in parallel,
+        then every package — and then uses that hierarchy like a table of contents: consult the
+        outline, open only the chapters that matter, resolve the issue there.</p>
+    </li>
+
+    <li class="note">
+      <p class="meta"><span class="tag">MCP</span><span>January 20, 2025</span></p>
+      <h2><a href="/universal-assistant-langgraph-mcp.html">Building a Universal Assistant with LangGraph and MCP</a></h2>
+      <p class="summary">Once every capability speaks Model Context Protocol, you stop writing a
+        bespoke graph node per integration — one router, one MCP-agent node and one
+        tool-invocation node are enough. A summary of the langgraph-mcp project.</p>
+    </li>
+
+    <li class="note">
+      <p class="meta"><span class="tag series">Series &middot; 5 parts</span><span>December 2024 &ndash; January 2025</span></p>
+      <h2><a href="/retrieval-agent/">Building a Retrieval Agent with LangGraph</a></h2>
+      <p class="summary">Five parts taking LangGraph's RAG template all the way to a deployed,
+        chat-facing assistant: crawling sites into a Milvus index, step-thru debugging the graph,
+        shipping it to LangGraph Cloud, wiring up a chat client, and then fixing what real use
+        exposed.</p>
+      <ul class="parts">
+        <li>
+          <span class="pn">Part 1</span>
+          <a href="/retrieval-agent/part-1-expanding-the-template.html">Expanding the LangGraph Retrieval Agent</a>
+        </li>
+        <li>
+          <span class="pn">Part 2</span>
+          <a href="/retrieval-agent/part-2-step-thru-debugging.html">Step-thru Debugging your LangGraphs</a>
+        </li>
+        <li>
+          <span class="pn">Part 3</span>
+          <a href="/retrieval-agent/part-3-deploying-to-langgraph-cloud.html">Deploying to LangGraph Cloud</a>
+        </li>
+        <li>
+          <span class="pn">Part 4</span>
+          <a href="/retrieval-agent/part-4-adding-a-chat-client.html">Adding a Chat Client to a LangGraph Assistant</a>
+        </li>
+        <li>
+          <span class="pn">Part 5</span>
+          <a href="/retrieval-agent/part-5-improvements.html">Improvements to the Retrieval Agent</a>
+        </li>
+      </ul>
+    </li>
+
+  </ol>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+</body>
+</html>
