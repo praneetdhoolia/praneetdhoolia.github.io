@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building a Software Engineering Agent with LangGraph &mdash; Praneet Dhoolia</title>
+<meta name="description" content="An agent that onboards a repository the way a new engineer does, then uses that hierarchy to localise and resolve issues.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/software-engineering-agent-langgraph.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="home" href="/">Praneet Dhoolia</a>
+    <nav>
+      <a href="/">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="post-header">
+    <p class="eyebrow">Agent Design</p>
+    <h1>Building a Software Engineering Agent with LangGraph</h1>
+    <p class="date"><time datetime="2025-02-08">February 8, 2025</time></p>
+  </div>
+
+  <article class="post-body">
+    <p>First step towards creating a software engineering agent is to understand its role and responsibilities. Here's a rough sketch:</p>
+    <p><img src="/media/role-responsilities.excalidraw.png" alt="Roles and responsibilities" /></p>
+    <p>Broadly, we expect a software engineer to develop new features, fix bugs, and deploy. For those tasks the engineer is expected to receive inputs from enterprise internal or external resources. Let's term these: the <em>digital fabric</em>.</p>
+    <p>In this work we implement an agent that may perform these tasks using Large Language Models (LLMs). Emulating the behavior of a human agent, we implement onboarding workflows to let our agent gain fine grain understanding at the level of code files, and a higher-order understanding at the level of packages. We also implement runtime workflows where the agent uses this hierarchical understanding to resolve user issues regarding bugs, enhancements, etc.</p>
+    <hr />
+    <h2>How to use this repository</h2>
+    <h3>Clone, install, and run</h3>
+    <ol>
+    <li>
+    <p>Create and activate a virtual environment</p>
+    <pre><code class="language-bash">git clone https://github.com/praneetdhoolia/langgraph-se-agent.git
+cd langgraph-se-agent
+python3 -m venv .venv
+source .venv/bin/activate
+</code></pre>
+    </li>
+    <li>
+    <p>Install Langgraph CLI</p>
+    <pre><code class="language-bash">pip install -U &quot;langgraph-cli[inmem]&quot;
+</code></pre>
+    <p>Note: &quot;inmem&quot; extra(s) are needed to run LangGraph API server in development mode (without requiring Docker installation)</p>
+    </li>
+    <li>
+    <p>Install the dependencies</p>
+    <pre><code class="language-bash">pip install -e .
+</code></pre>
+    </li>
+    <li>
+    <p>Configure environment variables</p>
+    <pre><code class="language-bash">cp example.env .env
+</code></pre>
+    <p>and edit <code>.env</code></p>
+    </li>
+    <li>
+    <p>Run</p>
+    <pre><code class="language-bash">langgraph dev
+</code></pre>
+    </li>
+    </ol>
+    <h3>Onboard the Agent on GitHub Repository</h3>
+    <ol>
+    <li>Specify the following configurations:</li>
+    </ol>
+    <ul>
+    <li><em>Repository URL</em>: E.g., <code>https://github.com/&lt;owner&gt;/&lt;repo&gt;</code></li>
+    <li><em>Source Path</em>: E.g., <code>src/java/main/com/module</code></li>
+    <li><em>GitHub Access Token</em>: Should have at least <em>read</em> access to the repository.</li>
+    <li><em>Prompts and Models</em>: Defaults provided. May be overriden.</li>
+    </ul>
+    <ol start="2">
+    <li>Run the Onboard-Graph.</li>
+    </ol>
+    <h3>Use the Agent</h3>
+    <ol>
+    <li>
+    <p>Use the onboarding configurations.</p>
+    </li>
+    <li>
+    <p>Chat with the agent!</p>
+    </li>
+    </ol>
+    <hr />
+    <h2>Implementation</h2>
+    <p>Let's now understand the agent workflows!</p>
+    <h3>Onboarding Workflow</h3>
+    <p><img src="/media/onboard-graph.excalidraw.png" alt="Figure - Onboarding Graph" /></p>
+    <p>See <a href="https://github.com/praneetdhoolia/langgraph-se-agent/blob/main/src/se_agent/onboard_graph.py"><code>src/se_agent/onboard_graph.py</code></a> for implementation details.</p>
+    <p>One aspect of the implementation worth highlighting is that we generate semantic undertanding for code files in <strong>parallel</strong>. E.g., if a repository has 1000 files. We make 1000 parallel LLM calls for semantic summary generation, effectively completing it in a single call's time. This saves a significant amount of time.</p>
+    <pre><code class="language-python">from langgraph.types import Send
+
+# ...
+
+def continue_to_save_file_summaries(state: OnboardState, *, config: RunnableConfig):
+    &quot;&quot;&quot; Maps out over the filepaths, returning a list of `Send` objects. Each `Send`
+    object includes target node name and the state to send to that node.
+    &quot;&quot;&quot;
+    return [
+        Send(&quot;generate_file_summary&quot;, FilepathState(filepath=filepath))
+        for filepath in state.filepaths
+    ]
+
+# ...
+
+# Conditional edge from get_filepaths node that parallel forks
+builder.add_conditional_edges(&quot;get_filepaths&quot;, continue_to_save_file_summaries, [&quot;generate_file_summary&quot;])
+
+# ...
+</code></pre>
+    <p>Similarly we generate semantic understanding for higher order packages also in parallel.</p>
+    <h3>Assist Workflow</h3>
+    <p><img src="/media/assist-graph.excalidraw.png" alt="Figure - Assist Graph" /></p>
+    <p>See <a href="https://github.com/praneetdhoolia/langgraph-se-agent/blob/main/src/se_agent/assist_graph.py"><code>src/se_agent/assist_graph.py</code></a> for implementation details.</p>
+    <p>We follow a hierarchical approach to localize the issue being discussed in the user conversation to the most relevant files, and then generate a resolution using those files.</p>
+    <p><strong>Why do we use Hierarchical approach?</strong></p>
+    <ol>
+    <li>
+    <p>Sending the whole code base with every request is not feasible:</p>
+    <ul>
+    <li>may far exceed the permitted token limit</li>
+    <li>generates huge network traffic</li>
+    <li>leads to huge LLM costs</li>
+    <li>results in less accurate responses</li>
+    </ul>
+    </li>
+    <li>
+    <p>It is intuitive! Say the code repository was available as a book. The high-order understanding represented by package-level summaries is like a <strong>table of contents</strong> or <em>outline</em>. Resolving an issue is like answering a question using this book. We'd first consult the table of contents to assess which chapters are relevant. We'd then go to those chapters and assess which sections are relevant, and then answer the question based on those parts. This keeps the context strictly relevant to the query, allowing a faster and more accurate response, all within token limits!</p>
+    </li>
+    </ol>
+  </article>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+</body>
+</html>

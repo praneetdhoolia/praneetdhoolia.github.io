@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building a Retrieval Agent with LangGraph &mdash; Praneet Dhoolia</title>
+<meta name="description" content="A five-part series taking LangGraph's RAG template to a deployed, chat-facing assistant: crawling, debugging, deploying, a chat client, and improvements.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/retrieval-agent/">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="home" href="/">Praneet Dhoolia</a>
+    <nav>
+      <a href="/">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <header class="masthead">
+    <p class="kicker">Series &middot; 5 parts &middot; December 2024 &ndash; January 2025</p>
+    <h1>Building a Retrieval Agent with LangGraph</h1>
+    <p class="standfirst">I wanted to know what building an AI solution with LangGraph actually
+      feels like, so I took the retrieval-agent template and pushed it the whole way: jump start
+      from a template, extend it, debug it, deploy it — and then keep fixing what real use
+      exposed.</p>
+  </header>
+
+  <div class="arc">
+    <p class="tag">The arc, in one breath</p>
+    <p><strong>Part 1</strong> takes LangGraph's RAG template and makes it mine — crawling from a
+      list of starter URLs within a set number of hops, indexed into Milvus. <strong>Part 2</strong>
+      opens the graph up to a debugger, so the thing can be inspected while it runs rather than
+      guessed at. <strong>Part 3</strong> puts it on LangGraph Cloud, and <strong>Part 4</strong>
+      gives it a face by pointing an assistant-ui chat client at the deployment. Then
+      <strong>Part 5</strong> is the part the template never warns you about: crawls that time out,
+      retrieval that is too coarse, embedding rate limits, and demos too slow to give.</p>
+  </div>
+
+  <div class="part-cards">
+
+    <a class="part" href="/retrieval-agent/part-1-expanding-the-template.html">
+      <p class="part-kicker">Part 1 &middot; The Template &middot; December 31, 2024</p>
+      <h2>Expanding the LangGraph Retrieval Agent</h2>
+      <p class="sum">Start from LangGraph's RAG template and extend it: crawl from a list of
+        <b>starter_urls</b> within a given number of <b>hops</b> to build the vector index, and swap
+        in the open-source Milvus as the retriever.</p>
+      <span class="read">Read Part 1 &rarr;</span>
+    </a>
+
+    <a class="part" href="/retrieval-agent/part-2-step-thru-debugging.html">
+      <p class="part-kicker">Part 2 &middot; Debugging &middot; January 1, 2025</p>
+      <h2>Step-thru Debugging your LangGraphs</h2>
+      <p class="sum">Run the API server with <b>--debug-port</b>, attach debugpy from VS Code, and
+        put a breakpoint on any graph node to step through execution instead of inferring it from
+        the outside.</p>
+      <span class="read">Read Part 2 &rarr;</span>
+    </a>
+
+    <a class="part" href="/retrieval-agent/part-3-deploying-to-langgraph-cloud.html">
+      <p class="part-kicker">Part 3 &middot; Deployment &middot; January 6, 2025</p>
+      <h2>Deploying to LangGraph Cloud</h2>
+      <p class="sum">Import the repo straight from GitHub, add the environment configuration,
+        submit — then wait out the 15-minute deploy, which you pay again in full for every
+        environment-variable change.</p>
+      <span class="read">Read Part 3 &rarr;</span>
+    </a>
+
+    <a class="part" href="/retrieval-agent/part-4-adding-a-chat-client.html">
+      <p class="part-kicker">Part 4 &middot; The Chat Client &middot; January 8, 2025</p>
+      <h2>Adding a Chat Client to a LangGraph Assistant</h2>
+      <p class="sum">Point an assistant-ui chat client at the deployed graph: scaffold from the
+        LangGraph template, create an assistant in LangGraph Studio, and wire the two together with
+        three environment variables.</p>
+      <span class="read">Read Part 4 &rarr;</span>
+    </a>
+
+    <a class="part" href="/retrieval-agent/part-5-improvements.html">
+      <p class="part-kicker">Part 5 &middot; What Real Use Exposed &middot; January 16, 2025</p>
+      <h2>Improvements to the Retrieval Agent</h2>
+      <p class="sum">Four fixes: loading pre-crawled Apify datasets when crawling would time out,
+        splitting documents for finer-grained retrieval, batching around embedding rate limits, and
+        pre-created indexes so demonstrations stay fast and cheap.</p>
+      <span class="read">Read Part 5 &rarr;</span>
+    </a>
+
+  </div>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+</body>
+</html>
