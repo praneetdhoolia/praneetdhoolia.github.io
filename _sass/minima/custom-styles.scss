@@ -1,0 +1,256 @@
+// Site-specific visual refresh, layered on top of the "auto" skin.
+// The "auto" skin resolves its palette through CSS custom properties
+// (--minima-*), so accent colors are overridden here rather than as
+// Sass variables — this keeps light/dark switching intact.
+
+:root {
+  --accent: #0f6e8c;
+  --accent-strong: #0b566d;
+  --minima-link-base-color: var(--accent);
+  --minima-link-visited-color: var(--accent-strong);
+  --minima-site-title-color: var(--accent-strong);
+  --minima-border-color-03: var(--accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #5cc8e0;
+    --accent-strong: #8adcf0;
+    --minima-link-base-color: var(--accent);
+    --minima-link-visited-color: var(--accent-strong);
+    --minima-site-title-color: var(--accent-strong);
+    --minima-border-color-03: var(--accent);
+  }
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------- */
+/* Header / nav                                                      */
+/* ---------------------------------------------------------------- */
+
+.site-header {
+  border-top-width: 3px;
+}
+
+.site-title {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.site-nav .nav-item {
+  font-weight: 500;
+}
+
+.nav-resume {
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 3px 14px !important;
+
+  &:hover {
+    background-color: var(--accent);
+    color: $background-color !important;
+  }
+}
+
+@include media-query($on-medium) {
+  .nav-resume {
+    display: inline-block !important;
+    margin: 4px 10px 8px;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Homepage hero                                                     */
+/* ---------------------------------------------------------------- */
+
+.home-intro {
+  padding-bottom: $spacing-unit * 0.75;
+  margin-bottom: $spacing-unit;
+  border-bottom: 1px solid $border-color-01;
+
+  h1 {
+    @include relative-font-size(2.25);
+    margin-bottom: 6px;
+  }
+
+  .tagline {
+    @include relative-font-size(1.1875);
+    color: $brand-color-dimmed;
+    margin-bottom: $spacing-unit * 0.6;
+    max-width: 46em;
+  }
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  a {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 500;
+    text-decoration: none;
+    @include relative-font-size(0.9375);
+  }
+
+  a.cta-primary {
+    background-color: var(--accent);
+    color: #fff !important;
+
+    &:hover { background-color: var(--accent-strong); }
+  }
+
+  a.cta-secondary {
+    border: 1px solid $border-color-01;
+    color: $text-color !important;
+
+    &:hover { border-color: var(--accent); color: var(--accent) !important; }
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Post list — card style                                            */
+/* ---------------------------------------------------------------- */
+
+.post-list-heading {
+  color: $brand-color-dimmed;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  @include relative-font-size(1);
+}
+
+.post-list {
+  > li {
+    padding: 18px 20px;
+    border: 1px solid $border-color-01;
+    border-radius: 10px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.post-link {
+  color: $heading-color;
+
+  &:hover { color: var(--accent); }
+}
+
+/* ---------------------------------------------------------------- */
+/* About page — experience timeline & skill chips                    */
+/* ---------------------------------------------------------------- */
+
+.timeline {
+  margin: $spacing-unit * 0.5 0;
+  padding-left: 0;
+  list-style: none;
+  border-left: 2px solid $border-color-01;
+}
+
+.timeline-item {
+  position: relative;
+  padding: 0 0 $spacing-unit * 0.85 $spacing-unit * 0.85;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--accent);
+  }
+
+  &:last-child { padding-bottom: 0; }
+}
+
+.timeline-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.timeline-role {
+  font-weight: 700;
+  color: $heading-color;
+}
+
+.timeline-org {
+  font-weight: 500;
+}
+
+.timeline-meta {
+  @include relative-font-size(0.8125);
+  color: $brand-color-dimmed;
+  white-space: nowrap;
+}
+
+.timeline-sub {
+  @include relative-font-size(0.875);
+  color: $brand-color-dimmed;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.timeline-item p, .timeline-item ul {
+  margin-top: 6px;
+  @include relative-font-size(0.9375);
+}
+
+.skill-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding-left: 0;
+  margin: 10px 0 $spacing-unit * 0.5;
+}
+
+.skill-chip {
+  padding: 4px 12px;
+  border: 1px solid $border-color-01;
+  border-radius: 999px;
+  @include relative-font-size(0.8125);
+  color: $text-color;
+}
+
+/* ---------------------------------------------------------------- */
+/* Projects page — cards                                             */
+/* ---------------------------------------------------------------- */
+
+.project-list {
+  display: grid;
+  gap: $spacing-unit * 0.6;
+  margin: $spacing-unit * 0.5 0;
+}
+
+.project-card {
+  padding: 20px 22px;
+  border: 1px solid $border-color-01;
+  border-radius: 10px;
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 4px;
+    @include relative-font-size(1.25);
+  }
+
+  p { margin-bottom: 8px; }
+
+  .project-links a {
+    @include relative-font-size(0.875);
+    margin-right: 14px;
+    font-weight: 500;
+  }
+}

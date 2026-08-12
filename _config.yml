@@ -1,4 +1,7 @@
 title: Praneet Dhoolia
+description: >-
+  Software engineer building multi-agent AI systems and LLM applications —
+  notes on LangGraph, MCP, and shipping agent products.
 
 author:
   name: Praneet Dhoolia
@@ -10,11 +13,17 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
 
-header_pages:
-  - about.md
-
 minima:
-  skin: classic
+  skin: auto
+  date_format: "%b %-d, %Y"
+  show_excerpts: true
+  nav_pages:
+    - about.md
+    - projects.md
   social_links:
-    - { platform: github, user_url: "https://github.com/praneetdhoolia"}
-    - { platform: linkedin, user_url: "https://www.linkedin.com/in/praneet-dhoolia"}
+    - title: GitHub
+      icon: github
+      url: "https://github.com/praneetdhoolia"
+    - title: LinkedIn
+      icon: linkedin
+      url: "https://www.linkedin.com/in/praneet-dhoolia"

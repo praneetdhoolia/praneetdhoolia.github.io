@@ -1,0 +1,26 @@
+<header class="site-header">
+
+  <div class="wrapper">
+    {%- assign default_paths = site.pages | map: "path" -%}
+    {%- assign page_paths = site.minima.nav_pages | default: default_paths -%}
+    {%- assign page_titles = site.pages | map: 'title' | compact %}
+    <a class="site-title" rel="author" href="{{ '/' | relative_url }}">{{ site.title | escape }}</a>
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon"></span>
+      </label>
+
+      <div class="nav-items">
+        {%- for path in page_paths -%}
+        {%- assign hyperpage = site.pages | where: "path", path | first -%}
+        {%- if hyperpage.title %}
+        <a class="nav-item" href="{{ hyperpage.url | relative_url }}">{{ hyperpage.title | escape }}</a>
+        {%- endif -%}
+        {%- endfor %}
+        <a class="nav-item nav-resume" href="{{ '/assets/resume/Praneet_Dhoolia_Resume.pdf' | relative_url }}">Resume</a>
+      </div>
+    </nav>
+  </div>
+</header>

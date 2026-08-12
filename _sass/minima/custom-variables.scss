@@ -1,0 +1,6 @@
+// Hook to override predefined variables. See _sass/minima/custom-styles.scss
+// for the actual color overrides (needed because the "auto" skin resolves
+// colors to CSS custom properties, not Sass variables).
+
+$content-width: 740px !default;
+$base-font-size: 17px !default;
