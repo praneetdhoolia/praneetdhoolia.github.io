@@ -1,0 +1,14 @@
+.DS_Store
+Thumbs.db
+*.log
+
+# Jekyll build output / local serving
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+.bundle/
+vendor/
+
+# Node (only if a build step is added later)
+node_modules/
