@@ -37,11 +37,12 @@ the markdown originals are gone from the working tree but remain in git history.
 - **Don't rewrite published posts' meaning.** Post content is the author's voice and record.
   Reformatting, restructuring, or re-styling is fair game; changing what a post *claims* is
   not, unless asked.
-- **Don't break existing URLs.** Every URL the site has ever published must keep resolving. The
-  original Jekyll post paths (`/2025/02/08/software-engineering-agent-langgraph.html` and the six
-  others under `2024/` and `2025/`) are preserved as redirect stubs — `<link rel="canonical">` +
-  `<meta http-equiv="refresh">` + `noindex, follow`. **Never delete a stub.** If a restructure
-  moves a page again, repoint the existing stub and add one for the path being vacated.
+- **URLs.** Keep current pages resolving at their published paths — a rename means adding a
+  redirect stub (`<link rel="canonical">` + `<meta http-equiv="refresh">` + `noindex, follow`)
+  at the path being vacated, and repointing any stub that already targeted it. The original
+  dated Jekyll post paths under `2024/` and `2025/` had such stubs; the author retired them
+  deliberately, so those seven URLs now 404. Recover them from git history if that turns out to
+  be a mistake. Don't drop a stub on your own initiative — that call is the author's.
 - **Self-contained pages.** Pages reference only assets committed to this repo — no CDN scripts,
   no remote fonts, no external trackers, no analytics. Two deliberate carve-outs: the shared
   `assets/site.css` (committed here, linked by every page), and **author-placed media embeds**
@@ -131,7 +132,6 @@ A series folder's `index.html` carries four things, in order (see
 | `about/index.html` | The `/about/` page. |
 | `retrieval-agent/` | Series: `index.html` landing page + `part-1…5-*.html`. |
 | `software-engineering-agent-langgraph.html`, `universal-assistant-langgraph-mcp.html` | Standalone posts. |
-| `2024/`, `2025/` | Redirect stubs preserving the original Jekyll post URLs. Never delete. |
 | `assets/site.css` | The single shared stylesheet (light + dark, system fonts, responsive). |
 | `media/` | Images, GIFs and diagrams referenced by posts (`/media/...`). |
 | `docs/` | Static documents served from the site (e.g. `docs/Profile.pdf`). |
