@@ -26,6 +26,17 @@
   --shadow: 0 1px 2px rgba(24, 24, 27, 0.05);
 
   --measure: 720px;
+
+  /* essay-artifact layer: diagrams, callouts, correction flags.
+     --accent is the cobalt; --flag is its counterpart, used to mark
+     what a piece is correcting or conceding. */
+  --ink-soft: var(--muted);
+  --rule: var(--line);
+  --grid: #e7ebef;
+  --flag: #c2255c;
+  --flag-wash: #fdeaf1;
+  --tip-bg: #1a2530;
+  --tip-ink: #f2f5f7;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -44,6 +55,12 @@
     --pre-bg: #08080a;
     --pre-ink: #e2e2e6;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+
+    --grid: #23262c;
+    --flag: #f491b6;
+    --flag-wash: #2c1620;
+    --tip-bg: #24242c;
+    --tip-ink: #ececed;
   }
 }
 
@@ -435,6 +452,178 @@ a.part .read {
   text-align: left;
 }
 .post-body th { background: var(--code-bg); font-weight: 650; }
+
+/* ---------- essay artifacts ----------
+   Shared by posts that argue with diagrams: a standfirst under the title,
+   numbered sections, figures that scroll rather than overflow, callout
+   boxes, a sources list, and the glossary tooltip. */
+
+/* opt-in: eyebrow trailed by a rule to the right margin */
+.eyebrow.ruled {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.eyebrow.ruled::after {
+  content: "";
+  flex: 1 0 40px;
+  height: 1px;
+  background: var(--line);
+}
+.post-header h1 em { font-style: normal; color: var(--accent); }
+.post-header .standfirst {
+  font-size: 18.5px;
+  line-height: 1.6;
+  color: var(--muted);
+  border-left: 3px solid var(--accent);
+  padding-left: 18px;
+  margin: 0 0 18px;
+}
+
+.post-body section { margin-top: 52px; }
+.post-body section:first-child { margin-top: 0; }
+.post-body section > h2 { margin-top: 0; }
+
+/* section number, and the flag that marks a correction */
+.post-body h2 .no {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 12.5px;
+  color: var(--accent);
+  vertical-align: 0.42em;
+  margin-right: 10px;
+  letter-spacing: 0.08em;
+}
+.post-body h2 .fix {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 11.5px;
+  color: var(--flag);
+  letter-spacing: 0.12em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.post-body figure {
+  margin: 30px 0 34px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 20px 16px 12px;
+}
+.post-body figure svg { width: 100%; height: auto; display: block; }
+/* wide diagrams scroll inside their own box, never the page */
+.post-body .fig-scroll { overflow-x: auto; }
+.post-body .fig-scroll svg { min-width: 640px; }
+.post-body figcaption {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  padding: 12px 6px 4px;
+  border-top: 1px solid var(--grid);
+  margin-top: 12px;
+}
+.post-body figcaption b { color: var(--accent); font-weight: 500; }
+
+/* text inside the inline SVG diagrams */
+.sv-lab   { font-family: var(--mono); font-size: 11.5px; fill: var(--ink); }
+.sv-lab-b { font-family: var(--mono); font-size: 11.5px; font-weight: 500; fill: var(--ink); }
+.sv-sub   { font-family: var(--mono); font-size: 10px; fill: var(--ink-soft); }
+.sv-band  { font-family: var(--sans); font-weight: 700; font-size: 12.5px;
+            letter-spacing: 0.09em; fill: var(--accent); }
+.sv-flag  { font-family: var(--mono); font-size: 10.5px; font-weight: 500; fill: var(--flag); }
+
+.callout {
+  border: 1.5px solid var(--accent);
+  background: var(--accent-wash);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin: 26px 0;
+}
+.callout .k {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 8px;
+}
+.callout p { font-size: 16px; margin: 0 0 14px; }
+.callout p:last-child { margin-bottom: 0; }
+.callout.flag { border-color: var(--flag); background: var(--flag-wash); }
+.callout.flag .k { color: var(--flag); }
+
+.sources {
+  margin-top: 64px;
+  border-top: 1px solid var(--rule);
+  padding-top: 26px;
+}
+.sources h2 { font-size: 19px; line-height: 1.3; font-weight: 660; margin: 0 0 12px; }
+.sources ol {
+  margin: 0;
+  padding-left: 22px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+.sources li { margin: 0 0 7px; }
+
+.colophon {
+  margin-top: 56px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.colophon::before {
+  content: "";
+  flex: none;
+  width: 26px;
+  height: 1px;
+  background: var(--flag);
+}
+
+/* glossary terms: dotted underline, definition in the shared tooltip */
+.t {
+  border-bottom: 1.5px dotted var(--accent);
+  cursor: help;
+  padding-bottom: 1px;
+}
+.t:hover,
+.t:focus-visible { background: var(--accent-wash); outline: none; }
+a.t { cursor: pointer; }
+
+#tip {
+  position: absolute;
+  z-index: 50;
+  max-width: 320px;
+  background: var(--tip-bg);
+  color: var(--tip-ink);
+  font-size: 14.5px;
+  line-height: 1.5;
+  padding: 12px 14px;
+  border-radius: 6px;
+  box-shadow: 0 6px 22px rgba(16, 28, 40, 0.28);
+  display: none;
+}
+#tip .tt {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9fb4ff;
+  display: block;
+  margin-bottom: 5px;
+}
+#tip.src .tt { color: #ff9fc2; }
+#tip a { color: #bfd0ff; }
 
 /* ---------- prev / next ---------- */
 

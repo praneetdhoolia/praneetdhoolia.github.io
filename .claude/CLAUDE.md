@@ -131,8 +131,9 @@ A series folder's `index.html` carries four things, in order (see
 | `index.html` | Landing page: reverse-chron list of all writing, one summary per entry. |
 | `about/index.html` | The `/about/` page. |
 | `retrieval-agent/` | Series: `index.html` landing page + `part-1…5-*.html`. |
+| `city-digital-twin/` | Series: `index.html` landing page + `part-<n>-*.html`. |
 | `software-engineering-agent-langgraph.html`, `universal-assistant-langgraph-mcp.html` | Standalone posts. |
-| `assets/site.css` | The single shared stylesheet (light + dark, system fonts, responsive). |
+| `assets/site.css` | The single shared stylesheet (light + dark, system fonts, responsive). Includes the **essay-artifact layer** — `figure`/`figcaption`, `.fig-scroll`, the `.sv-*` SVG text classes, `.callout` (and `.callout.flag`), `.sources`, `.colophon`, `.eyebrow.ruled`, and the `.t` / `#tip` glossary tooltip — so a post that argues with diagrams needs no bespoke CSS. |
 | `media/` | Images, GIFs and diagrams referenced by posts (`/media/...`). |
 | `docs/` | Static documents served from the site (e.g. `docs/Profile.pdf`). |
 | `.nojekyll` | Turns GitHub Pages' Jekyll processing off; the HTML is served as committed. |
