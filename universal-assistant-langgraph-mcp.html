@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Building a Universal Assistant with LangGraph and MCP &mdash; Praneet Dhoolia</title>
-<meta name="description" content="A router, an MCP-agent node and a tool-invocation node — one assistant that reaches any capability that speaks Model Context Protocol.">
+<title>Building a Universal Assistant with LangGraph and MCP - Praneet Dhoolia</title>
+<meta name="description" content="A router, an MCP-agent node and a tool-invocation node - one assistant that reaches any capability that speaks Model Context Protocol.">
 <link rel="canonical" href="https://praneetdhoolia.github.io/universal-assistant-langgraph-mcp.html">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css">
@@ -34,7 +34,9 @@
     <hr />
     <p><a href="https://modelcontextprotocol.io/introduction">MCP</a> is an open protocol that enables seamless integration between LLM applications and external data sources and tools. Whether you're building an AI-powered IDE, enhancing a chat interface, or creating custom AI workflows, MCP provides a standardized way to connect LLMs with the context they need. Think of MCP like a USB-C port for AI applications. Just as USB-C provides a standardized way to connect your devices to various peripherals and accessories, MCP provides a standardized way to connect AI models to different data sources and tools.</p>
     <p><a href="https://langchain-ai.github.io/langgraph/">LangGraph</a> is a framework designed to enable seamless integration of language models into complex workflows and applications. It emphasizes modularity and flexibility. Workflows are represented as graphs. Nodes correspond to actions, tools, or model queries. Edges define the flow of information between them. LangGraph provides a structured yet dynamic way to execute tasks, making it ideal for writing AI applications involving natural language understanding, automation, and decision-making.</p>
-    <p>In <a href="/retrieval-agent/part-1-expanding-the-template.html">this previous BLOG</a> I enhanced LangGraph's retrieval agent template to develop and deploy an AI solution. We start with that enhanced template and build a universal assistant combining it with MCP. We follow a multi-agent flow.</p>
+    <p>In <a class="t" data-ref="Retrieval Agent &middot; Part 1"
+      data-tip="Expanding LangGraph&rsquo;s retrieval agent template into a configurable, deployable AI solution - the starting point for this post."
+      href="/retrieval-agent/part-1-expanding-the-template.html">this previous BLOG</a> I enhanced LangGraph's retrieval agent template to develop and deploy an AI solution. We start with that enhanced template and build a universal assistant combining it with MCP. We follow a multi-agent flow.</p>
     <p><img src="/media/assistant-flow.excalidraw.png" alt="Basic assistant flow" /></p>
     <p>Assistant receives the user message and decides the agent to use. The agent node decides the right tool to use, and calls the tool on the MCP server. Since all our agents are based on MCP, a single MCP-Agent node is sufficient for LLM based orchestraion, and another single node is sufficient to work with MCP servers to invoke their tools.</p>
     <h2>Implementation</h2>
@@ -140,6 +142,9 @@ source .venv/bin/activate
   <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
         <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
 </footer>
+
+<div id="tip" role="tooltip"></div>
+<script src="/assets/tip.js" defer></script>
 
 </body>
 </html>

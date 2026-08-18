@@ -1,4 +1,4 @@
-/* praneetdhoolia.github.io — shared stylesheet for the index and every post artifact.
+/* praneetdhoolia.github.io - shared stylesheet for the index and every post artifact.
    Self-contained by design: system font stacks only, no remote fonts, no CDN, no trackers.
    Light and dark are both first-class, driven by prefers-color-scheme. */
 
@@ -395,7 +395,7 @@ a.part .read {
   padding: 0.14em 0.36em;
 }
 
-/* code blocks — must scroll inside themselves, never the page */
+/* code blocks - must scroll inside themselves, never the page */
 .post-body pre {
   margin: 0 0 22px;
   padding: 16px 18px;
@@ -623,6 +623,7 @@ a.t { cursor: pointer; }
   margin-bottom: 5px;
 }
 #tip.src .tt { color: #ff9fc2; }
+#tip.ref .tt { color: #8fe0bb; text-transform: none; letter-spacing: 0.04em; }
 #tip a { color: #bfd0ff; }
 
 /* ---------- prev / next ---------- */

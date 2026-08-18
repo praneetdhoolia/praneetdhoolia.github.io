@@ -9,7 +9,7 @@ name: strip-session-ref
 # the agent's tool loop) slips past them. This workflow is the only enforcement point that
 # catches a platform-created body. It is a scrub-AFTER-creation (the platform injects the
 # link; `attribution.sessionUrl: false` is meant to suppress it at source but does not cover
-# the cloud PR-body path), so there is a brief window before this runs — acceptable, since
+# the cloud PR-body path), so there is a brief window before this runs - acceptable, since
 # the repo side cannot block the platform injection. (CLAUDE.md: no claude.ai/code session
 # link or attribution in commits or PRs.)
 #
@@ -33,14 +33,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           # `gh pr edit` resolves the target repo from the local git remote. This job has
           # no `actions/checkout`, so the runner dir is NOT a git repo and gh dies with
-          # "fatal: not a git repository" (observed on PR #42 — the strip silently failed
+          # "fatal: not a git repository" (observed on PR #42 - the strip silently failed
           # and the session link survived). GH_REPO names the repo explicitly so gh works
           # without a clone. (Cheaper than adding checkout just to run one gh call.)
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          # Only act when a session reference is actually present — this keeps the workflow
+          # Only act when a session reference is actually present - this keeps the workflow
           # idempotent and loop-safe: the stripped body has no match, so the `edited` event
           # this edit triggers re-runs and no-ops.
           if printf '%s' "$PR_BODY" | grep -qiE 'https?://claude\.ai/code|^[[:space:]]*Claude-Session:[[:space:]]'; then

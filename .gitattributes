@@ -1,5 +1,5 @@
 # Shell scripts and git hooks MUST keep LF endings: they are authored on Windows but
-# executed by bash — in a Linux cloud session a CRLF shebang line fails outright
+# executed by bash - in a Linux cloud session a CRLF shebang line fails outright
 # ("/usr/bin/env bash\r: no such file or directory"), silently disabling the hook.
 *.sh text eol=lf
 .githooks/* text eol=lf

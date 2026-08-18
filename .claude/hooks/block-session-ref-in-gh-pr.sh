@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse guard — block a `gh pr create` / `gh pr edit` whose title or body
+# PreToolUse guard - block a `gh pr create` / `gh pr edit` whose title or body
 # references the claude.ai/code session (CLAUDE.md: no Claude session link in PRs).
 #
 # Companion to block-session-ref-in-pr.sh: that one covers the GitHub MCP path; this
@@ -17,7 +17,7 @@ payload="$(cat)"
 
 if printf '%s' "$payload" | grep -qiE 'gh[[:space:]]+pr[[:space:]]+(create|edit)\b' \
    && printf '%s' "$payload" | grep -qiE 'https?://claude\.ai/code'; then
-  echo "Blocked: this 'gh pr' command's title/body references the claude.ai/code session, which this repo forbids (CLAUDE.md — no Claude session link in commits or PRs). Re-run gh pr create/edit without the session reference." >&2
+  echo "Blocked: this 'gh pr' command's title/body references the claude.ai/code session, which this repo forbids (CLAUDE.md - no Claude session link in commits or PRs). Re-run gh pr create/edit without the session reference." >&2
   exit 2
 fi
 exit 0

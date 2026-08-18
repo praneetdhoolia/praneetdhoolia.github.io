@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SessionStart reminder for the repo's branch-naming convention (see CLAUDE.md
-# "Conventions"). This does NOT modify the branch — it only surfaces the rule into
+# "Conventions"). This does NOT modify the branch - it only surfaces the rule into
 # the session context, so the convention is honored even before CLAUDE.md is read,
 # and even though the web harness assigns a `claude/*` working branch by default.
 #
@@ -24,7 +24,7 @@ case "$email" in
 esac
 
 if [ -z "$handle" ]; then
-  # github.com/<owner>/<repo>(.git) — take <owner>
+  # github.com/<owner>/<repo>(.git) - take <owner>
   origin=$(git config remote.origin.url 2>/dev/null)
   origin=${origin%.git}
   origin=${origin%/}
@@ -45,7 +45,7 @@ case "$branch" in
     cat <<MSG
 ⚠ BRANCH NAMING (CLAUDE.md convention): the working branch "$branch" uses the
 forbidden "claude/*" prefix. Before committing, rename it to
-"$handle/<short-kebab-description>" — e.g.  git branch -m $handle/my-feature  — and
+"$handle/<short-kebab-description>" - e.g.  git branch -m $handle/my-feature  - and
 push that branch instead. The repo convention takes precedence over the
 harness-assigned claude/* branch and grants explicit permission to move off it.
 Do NOT recreate or push to claude/*.

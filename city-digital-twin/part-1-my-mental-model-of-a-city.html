@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>My mental model of a city: what held up, what didn't &mdash; Praneet Dhoolia</title>
+<title>My mental model of a city: what held up, what didn't - Praneet Dhoolia</title>
 <meta name="description" content="A city is stocks, flows and sensors. The skeleton held; six of its assumptions did not. The model I started with, the corrections the literature forced, and where every one of them points.">
 <link rel="canonical" href="https://praneetdhoolia.github.io/city-digital-twin/part-1-my-mental-model-of-a-city.html">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
@@ -26,7 +26,7 @@
   <div class="post-header">
     <p class="eyebrow ruled"><span><a href="/city-digital-twin/">City digital twin</a> &middot; Part 1 &middot; The model</span></p>
     <h1>My mental model of a city: <em>what held up, what didn't</em></h1>
-    <p class="standfirst">I entered this space with a tidy mental model: a city is stocks, flows, and sensors. The literature and my own experiments kept the skeleton — and broke six of its assumptions. This post is the model, the corrections, and the ideas from other fields that forced them.</p>
+    <p class="standfirst">I entered this space with a tidy mental model: a city is stocks, flows, and sensors. The literature and my own experiments kept the skeleton - and broke six of its assumptions. This post is the model, the corrections, and the ideas from other fields that forced them.</p>
     <p class="date"><time datetime="2026-08">August 2026</time> &middot; ~10 min read &middot; Part 1 of a series</p>
   </div>
 
@@ -36,7 +36,7 @@
   <h2><span class="no">§1</span>The model I started with</h2>
   <p>Here is the model, as I first wrote it down. A city is its people, its culture, its institutions, its businesses, its infrastructure, and its governance. All of these sit on a geographic structure. Every person, shop, hospital, and land parcel has a place.</p>
   <p>Between these entities run <strong>flows</strong>. The transport flow moves people from residences to workplaces, schools, hospitals, markets, and airports. It has weekday rhythms, weekend patterns, and event surges. The fiscal flow moves money. People earn and spend. Businesses and institutions earn and spend. Everyone pays taxes. Governments collect that money and plan projects that put it back into maintenance and improvement. Goods, water, energy, and information flow through the same structure.</p>
-  <p>And the city watches itself. It puts out a wide variety of "sensors" — I use the word in a broad sense. Traffic cameras give a sense of road load. Tap-on and tap-off readers on public transport are payment devices, but they also count every journey by mode, exactly. Every income, expense, and tax return is lodged digitally. Every land purchase, sale, and plan is recorded. Governments publish budgets. Schools record attendance. Hospitals report aggregate patient counts. Roughly twice a decade, the census surveys everyone at once.</p>
+  <p>And the city watches itself. It puts out a wide variety of "sensors" - I use the word in a broad sense. Traffic cameras give a sense of road load. Tap-on and tap-off readers on public transport are payment devices, but they also count every journey by mode, exactly. Every income, expense, and tax return is lodged digitally. Every land purchase, sale, and plan is recorded. Governments publish budgets. Schools record attendance. Hospitals report aggregate patient counts. Roughly twice a decade, the census surveys everyone at once.</p>
 
   <figure>
     <svg viewBox="0 0 720 330" role="img" aria-label="A diagram of the city in three layers. The bottom layer holds entities and places on geography. The middle layer holds flows of people and money between entities. The top layer holds the instruments that observe both.">
@@ -57,20 +57,20 @@
 
       <rect x="120" y="126" width="586" height="74" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
       <text class="sv-band" x="138" y="150" style="fill:var(--ink)">FLOWS</text>
-      <text class="sv-sub" x="138" y="168">transport — trips between homes, work, schools, hospitals, events</text>
-      <text class="sv-sub" x="138" y="184">fiscal — wages, spending, taxes, budgets · goods · energy · information</text>
+      <text class="sv-sub" x="138" y="168">transport - trips between homes, work, schools, hospitals, events</text>
+      <text class="sv-sub" x="138" y="184">fiscal - wages, spending, taxes, budgets · goods · energy · information</text>
 
       <rect x="120" y="234" width="586" height="74" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
       <text class="sv-band" x="138" y="258" style="fill:var(--ink)">ENTITIES &amp; PLACES</text>
       <text class="sv-sub" x="138" y="276">people · households · businesses · institutions · infrastructure</text>
-      <text class="sv-sub" x="138" y="292">land parcels — all anchored to geography</text>
+      <text class="sv-sub" x="138" y="292">land parcels - all anchored to geography</text>
 
       <path d="M78 263 C 40 240 40 176 78 160" fill="none" stroke="var(--accent)" stroke-width="1.3" marker-end="url(#m1)"/>
       <path d="M78 160 C 40 138 40 74 78 52" fill="none" stroke="var(--accent)" stroke-width="1.3" marker-end="url(#m1)" stroke-dasharray="4 3"/>
       <text class="sv-sub" transform="translate(14 163) rotate(-90)" text-anchor="middle">flows move between entities</text>
       <text class="sv-sub" transform="translate(28 163) rotate(-90)" text-anchor="middle" style="fill:var(--accent)">senses observe both</text>
     </svg>
-    <figcaption><b>FIG 1</b> — My starting mental model. Entities and places hold the state. Flows change the state. Senses record it. The skeleton survives everything that follows. Several of its assumptions do not.</figcaption>
+    <figcaption><b>FIG 1</b> - My starting mental model. Entities and places hold the state. Flows change the state. Senses record it. The skeleton survives everything that follows. Several of its assumptions do not.</figcaption>
   </figure>
 
   <p>I later learned this skeleton has a name. Engineers call it a <a class="t" data-k="statespace" href="https://en.wikipedia.org/wiki/State-space_representation">state-space model</a>: a state, dynamics that change the state, and an observation function that reports part of it. That is the durable part of the model, and I did not have to invent it. The corrections below challenge the assumptions I had on top of this model and its use.</p>
@@ -78,13 +78,13 @@
 
 <section>
   <h2><span class="no">§2</span>The full twin I was aiming for</h2>
-  <p>Follow the model to its natural ambition. Put the entities, the flows, and the sensor streams into one system. Then every plan a council proposes — reactive, proactive, or strategic — could be tested before it is built. Simulate the flows under realistic loads. Add what we know about behaviour. Estimate the value of the plan in the model, not in the city.</p>
+  <p>Follow the model to its natural ambition. Put the entities, the flows, and the sensor streams into one system. Then every plan a council proposes - reactive, proactive, or strategic - could be tested before it is built. Simulate the flows under realistic loads. Add what we know about behaviour. Estimate the value of the plan in the model, not in the city.</p>
   <p>And follow the ambition to its limit. With enough instrumentation, the model's state tracks the city's state, closely and in near real time. Every person, car, bus, and dollar has a live counterpart. A forecast run on that model approximates what the real city will do. Call it the <strong>full city digital twin</strong>. That was the destination I had in mind when I started.</p>
 </section>
 
 <section>
   <h2><span class="fix">CORRECTION 1</span><span class="no">§3</span>The city senses itself unevenly</h2>
-  <p>The first crack in my assumptions appeared as soon as I catalogued real Australian data sources. The sensors do not report at the same speed — not even close. A transit vehicle-position feed updates <a href="https://translink.com.au/about-translink/open-data/gtfs-rt" data-src="TransLink open data — GTFS-realtime feeds">every 15 to 30 seconds</a>. The electricity market publishes <a href="https://www.aemo.com.au/energy-systems/electricity/national-electricity-market-nem/data-nem" data-src="AEMO — National Electricity Market data">demand every five minutes</a>. Land valuations arrive <a href="https://www.data.qld.gov.au/dataset/historical-trends-in-land-valuations" data-src="Queensland Government — historical land valuation trends">once a year</a>. Council budgets arrive <a href="https://www.brisbane.qld.gov.au/about-council/governance-and-strategy/annual-plan-and-budget/2025-26-brisbane-budget" data-src="Brisbane City Council — Annual Plan and Budget">once a year, as PDF documents</a>. National taxation statistics lag by <a href="https://www.ato.gov.au/about-ato/research-and-statistics/in-detail/taxation-statistics/taxation-statistics-2022-23" data-src="Australian Taxation Office — taxation statistics">about two years</a>. The census runs every five years, and its first results take <a href="https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis" data-src="Australian Bureau of Statistics — data services and release timing">ten months to appear</a>.</p>
+  <p>The first crack in my assumptions appeared as soon as I catalogued real Australian data sources. The sensors do not report at the same speed - not even close. A transit vehicle-position feed updates <a href="https://translink.com.au/about-translink/open-data/gtfs-rt" data-src="TransLink open data - GTFS-realtime feeds">every 15 to 30 seconds</a>. The electricity market publishes <a href="https://www.aemo.com.au/energy-systems/electricity/national-electricity-market-nem/data-nem" data-src="AEMO - National Electricity Market data">demand every five minutes</a>. Land valuations arrive <a href="https://www.data.qld.gov.au/dataset/historical-trends-in-land-valuations" data-src="Queensland Government - historical land valuation trends">once a year</a>. Council budgets arrive <a href="https://www.brisbane.qld.gov.au/about-council/governance-and-strategy/annual-plan-and-budget/2025-26-brisbane-budget" data-src="Brisbane City Council - Annual Plan and Budget">once a year, as PDF documents</a>. National taxation statistics lag by <a href="https://www.ato.gov.au/about-ato/research-and-statistics/in-detail/taxation-statistics/taxation-statistics-2022-23" data-src="Australian Taxation Office - taxation statistics">about two years</a>. The census runs every five years, and its first results take <a href="https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis" data-src="Australian Bureau of Statistics - data services and release timing">ten months to appear</a>.</p>
 
   <figure class="fig-scroll">
     <svg viewBox="0 0 720 300" role="img" aria-label="A logarithmic timeline of observation cadence from seconds to five years. Transit positions and electricity sit at the fast end. Budgets, valuations, tax statistics, and the census sit at the slow end. The spread covers about seven orders of magnitude.">
@@ -105,7 +105,7 @@
         <line x1="608" y1="232" x2="608" y2="238" stroke="var(--ink)"/><text x="608" y="254">1 year</text>
         <line x1="666" y1="232" x2="666" y2="238" stroke="var(--ink)"/><text x="666" y="254">5 years</text>
       </g>
-      <text class="sv-sub" x="380" y="284" text-anchor="middle">observation cadence (logarithmic) — a spread of ≈ 7 orders of magnitude</text>
+      <text class="sv-sub" x="380" y="284" text-anchor="middle">observation cadence (logarithmic) - a spread of ≈ 7 orders of magnitude</text>
 
       <g stroke="var(--accent)" stroke-width="1.3">
         <line x1="93"  y1="232" x2="93"  y2="176"/>
@@ -136,7 +136,7 @@
       <text class="sv-sub" x="93" y="36">streams</text>
       <text class="sv-sub" x="690" y="284" text-anchor="end">ledgers &amp; surveys</text>
     </svg>
-    <figcaption><b>FIG 2</b> — The cadence of the city's senses, on Australian public data. The fast end updates before you finish a coffee. The slow end updates twice a decade.</figcaption>
+    <figcaption><b>FIG 2</b> - The cadence of the city's senses, on Australian public data. The fast end updates before you finish a coffee. The slow end updates twice a decade.</figcaption>
   </figure>
 
   <p>The spread covers roughly seven orders of magnitude. The consequence is that there is no single moment at which the whole city model is current. I had initially assumed that one store and one schema could "accommodate all of this." The cadence chart clearly showed faults with that assumption.</p>
@@ -146,14 +146,14 @@
   <h2><span class="fix">CORRECTION 2</span><span class="no">§4</span>The sensors are not the city</h2>
   <p>My initial mental model equated observation with state. List enough sensors, and their union is the city. It is not. Tap-on and tap-off counts do not account for fare evasion. Tax data cannot account for the cash economy. Cameras may not cover all the corners. Every sensor was purpose-installed, and it only addresses that purpose.</p>
   <p>I realised that there was no sensor or flow for culture, trust, social networks, unpaid care work, or political mood. However, these are load-bearing for whether a policy succeeds.</p>
-  <p>The discipline I adopted from this: the model holds the <span class="t" data-k="state">state</span>, and the sensors hold an <span class="t" data-k="obsfn">observed shadow</span> of it. The gap between the two must stay visible in every result. There is also a practical edge to this correction. "The city senses itself" does not mean <em>I</em> can sense the city. Individual tax, tap, and health records are observed by the state and rightly withheld from everyone else. A twin built outside government gets aggregates, and must synthesise the rest — openly.</p>
+  <p>The discipline I adopted from this: the model holds the <span class="t" data-k="state">state</span>, and the sensors hold an <span class="t" data-k="obsfn">observed shadow</span> of it. The gap between the two must stay visible in every result. There is also a practical edge to this correction. "The city senses itself" does not mean <em>I</em> can sense the city. Individual tax, tap, and health records are observed by the state and rightly withheld from everyone else. A twin built outside government gets aggregates, and must synthesise the rest - openly.</p>
 </section>
 
 <section>
   <h2><span class="fix">CORRECTION 3</span><span class="no">§5</span>People are not particles</h2>
   <p>My initial mental model treated people the way physics treats particles. But people react to the policy being tested. Widen a road, and new trips appear to fill it. The effect is so consistent that economists call it the <a class="t" data-k="induced" href="https://doi.org/10.1257/aer.101.6.2616">fundamental law of road congestion</a>. Announce a rail line, and land prices move before the first train runs.</p>
   <p>Economics has a name for the general trap. The <a class="t" data-k="lucas" href="https://en.wikipedia.org/wiki/Lucas_critique">Lucas critique</a> says that behaviour estimated under the old rules does not survive a change in the rules, because people re-optimise. Its cousin, <a class="t" data-k="goodhart" href="https://en.wikipedia.org/wiki/Goodhart%27s_law">Goodhart's law</a>, warns that when a measure becomes a target, it stops being a good measure. Both apply to twins directly. A model calibrated on yesterday's trips cannot simply replay them under tomorrow's policy.</p>
-  <p>The correction: a useful twin must model <strong>choice</strong>, not only flow. Give the simulated people options — mode, route, departure time — and let the policy change what those options cost. That is precisely what agent-based transport models do.</p>
+  <p>The correction: a useful twin must model <strong>choice</strong>, not only flow. Give the simulated people options - mode, route, departure time - and let the policy change what those options cost. That is precisely what agent-based transport models do.</p>
 </section>
 
 <section>
@@ -164,7 +164,7 @@
 
 <section>
   <h2><span class="fix">CORRECTION 5</span><span class="no">§7</span>Governance is the controller, not just another entity</h2>
-  <p>I initially thought of governance as yet another entity among many, next to businesses and institutions. That was an error. Governance owns most of the sensor list — the tax ledger, the land registry, the census. And it acts on what it senses, through budgets, projects, and rules. In control-engineering terms, governance is the <span class="t" data-k="controller">feedback controller</span> of the system. The city is a closed loop: sense, decide, act, change, sense again.</p>
+  <p>I initially thought of governance as yet another entity among many, next to businesses and institutions. That was an error. Governance owns most of the sensor list - the tax ledger, the land registry, the census. And it acts on what it senses, through budgets, projects, and rules. In control-engineering terms, governance is the <span class="t" data-k="controller">feedback controller</span> of the system. The city is a closed loop: sense, decide, act, change, sense again.</p>
 
   <figure>
     <svg viewBox="0 0 720 260" role="img" aria-label="A closed control loop. City state is read by the senses, governance decides, budgets and rules act on the city, and the loop repeats. A digital twin that informs decisions is shown entering the loop at the decision stage.">
@@ -206,7 +206,7 @@
       <text class="sv-flag" x="596" y="244" text-anchor="middle">a twin that informs decisions</text>
       <text class="sv-flag" x="596" y="257" text-anchor="middle">enters the loop it models</text>
     </svg>
-    <figcaption><b>FIG 3</b> — The city as a closed loop, with governance as its controller. The <span style="color:var(--flag)">pink insertion</span> is the deep consequence: a twin used for decisions becomes part of the system it models.</figcaption>
+    <figcaption><b>FIG 3</b> - The city as a closed loop, with governance as its controller. The <span style="color:var(--flag)">pink insertion</span> is the deep consequence: a twin used for decisions becomes part of the system it models.</figcaption>
   </figure>
 
   <p>This correction taught me two things. First, the fiscal flow is special. Budgets and rules are how governance acts on the city. So a model of money is a model of the main lever. Second, a twin that informs decisions becomes part of the loop. Its forecasts change the behaviour it tried to forecast. That is a permanent condition of this work.</p>
@@ -216,7 +216,7 @@
   <h2><span class="fix">CORRECTION 6</span><span class="no">§8</span>Compare, not forecast</h2>
   <p>Even with enough sensors, a forecast cannot approximate reality for long. <a class="t" data-k="nwp" href="https://en.wikipedia.org/wiki/Numerical_weather_prediction">Numerical weather prediction</a> has near-perfect physics, planetary-scale sensing, and decades of relentless improvement. It can predict accurately for about ten useful days. Beyond that, <span class="t" data-k="chaos">sensitive dependence</span> takes over: tiny errors in the initial state grow until the forecast is unreliable.</p>
   <p>A city is a much harder case than weather. It has chaotic dynamics and agents who re-optimise and a controller inside the loop. More sensors may shrink the initial error. They do not control its growth. So the full twin fails as a forecast machine even in the limit.</p>
-  <p>Here is what works. Run scenario A and scenario B on the same model, with identical assumptions, identical demand, and identical seeds. The shared errors largely cancel. The <em>difference</em> between A and B is far more trustworthy than the final state of either. A twin earns its keep on comparisons — this versus that — not on predictions.</p>
+  <p>Here is what works. Run scenario A and scenario B on the same model, with identical assumptions, identical demand, and identical seeds. The shared errors largely cancel. The <em>difference</em> between A and B is far more trustworthy than the final state of either. A twin earns its keep on comparisons - this versus that - not on predictions.</p>
 
   <div class="callout">
     <span class="k">What to build instead</span>
@@ -248,20 +248,20 @@
 
       <!-- OBSERVATION band -->
       <rect x="120" y="18" width="470" height="74" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
-      <text class="sv-band" x="138" y="42">OBSERVATION — a shadow, not a mirror</text>
+      <text class="sv-band" x="138" y="42">OBSERVATION - a shadow, not a mirror</text>
       <text class="sv-sub" x="138" y="60">partial coverage · installed for someone's purpose</text>
       <text class="sv-sub" x="138" y="76">cadence spread ≈ 7 orders of magnitude (Fig 2)</text>
 
       <!-- FLOWS band -->
       <rect x="120" y="126" width="470" height="74" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
-      <text class="sv-band" x="138" y="150" style="fill:var(--ink)">DYNAMICS — choosing agents, not particles</text>
+      <text class="sv-band" x="138" y="150" style="fill:var(--ink)">DYNAMICS - choosing agents, not particles</text>
       <text class="sv-sub" x="138" y="168">people re-optimise when policy changes the costs</text>
       <text class="sv-sub" x="138" y="184">mode · route · departure time · location</text>
 
       <!-- STATE band with unobserved region -->
       <rect x="120" y="234" width="470" height="74" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
       <rect x="452" y="235" width="137" height="72" rx="4" fill="url(#hatch)"/>
-      <text class="sv-band" x="138" y="258" style="fill:var(--ink)">STATE — partly unobserved</text>
+      <text class="sv-band" x="138" y="258" style="fill:var(--ink)">STATE - partly unobserved</text>
       <text class="sv-sub" x="138" y="276">people · businesses · parcels · infrastructure</text>
       <text class="sv-flag" x="460" y="276">culture · trust</text>
       <text class="sv-flag" x="460" y="291">informal economy</text>
@@ -283,32 +283,34 @@
       <line x1="120" y1="336" x2="590" y2="336" stroke="var(--flag)" stroke-width="1.2" stroke-dasharray="4 3"/>
       <text class="sv-flag" x="355" y="352" text-anchor="middle">every quantity carries a distribution · outputs are comparisons, never prophecies</text>
     </svg>
-    <figcaption><b>FIG 4</b> — My refined mental model. Same skeleton, six amendments. <span style="color:var(--flag)">Pink</span> marks what my initial model could not say: the unobserved state, the uncertainty, and the refusal to prophesy.</figcaption>
+    <figcaption><b>FIG 4</b> - My refined mental model. Same skeleton, six amendments. <span style="color:var(--flag)">Pink</span> marks what my initial model could not say: the unobserved state, the uncertainty, and the refusal to prophesy.</figcaption>
   </figure>
 
-  <p>To be honest, these corrections were standard knowledge in many neighbouring fields — control engineering, econometrics, meteorology, transport science. It was fortunate that the literature review helped me appreciate that they all apply here, at once, to the same mental model.</p>
+  <p>To be honest, these corrections were standard knowledge in many neighbouring fields - control engineering, econometrics, meteorology, transport science. It was fortunate that the literature review helped me appreciate that they all apply here, at once, to the same mental model.</p>
 
   <div class="callout flag">
     <span class="k">Where this leads</span>
-    <p>Look at the direction every correction pushes. Uneven senses say: live at one pace. Choosing agents say: model the choices your question touches, not all choices. Native uncertainty says: run ensembles, which only small models afford. Comparison-over-prophecy says: pick an A and a B. Every arrow points the same way — <strong>scope the twin</strong>. What happens to teams that build the everything-twin anyway is the next post.</p>
+    <p>Look at the direction every correction pushes. Uneven senses say: live at one pace. Choosing agents say: model the choices your question touches, not all choices. Native uncertainty says: run ensembles, which only small models afford. Comparison-over-prophecy says: pick an A and a B. Every arrow points the same way - <strong>scope the twin</strong>. What happens to teams that build the everything-twin anyway is the next post.</p>
   </div>
 </section>
 
 <div class="sources">
   <h2>Sources &amp; anchors</h2>
   <ol>
-    <li>State-space representation (the skeleton's proper name) — <a href="https://en.wikipedia.org/wiki/State-space_representation">en.wikipedia.org</a></li>
-    <li>Lucas, R. (1976), the critique of policy evaluation with fixed behaviour — <a href="https://en.wikipedia.org/wiki/Lucas_critique">en.wikipedia.org</a> · Goodhart's law — <a href="https://en.wikipedia.org/wiki/Goodhart%27s_law">en.wikipedia.org</a></li>
-    <li>Duranton, G. &amp; Turner, M. (2011), "The Fundamental Law of Road Congestion", <em>American Economic Review</em> — <a href="https://doi.org/10.1257/aer.101.6.2616">doi.org</a></li>
-    <li>Numerical weather prediction and its predictability horizon — <a href="https://en.wikipedia.org/wiki/Numerical_weather_prediction">en.wikipedia.org</a></li>
-    <li>Cadence examples: TransLink GTFS-realtime — <a href="https://translink.com.au/about-translink/open-data/gtfs-rt">translink.com.au</a> · AEMO NEM data — <a href="https://www.aemo.com.au/energy-systems/electricity/national-electricity-market-nem/data-nem">aemo.com.au</a> · Queensland land valuation trends — <a href="https://www.data.qld.gov.au/dataset/historical-trends-in-land-valuations">data.qld.gov.au</a> · Brisbane City Council budget — <a href="https://www.brisbane.qld.gov.au/about-council/governance-and-strategy/annual-plan-and-budget/2025-26-brisbane-budget">brisbane.qld.gov.au</a> · ATO taxation statistics — <a href="https://www.ato.gov.au/about-ato/research-and-statistics/in-detail/taxation-statistics/taxation-statistics-2022-23">ato.gov.au</a> · ABS data services — <a href="https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis">abs.gov.au</a></li>
+    <li>State-space representation (the skeleton's proper name) - <a href="https://en.wikipedia.org/wiki/State-space_representation">en.wikipedia.org</a></li>
+    <li>Lucas, R. (1976), the critique of policy evaluation with fixed behaviour - <a href="https://en.wikipedia.org/wiki/Lucas_critique">en.wikipedia.org</a> · Goodhart's law - <a href="https://en.wikipedia.org/wiki/Goodhart%27s_law">en.wikipedia.org</a></li>
+    <li>Duranton, G. &amp; Turner, M. (2011), "The Fundamental Law of Road Congestion", <em>American Economic Review</em> - <a href="https://doi.org/10.1257/aer.101.6.2616">doi.org</a></li>
+    <li>Numerical weather prediction and its predictability horizon - <a href="https://en.wikipedia.org/wiki/Numerical_weather_prediction">en.wikipedia.org</a></li>
+    <li>Cadence examples: TransLink GTFS-realtime - <a href="https://translink.com.au/about-translink/open-data/gtfs-rt">translink.com.au</a> · AEMO NEM data - <a href="https://www.aemo.com.au/energy-systems/electricity/national-electricity-market-nem/data-nem">aemo.com.au</a> · Queensland land valuation trends - <a href="https://www.data.qld.gov.au/dataset/historical-trends-in-land-valuations">data.qld.gov.au</a> · Brisbane City Council budget - <a href="https://www.brisbane.qld.gov.au/about-council/governance-and-strategy/annual-plan-and-budget/2025-26-brisbane-budget">brisbane.qld.gov.au</a> · ATO taxation statistics - <a href="https://www.ato.gov.au/about-ato/research-and-statistics/in-detail/taxation-statistics/taxation-statistics-2022-23">ato.gov.au</a> · ABS data services - <a href="https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis">abs.gov.au</a></li>
   </ol>
 </div>
 
   </article>
 
   <p class="colophon"><span>City digital twin &middot; Part 1 of the series &middot;
-    Next: <a href="/city-digital-twin/part-2-lets-simulate-everything.html">why city-scale
+    Next: <a class="t" data-ref="Part 2 &middot; The track record"
+    data-tip="A decade of government everything-twins, the scoped twins that outlived them, and a US$2 billion company running the same experiment today."
+    href="/city-digital-twin/part-2-lets-simulate-everything.html">why city-scale
     &ldquo;everything twins&rdquo; fail</a></span></p>
 
 </main>
@@ -322,83 +324,20 @@
 <div id="tip" role="tooltip"></div>
 
 <script>
-(function(){
-  var GLOSS = {
-    statespace:{t:"State-space model",d:"An engineering description of a system in three parts: a state (what the system is right now), dynamics (rules for how the state changes), and an observation function (what your instruments report about the state). Click to read more."},
-    state:{t:"State",d:"The complete condition of the system at one moment — every entity, position, and balance. No real observer sees all of it."},
-    obsfn:{t:"Observed shadow",d:"What the sensors actually report: a partial, delayed, purpose-shaped projection of the state. The model must never confuse this shadow with the state itself."},
-    induced:{t:"Induced demand",d:"New road capacity generates new traffic in roughly equal proportion, so congestion returns. Measured across US cities by Duranton & Turner (2011). Click for the paper."},
-    capital:{t:"Capitalisation",d:"Markets fold expected future benefits into prices today. A promised rail line raises nearby land values before it opens — the future access is 'capitalised' into the price."},
-    lucas:{t:"Lucas critique",d:"Robert Lucas's 1976 argument: relationships estimated from behaviour under old rules break when the rules change, because people re-optimise. Click to read more."},
-    goodhart:{t:"Goodhart's law",d:"When a measure becomes a target, it ceases to be a good measure — people optimise the metric, not the goal it stood for. Click to read more."},
-    seed:{t:"Seed",d:"The number that initialises a simulation's random-number generator. The same seed reproduces the same run exactly. A sweep across many seeds reveals the spread of outcomes."},
-    controller:{t:"Feedback controller",d:"In control engineering, the component that reads the sensors, compares against a goal, and issues corrective action — a thermostat is the classic example. Here: governance."},
-    nwp:{t:"Numerical weather prediction",d:"Weather forecast computed from atmospheric physics and an observed initial state — the most mature, best-instrumented digital twin humanity runs. Click to read more."},
-    chaos:{t:"Sensitive dependence",d:"The signature of chaotic systems: microscopic differences in the starting state grow exponentially, so long-range prediction fails no matter how good the model is."}
-  };
-
-  var tip = document.getElementById('tip');
-  var current = null;
-  var hideTimer = null;
-
-  function show(el){
-    var k = el.getAttribute('data-k');
-    var src = el.getAttribute('data-src');
-    if(k && GLOSS[k]){
-      tip.className='';
-      tip.innerHTML = '<span class="tt">'+GLOSS[k].t+'</span>'+GLOSS[k].d;
-    } else if(src){
-      tip.className='src';
-      tip.innerHTML = '<span class="tt">Source</span>'+src+' ↗';
-    } else { return; }
-    if(hideTimer){ clearTimeout(hideTimer); hideTimer=null; }
-    tip.style.display='block';
-    var r = el.getBoundingClientRect();
-    var tw = tip.offsetWidth;
-    var x = window.scrollX + r.left + (r.width/2) - (tw/2);
-    x = Math.max(10, Math.min(x, window.scrollX + document.documentElement.clientWidth - tw - 10));
-    var y = window.scrollY + r.top - tip.offsetHeight - 10;
-    if (y < window.scrollY + 4) y = window.scrollY + r.bottom + 10;
-    tip.style.left = x+'px';
-    tip.style.top = y+'px';
-    current = el;
-  }
-  function hideSoon(){
-    if(hideTimer) clearTimeout(hideTimer);
-    hideTimer = setTimeout(function(){ tip.style.display='none'; current=null; }, 140);
-  }
-  function hideNow(){ if(hideTimer) clearTimeout(hideTimer); tip.style.display='none'; current=null; }
-
-  tip.addEventListener('mouseenter', function(){ if(hideTimer){ clearTimeout(hideTimer); hideTimer=null; } });
-  tip.addEventListener('mouseleave', hideSoon);
-
-  var targets = document.querySelectorAll('.t, a[data-src]');
-  targets.forEach(function(el){
-    var isLink = el.tagName === 'A';
-    if(!isLink){ el.setAttribute('tabindex','0'); }
-    el.addEventListener('mouseenter', function(){ show(el); });
-    el.addEventListener('mouseleave', hideSoon);
-    el.addEventListener('focus', function(){ show(el); });
-    el.addEventListener('blur', hideSoon);
-    el.addEventListener('click', function(e){
-      if(!isLink){
-        e.preventDefault();
-        if(current===el){ hideNow(); } else { show(el); }
-      }
-    });
-    // On touch devices, first tap on a defined link shows the definition; second tap follows it.
-    el.addEventListener('touchend', function(e){
-      if(isLink && el.getAttribute('data-k') && current !== el){
-        e.preventDefault();
-        show(el);
-      }
-    });
-  });
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape') hideNow(); });
-  document.addEventListener('touchstart', function(e){
-    if(current && !current.contains(e.target) && !tip.contains(e.target)) hideNow();
-  }, {passive:true});
-})();
+window.GLOSS = {
+  statespace:{t:"State-space model",d:"An engineering description of a system in three parts: a state (what the system is right now), dynamics (rules for how the state changes), and an observation function (what your instruments report about the state). Click to read more."},
+  state:{t:"State",d:"The complete condition of the system at one moment - every entity, position, and balance. No real observer sees all of it."},
+  obsfn:{t:"Observed shadow",d:"What the sensors actually report: a partial, delayed, purpose-shaped projection of the state. The model must never confuse this shadow with the state itself."},
+  induced:{t:"Induced demand",d:"New road capacity generates new traffic in roughly equal proportion, so congestion returns. Measured across US cities by Duranton & Turner (2011). Click for the paper."},
+  capital:{t:"Capitalisation",d:"Markets fold expected future benefits into prices today. A promised rail line raises nearby land values before it opens - the future access is 'capitalised' into the price."},
+  lucas:{t:"Lucas critique",d:"Robert Lucas's 1976 argument: relationships estimated from behaviour under old rules break when the rules change, because people re-optimise. Click to read more."},
+  goodhart:{t:"Goodhart's law",d:"When a measure becomes a target, it ceases to be a good measure - people optimise the metric, not the goal it stood for. Click to read more."},
+  seed:{t:"Seed",d:"The number that initialises a simulation's random-number generator. The same seed reproduces the same run exactly. A sweep across many seeds reveals the spread of outcomes."},
+  controller:{t:"Feedback controller",d:"In control engineering, the component that reads the sensors, compares against a goal, and issues corrective action - a thermostat is the classic example. Here: governance."},
+  nwp:{t:"Numerical weather prediction",d:"Weather forecast computed from atmospheric physics and an observed initial state - the most mature, best-instrumented digital twin humanity runs. Click to read more."},
+  chaos:{t:"Sensitive dependence",d:"The signature of chaotic systems: microscopic differences in the starting state grow exponentially, so long-range prediction fails no matter how good the model is."}
+};
 </script>
+<script src="/assets/tip.js" defer></script>
 </body>
 </html>
