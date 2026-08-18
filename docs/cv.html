@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Praneet Dhoolia - CV</title>
+<meta name="description" content="Curriculum vitae of Praneet Dhoolia, AI Engineer, Brisbane, Australia.">
+<meta name="robots" content="noindex, follow">
+<style>
+  /* Print source for docs/Profile.pdf. Regenerate with:
+     chrome --headless --disable-gpu --no-pdf-header-footer --print-to-pdf=docs/Profile.pdf docs/cv.html
+
+     Deliberately plain: one column, no tables, no icons, no graphics, no web fonts.
+     Multi-column and table layouts are the main cause of applicant-tracking systems
+     reading a CV out of order, and contact details are kept in the body rather than
+     a page header for the same reason. */
+
+  @page { size: A4; margin: 11mm 13mm; }
+
+  :root {
+    --ink: #111111;
+    --soft: #444444;
+    --rule: #bbbbbb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 10pt;
+    line-height: 1.34;
+    color: var(--ink);
+    background: #ffffff;
+    max-width: 190mm;
+    margin: 0 auto;
+    padding: 1mm 2mm;
+  }
+
+  h1 {
+    font-size: 19pt;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    margin-bottom: 2pt;
+  }
+
+  .title {
+    font-size: 11.5pt;
+    color: var(--soft);
+    margin-bottom: 5pt;
+  }
+
+  .contact {
+    font-size: 9.5pt;
+    color: var(--soft);
+    line-height: 1.5;
+    margin-bottom: 6pt;
+  }
+  .contact a { color: var(--ink); text-decoration: none; }
+
+  h2 {
+    font-size: 11pt;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2pt;
+    margin: 7pt 0 4pt;
+  }
+
+  .summary { margin-bottom: 2pt; }
+
+  .role { margin-bottom: 6pt; page-break-inside: avoid; }
+  .role:last-child { margin-bottom: 2pt; }
+
+  .role-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10pt;
+    flex-wrap: wrap;
+  }
+  .role-title { font-weight: bold; }
+  .role-when { font-size: 9.5pt; color: var(--soft); white-space: nowrap; }
+  .role-where { font-size: 9.5pt; color: var(--soft); font-style: italic; margin-bottom: 3pt; }
+
+  ul { margin: 0 0 0 16pt; }
+  li { margin-bottom: 1.5pt; }
+
+  .skills p { margin-bottom: 3pt; }
+  .skills b { font-weight: bold; }
+
+  .writing li { margin-bottom: 2pt; }
+  .writing .when { color: var(--soft); font-size: 9.5pt; }
+</style>
+</head>
+<body>
+
+<h1>Praneet Dhoolia</h1>
+<p class="title">AI Engineer, Hardware Enthusiast</p>
+<p class="contact">
+  Brisbane, Queensland, Australia<br>
+  praneet.dhoolia@gmail.com &middot;
+  linkedin.com/in/praneet-dhoolia &middot;
+  github.com/praneetdhoolia &middot;
+  praneetdhoolia.github.io
+</p>
+
+<h2>Summary</h2>
+<p class="summary">AI engineer with a Bachelor of Engineering (Honours) in Software Engineering
+from the University of Queensland. Founded and led engineering for an AI agent platform, taking it
+from a from-scratch prototype to paying pilots and A$100K ARR. Experience across agent systems,
+retrieval-augmented generation and vector search, and currently tutoring pattern recognition and
+deep learning at UQ.</p>
+
+<h2>Skills</h2>
+<div class="skills">
+  <p><b>Languages:</b> Python, Java</p>
+  <p><b>Machine learning:</b> PyTorch, TensorFlow, pattern recognition, retrieval-augmented
+    generation (RAG)</p>
+  <p><b>AI systems:</b> LangGraph, Model Context Protocol (MCP), multi-agent systems, prompt
+    engineering</p>
+  <p><b>Data and infrastructure:</b> Milvus vector database, Docker, Apify</p>
+  <p><b>Engineering:</b> full-stack development, taking a product from prototype to pilot</p>
+</div>
+
+<h2>Experience</h2>
+
+<div class="role">
+  <div class="role-head">
+    <span class="role-title">Tutor, The University of Queensland</span>
+    <span class="role-when">Jul 2026 - present</span>
+  </div>
+  <p class="role-where">St Lucia, Queensland, Australia</p>
+  <ul>
+    <li>Tutor COMP3710, Pattern Recognition and Analysis, teaching deep learning practice in
+      Python, PyTorch and TensorFlow.</li>
+  </ul>
+</div>
+
+<div class="role">
+  <div class="role-head">
+    <span class="role-title">Founder and CTO, G&ouml;del</span>
+    <span class="role-when">Apr 2025 - Dec 2025</span>
+  </div>
+  <p class="role-where">godel.sh</p>
+  <ul>
+    <li>Built a platform for creating G&ouml;del agents (arXiv:2410.04444), from a from-scratch
+      prototype through to customer pilots.</li>
+    <li>Gave those agents access to any software-based tool through the Model Context Protocol,
+      removing the need for a bespoke integration per tool.</li>
+    <li>Led full-stack development and the engineering team, clearing A$100K ARR through
+      org-based usage.</li>
+  </ul>
+</div>
+
+<div class="role">
+  <div class="role-head">
+    <span class="role-title">AI Engineering Intern, AGAILE Inc.</span>
+    <span class="role-when">Jan 2025 - Mar 2025</span>
+  </div>
+  <p class="role-where">Delaware, United States</p>
+  <ul>
+    <li>Prototyped a question-answering solution with LangGraph.</li>
+    <li>Crawled website data with Apify and indexed it into a Milvus vector database running on
+      Docker.</li>
+    <li>Answered questions over that index using retrieval-augmented generation.</li>
+  </ul>
+</div>
+
+<div class="role">
+  <div class="role-head">
+    <span class="role-title">AI Solutions Intern, Segment X</span>
+    <span class="role-when">Jul 2024 - Dec 2024</span>
+  </div>
+  <p class="role-where">St Lucia, Queensland, Australia</p>
+</div>
+
+<div class="role">
+  <div class="role-head">
+    <span class="role-title">Tutor, The University of Queensland</span>
+    <span class="role-when">Jul 2023 - Dec 2023</span>
+  </div>
+  <p class="role-where">St Lucia, Queensland, Australia</p>
+  <ul>
+    <li>Tutored CSSE2002, Programming in the Large, covering Java and software design.</li>
+  </ul>
+</div>
+
+<h2>Education</h2>
+<div class="role">
+  <div class="role-head">
+    <span class="role-title">Bachelor of Engineering (Honours), Software Engineering</span>
+    <span class="role-when">Feb 2022 - Jun 2026</span>
+  </div>
+  <p class="role-where">The University of Queensland, St Lucia, Queensland, Australia</p>
+</div>
+
+<h2>Writing</h2>
+<ul class="writing">
+  <li>Building a City Digital Twin, on what a city model can honestly claim.
+    <span class="when">Series, 2026</span></li>
+  <li>Building a Retrieval Agent with LangGraph, template to deployed assistant.
+    <span class="when">Series, 2024 to 2025</span></li>
+  <li>Building a Universal Assistant with LangGraph and MCP. <span class="when">2025</span></li>
+  <li>Building a Software Engineering Agent with LangGraph. <span class="when">2025</span></li>
+</ul>
+
+</body>
+</html>
