@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse guard — block creating/updating a pull request whose title or body
+# PreToolUse guard - block creating/updating a pull request whose title or body
 # references the claude.ai/code session (CLAUDE.md: no Claude session/attribution in
 # commits or PRs).
 #
@@ -14,7 +14,7 @@
 payload="$(cat)"
 
 if printf '%s' "$payload" | grep -qiE 'https?://claude\.ai/code'; then
-  echo "Blocked: this PR title/body references the claude.ai/code session, which this repo forbids (CLAUDE.md — no Claude session link or attribution in commits or PRs). Resubmit the PR without the session reference." >&2
+  echo "Blocked: this PR title/body references the claude.ai/code session, which this repo forbids (CLAUDE.md - no Claude session link or attribution in commits or PRs). Resubmit the PR without the session reference." >&2
   exit 2
 fi
 exit 0
