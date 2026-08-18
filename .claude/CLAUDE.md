@@ -88,6 +88,19 @@ A series folder's `index.html` carries four things, in order (see
 
 ## Conventions
 
+- **Cross-references carry a hover description.** A link in prose (or in a colophon) to another
+  post on this site is never a bare link — the reader should learn what is behind it without
+  clicking. Mark it up for the shared tooltip:
+  `<a class="t" data-ref="Part 1 &middot; The model" data-tip="One sentence on what they will
+  find there." href="/...">link text</a>`. The page needs `<div id="tip" role="tooltip"></div>`
+  and `<script src="/assets/tip.js" defer></script>` before `</body>`. This does **not** apply to
+  the prev/next pager cards or the index and series-landing cards — those already show the target's
+  title and summary on screen.
+- **Tooltips are one shared script.** `assets/tip.js` drives all three tooltip forms — `data-k`
+  (glossary, defined per page as `window.GLOSS = {...}` in an inline `<script>` before the file
+  loads), `data-src` (outbound citation, labelled SOURCE), and `data-ref` + `data-tip`
+  (cross-reference). Styling lives in `assets/site.css` (`.t`, `#tip`). Never paste the engine
+  inline into a page.
 - **Page naming.** Standalone post: `<kebab-slug>.html` at the repo root. Series: a
   `<kebab-slug>/` folder holding `index.html` and `part-<n>-<kebab-slug>.html`. Keep slugs stable
   — a rename means a new redirect stub.
@@ -133,6 +146,7 @@ A series folder's `index.html` carries four things, in order (see
 | `retrieval-agent/` | Series: `index.html` landing page + `part-1…5-*.html`. |
 | `city-digital-twin/` | Series: `index.html` landing page + `part-<n>-*.html`. |
 | `software-engineering-agent-langgraph.html`, `universal-assistant-langgraph-mcp.html` | Standalone posts. |
+| `assets/tip.js` | The shared glossary / source / cross-reference tooltip engine. |
 | `assets/site.css` | The single shared stylesheet (light + dark, system fonts, responsive). Includes the **essay-artifact layer** — `figure`/`figcaption`, `.fig-scroll`, the `.sv-*` SVG text classes, `.callout` (and `.callout.flag`), `.sources`, `.colophon`, `.eyebrow.ruled`, and the `.t` / `#tip` glossary tooltip — so a post that argues with diagrams needs no bespoke CSS. |
 | `media/` | Images, GIFs and diagrams referenced by posts (`/media/...`). |
 | `docs/` | Static documents served from the site (e.g. `docs/Profile.pdf`). |

@@ -623,6 +623,7 @@ a.t { cursor: pointer; }
   margin-bottom: 5px;
 }
 #tip.src .tt { color: #ff9fc2; }
+#tip.ref .tt { color: #8fe0bb; text-transform: none; letter-spacing: 0.04em; }
 #tip a { color: #bfd0ff; }
 
 /* ---------- prev / next ---------- */

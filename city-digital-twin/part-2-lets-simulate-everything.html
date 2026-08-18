@@ -34,7 +34,9 @@
 
 <section>
   <h2><span class="no">§1</span>The claim, made testable</h2>
-  <p><a href="/city-digital-twin/part-1-my-mental-model-of-a-city.html">Post 1</a> ended with a promise. I had argued, from first principles, that every correction to my mental model pushed one way. A city twin must be scoped, or it won't work. But an argument from first principles is cheap until the record agrees with it. So this post brings the record.</p>
+  <p><a class="t" data-ref="Part 1 &middot; The model"
+     data-tip="A city as entities, flows and senses &mdash; a state-space model, and the six assumptions resting on it that broke."
+     href="/city-digital-twin/part-1-my-mental-model-of-a-city.html">Post 1</a> ended with a promise. I had argued, from first principles, that every correction to my mental model pushed one way. A city twin must be scoped, or it won't work. But an argument from first principles is cheap until the record agrees with it. So this post brings the record.</p>
   <p>Governments have funded city-scale everything-twins for more than a decade. Companies have sold scoped twins into the same market for just as long. Both histories are public. I explored both to see what worked and what didn't.</p>
   <p>First, terms. I call a twin an <strong>everything-twin</strong> when its stated scope is the whole city — geometry, movement, economy, environment — in one system. A <strong>scoped twin</strong> answers a named question about one subsystem, at one cadence.</p>
 </section>
@@ -210,81 +212,19 @@
 <div id="tip" role="tooltip"></div>
 
 <script>
-(function(){
-  var GLOSS = {
-    ontology:{t:"Ontology",d:"A shared, formal vocabulary for data — agreed names and relationships so that different organisations' datasets can be joined. Foundational work, but not a twin."},
-    terria:{t:"TerriaJS",d:"An open-source map-based platform from CSIRO's Data61. It powers the NSW Spatial Digital Twin and Digital Twin Victoria, and Queensland's 2021 prototype."},
-    genagents:{t:"Generative agents",d:"Simulated people driven by a language model, with memory and daily routines. Introduced by Joon Sung Park's 2023 'Smallville' paper, which showed believable emergent behaviour."},
-    foundation:{t:"Foundation model",d:"A large model trained on broad data and adapted to many tasks. The term was coined at Stanford by a group led by Percy Liang — now Simile's chief scientist."},
-    retest:{t:"Test-retest consistency",d:"How closely a person's own answers agree when they take the same survey twice. It is the ceiling for any model of that person — you cannot out-predict someone's self-agreement."},
-    lucas:{t:"Lucas critique",d:"Robert Lucas's 1976 argument: patterns learned from behaviour under old rules break when the rules change, because people adjust. Click to read more."},
-    aimsunlive:{t:"Aimsun Live",d:"A commercial real-time traffic digital twin. It reads live road-sensor data, forecasts conditions up to an hour ahead, and tests response plans. It runs in operations centres from Florida to Tees Valley. Click to visit."},
-    statval:{t:"Statutory land valuation",d:"The land value assessed by the Queensland Valuer-General for rating and land-tax purposes. Issued annually for most local government areas."},
-    ratedollar:{t:"Rate in the dollar",d:"The multiplier a council sets per dollar of land valuation to compute a property's rates bill. Different rating categories get different multipliers."},
-    cadastre:{t:"Cadastre",d:"The official map of land parcels and their boundaries. Queensland's digital cadastre (DCDB) is openly available."}
-  };
-
-  var tip = document.getElementById('tip');
-  var current = null;
-  var hideTimer = null;
-
-  function show(el){
-    var k = el.getAttribute('data-k');
-    var src = el.getAttribute('data-src');
-    if(k && GLOSS[k]){
-      tip.className='';
-      tip.innerHTML = '<span class="tt">'+GLOSS[k].t+'</span>'+GLOSS[k].d;
-    } else if(src){
-      tip.className='src';
-      tip.innerHTML = '<span class="tt">Source</span>'+src+' ↗';
-    } else { return; }
-    if(hideTimer){ clearTimeout(hideTimer); hideTimer=null; }
-    tip.style.display='block';
-    var r = el.getBoundingClientRect();
-    var tw = tip.offsetWidth;
-    var x = window.scrollX + r.left + (r.width/2) - (tw/2);
-    x = Math.max(10, Math.min(x, window.scrollX + document.documentElement.clientWidth - tw - 10));
-    var y = window.scrollY + r.top - tip.offsetHeight - 10;
-    if (y < window.scrollY + 4) y = window.scrollY + r.bottom + 10;
-    tip.style.left = x+'px';
-    tip.style.top = y+'px';
-    current = el;
-  }
-  function hideSoon(){
-    if(hideTimer) clearTimeout(hideTimer);
-    hideTimer = setTimeout(function(){ tip.style.display='none'; current=null; }, 140);
-  }
-  function hideNow(){ if(hideTimer) clearTimeout(hideTimer); tip.style.display='none'; current=null; }
-
-  tip.addEventListener('mouseenter', function(){ if(hideTimer){ clearTimeout(hideTimer); hideTimer=null; } });
-  tip.addEventListener('mouseleave', hideSoon);
-
-  var targets = document.querySelectorAll('.t, a[data-src]');
-  targets.forEach(function(el){
-    var isLink = el.tagName === 'A';
-    if(!isLink){ el.setAttribute('tabindex','0'); }
-    el.addEventListener('mouseenter', function(){ show(el); });
-    el.addEventListener('mouseleave', hideSoon);
-    el.addEventListener('focus', function(){ show(el); });
-    el.addEventListener('blur', hideSoon);
-    el.addEventListener('click', function(e){
-      if(!isLink){
-        e.preventDefault();
-        if(current===el){ hideNow(); } else { show(el); }
-      }
-    });
-    el.addEventListener('touchend', function(e){
-      if(isLink && el.getAttribute('data-k') && current !== el){
-        e.preventDefault();
-        show(el);
-      }
-    });
-  });
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape') hideNow(); });
-  document.addEventListener('touchstart', function(e){
-    if(current && !current.contains(e.target) && !tip.contains(e.target)) hideNow();
-  }, {passive:true});
-})();
+window.GLOSS = {
+  ontology:{t:"Ontology",d:"A shared, formal vocabulary for data — agreed names and relationships so that different organisations' datasets can be joined. Foundational work, but not a twin."},
+  terria:{t:"TerriaJS",d:"An open-source map-based platform from CSIRO's Data61. It powers the NSW Spatial Digital Twin and Digital Twin Victoria, and Queensland's 2021 prototype."},
+  genagents:{t:"Generative agents",d:"Simulated people driven by a language model, with memory and daily routines. Introduced by Joon Sung Park's 2023 'Smallville' paper, which showed believable emergent behaviour."},
+  foundation:{t:"Foundation model",d:"A large model trained on broad data and adapted to many tasks. The term was coined at Stanford by a group led by Percy Liang — now Simile's chief scientist."},
+  retest:{t:"Test-retest consistency",d:"How closely a person's own answers agree when they take the same survey twice. It is the ceiling for any model of that person — you cannot out-predict someone's self-agreement."},
+  lucas:{t:"Lucas critique",d:"Robert Lucas's 1976 argument: patterns learned from behaviour under old rules break when the rules change, because people adjust. Click to read more."},
+  aimsunlive:{t:"Aimsun Live",d:"A commercial real-time traffic digital twin. It reads live road-sensor data, forecasts conditions up to an hour ahead, and tests response plans. It runs in operations centres from Florida to Tees Valley. Click to visit."},
+  statval:{t:"Statutory land valuation",d:"The land value assessed by the Queensland Valuer-General for rating and land-tax purposes. Issued annually for most local government areas."},
+  ratedollar:{t:"Rate in the dollar",d:"The multiplier a council sets per dollar of land valuation to compute a property's rates bill. Different rating categories get different multipliers."},
+  cadastre:{t:"Cadastre",d:"The official map of land parcels and their boundaries. Queensland's digital cadastre (DCDB) is openly available."}
+};
 </script>
+<script src="/assets/tip.js" defer></script>
 </body>
 </html>

@@ -308,7 +308,9 @@
   </article>
 
   <p class="colophon"><span>City digital twin &middot; Part 1 of the series &middot;
-    Next: <a href="/city-digital-twin/part-2-lets-simulate-everything.html">why city-scale
+    Next: <a class="t" data-ref="Part 2 &middot; The track record"
+    data-tip="A decade of government everything-twins, the scoped twins that outlived them, and a US$2 billion company running the same experiment today."
+    href="/city-digital-twin/part-2-lets-simulate-everything.html">why city-scale
     &ldquo;everything twins&rdquo; fail</a></span></p>
 
 </main>
@@ -322,83 +324,20 @@
 <div id="tip" role="tooltip"></div>
 
 <script>
-(function(){
-  var GLOSS = {
-    statespace:{t:"State-space model",d:"An engineering description of a system in three parts: a state (what the system is right now), dynamics (rules for how the state changes), and an observation function (what your instruments report about the state). Click to read more."},
-    state:{t:"State",d:"The complete condition of the system at one moment — every entity, position, and balance. No real observer sees all of it."},
-    obsfn:{t:"Observed shadow",d:"What the sensors actually report: a partial, delayed, purpose-shaped projection of the state. The model must never confuse this shadow with the state itself."},
-    induced:{t:"Induced demand",d:"New road capacity generates new traffic in roughly equal proportion, so congestion returns. Measured across US cities by Duranton & Turner (2011). Click for the paper."},
-    capital:{t:"Capitalisation",d:"Markets fold expected future benefits into prices today. A promised rail line raises nearby land values before it opens — the future access is 'capitalised' into the price."},
-    lucas:{t:"Lucas critique",d:"Robert Lucas's 1976 argument: relationships estimated from behaviour under old rules break when the rules change, because people re-optimise. Click to read more."},
-    goodhart:{t:"Goodhart's law",d:"When a measure becomes a target, it ceases to be a good measure — people optimise the metric, not the goal it stood for. Click to read more."},
-    seed:{t:"Seed",d:"The number that initialises a simulation's random-number generator. The same seed reproduces the same run exactly. A sweep across many seeds reveals the spread of outcomes."},
-    controller:{t:"Feedback controller",d:"In control engineering, the component that reads the sensors, compares against a goal, and issues corrective action — a thermostat is the classic example. Here: governance."},
-    nwp:{t:"Numerical weather prediction",d:"Weather forecast computed from atmospheric physics and an observed initial state — the most mature, best-instrumented digital twin humanity runs. Click to read more."},
-    chaos:{t:"Sensitive dependence",d:"The signature of chaotic systems: microscopic differences in the starting state grow exponentially, so long-range prediction fails no matter how good the model is."}
-  };
-
-  var tip = document.getElementById('tip');
-  var current = null;
-  var hideTimer = null;
-
-  function show(el){
-    var k = el.getAttribute('data-k');
-    var src = el.getAttribute('data-src');
-    if(k && GLOSS[k]){
-      tip.className='';
-      tip.innerHTML = '<span class="tt">'+GLOSS[k].t+'</span>'+GLOSS[k].d;
-    } else if(src){
-      tip.className='src';
-      tip.innerHTML = '<span class="tt">Source</span>'+src+' ↗';
-    } else { return; }
-    if(hideTimer){ clearTimeout(hideTimer); hideTimer=null; }
-    tip.style.display='block';
-    var r = el.getBoundingClientRect();
-    var tw = tip.offsetWidth;
-    var x = window.scrollX + r.left + (r.width/2) - (tw/2);
-    x = Math.max(10, Math.min(x, window.scrollX + document.documentElement.clientWidth - tw - 10));
-    var y = window.scrollY + r.top - tip.offsetHeight - 10;
-    if (y < window.scrollY + 4) y = window.scrollY + r.bottom + 10;
-    tip.style.left = x+'px';
-    tip.style.top = y+'px';
-    current = el;
-  }
-  function hideSoon(){
-    if(hideTimer) clearTimeout(hideTimer);
-    hideTimer = setTimeout(function(){ tip.style.display='none'; current=null; }, 140);
-  }
-  function hideNow(){ if(hideTimer) clearTimeout(hideTimer); tip.style.display='none'; current=null; }
-
-  tip.addEventListener('mouseenter', function(){ if(hideTimer){ clearTimeout(hideTimer); hideTimer=null; } });
-  tip.addEventListener('mouseleave', hideSoon);
-
-  var targets = document.querySelectorAll('.t, a[data-src]');
-  targets.forEach(function(el){
-    var isLink = el.tagName === 'A';
-    if(!isLink){ el.setAttribute('tabindex','0'); }
-    el.addEventListener('mouseenter', function(){ show(el); });
-    el.addEventListener('mouseleave', hideSoon);
-    el.addEventListener('focus', function(){ show(el); });
-    el.addEventListener('blur', hideSoon);
-    el.addEventListener('click', function(e){
-      if(!isLink){
-        e.preventDefault();
-        if(current===el){ hideNow(); } else { show(el); }
-      }
-    });
-    // On touch devices, first tap on a defined link shows the definition; second tap follows it.
-    el.addEventListener('touchend', function(e){
-      if(isLink && el.getAttribute('data-k') && current !== el){
-        e.preventDefault();
-        show(el);
-      }
-    });
-  });
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape') hideNow(); });
-  document.addEventListener('touchstart', function(e){
-    if(current && !current.contains(e.target) && !tip.contains(e.target)) hideNow();
-  }, {passive:true});
-})();
+window.GLOSS = {
+  statespace:{t:"State-space model",d:"An engineering description of a system in three parts: a state (what the system is right now), dynamics (rules for how the state changes), and an observation function (what your instruments report about the state). Click to read more."},
+  state:{t:"State",d:"The complete condition of the system at one moment — every entity, position, and balance. No real observer sees all of it."},
+  obsfn:{t:"Observed shadow",d:"What the sensors actually report: a partial, delayed, purpose-shaped projection of the state. The model must never confuse this shadow with the state itself."},
+  induced:{t:"Induced demand",d:"New road capacity generates new traffic in roughly equal proportion, so congestion returns. Measured across US cities by Duranton & Turner (2011). Click for the paper."},
+  capital:{t:"Capitalisation",d:"Markets fold expected future benefits into prices today. A promised rail line raises nearby land values before it opens — the future access is 'capitalised' into the price."},
+  lucas:{t:"Lucas critique",d:"Robert Lucas's 1976 argument: relationships estimated from behaviour under old rules break when the rules change, because people re-optimise. Click to read more."},
+  goodhart:{t:"Goodhart's law",d:"When a measure becomes a target, it ceases to be a good measure — people optimise the metric, not the goal it stood for. Click to read more."},
+  seed:{t:"Seed",d:"The number that initialises a simulation's random-number generator. The same seed reproduces the same run exactly. A sweep across many seeds reveals the spread of outcomes."},
+  controller:{t:"Feedback controller",d:"In control engineering, the component that reads the sensors, compares against a goal, and issues corrective action — a thermostat is the classic example. Here: governance."},
+  nwp:{t:"Numerical weather prediction",d:"Weather forecast computed from atmospheric physics and an observed initial state — the most mature, best-instrumented digital twin humanity runs. Click to read more."},
+  chaos:{t:"Sensitive dependence",d:"The signature of chaotic systems: microscopic differences in the starting state grow exponentially, so long-range prediction fails no matter how good the model is."}
+};
 </script>
+<script src="/assets/tip.js" defer></script>
 </body>
 </html>
