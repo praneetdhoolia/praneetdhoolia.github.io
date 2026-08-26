@@ -25,7 +25,11 @@
   --pre-ink: #e7e7ea;
   --shadow: 0 1px 2px rgba(24, 24, 27, 0.05);
 
-  --measure: 720px;
+  /* the shell: how wide the page column may grow on a large screen.
+     --measure-figure caps a diagram so a 720-unit SVG is not scaled up
+     past the size its labels were drawn for. */
+  --measure: 1120px;
+  --measure-figure: 920px;
 
   /* essay-artifact layer: diagrams, callouts, correction flags.
      --accent is the cobalt; --flag is its counterpart, used to mark
@@ -81,7 +85,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -92,6 +96,9 @@ body {
   max-width: var(--measure);
   margin: 0 auto;
   padding: 0 24px;
+}
+@media (min-width: 900px) {
+  .wrap { padding: 0 32px; }
 }
 
 a {
@@ -172,7 +179,7 @@ a:focus-visible {
 .masthead .standfirst {
   font-size: 19px;
   color: var(--muted);
-  max-width: 56ch;
+  max-width: 72ch;
   margin: 0;
 }
 .masthead .links {
@@ -222,7 +229,7 @@ a:focus-visible {
 .note .summary {
   margin: 0;
   color: var(--muted);
-  max-width: 64ch;
+  max-width: 80ch;
 }
 
 /* ---------- series landing: the arc, then the parts as cards ---------- */
@@ -313,7 +320,7 @@ a.part .read {
   color: var(--muted);
   font-size: 15px;
   line-height: 1.6;
-  max-width: 62ch;
+  max-width: 78ch;
 }
 
 /* ---------- article ---------- */
@@ -505,7 +512,8 @@ a.part .read {
 }
 
 .post-body figure {
-  margin: 30px 0 34px;
+  margin: 30px auto 34px;
+  max-width: var(--measure-figure);
   background: var(--surface);
   border: 1px solid var(--rule);
   border-radius: 8px;
@@ -716,7 +724,7 @@ a.t { cursor: pointer; }
 /* ---------- small screens ---------- */
 
 @media (max-width: 620px) {
-  body { font-size: 16.5px; }
+  body { font-size: 17px; }
   .wrap { padding: 0 18px; }
   .masthead { padding: 52px 0 32px; }
   .post-header { padding: 36px 0 24px; }
