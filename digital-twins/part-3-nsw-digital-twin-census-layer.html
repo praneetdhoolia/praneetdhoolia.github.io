@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exploring the official NSW Digital Twin portal: a census layer, one land parcel at a time - Praneet Dhoolia</title>
+<meta name="description" content="A side quest into the NSW Spatial Digital Twin. The census never publishes below the SA1, so getting census-night counts onto individual land parcels meant borrowing detail from the cadastre itself: a two-stage disaggregation, run entirely in two browser consoles.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/digital-twins/part-3-nsw-digital-twin-census-layer.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="home" href="/">Praneet Dhoolia</a>
+    <nav>
+      <a href="/">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="post-header">
+    <p class="eyebrow ruled"><span><a href="/digital-twins/">City digital twin</a> &middot; Part 3 &middot; The side quest</span></p>
+    <h1>Exploring the official <em>NSW Digital Twin</em> portal</h1>
+    <p class="standfirst">I'd been living inside city simulators for weeks: <span class="t" data-k="sumo">SUMO</span>, <span class="t" data-k="matsim">MATSim</span>, and the twin stacks underneath them. On census night I happened to have the official New South Wales digital twin open, realised I could layer my own data onto it, and couldn't resist a small experiment: put the census itself on the map, one <span class="t" data-k="parcel">parcel</span> at a time.</p>
+    <p class="date"><time datetime="2026-08">August 2026</time> &middot; ~6 min read &middot; Part 3 of a series</p>
+  </div>
+
+  <article class="post-body">
+
+<section>
+  <h2><span class="no">&sect;1</span>Official digital twins</h2>
+  <p>The two posts before this one argued about city twins from the outside. <a class="t" data-ref="Part 1 &middot; The model" data-tip="A city as entities, flows and senses - a state-space model, and the six assumptions resting on it that broke." href="/digital-twins/part-1-my-mental-model-of-a-city.html">Part 1</a> wrote down the mental model and recorded the corrections; <a class="t" data-ref="Part 2 &middot; The track record" data-tip="A decade of government everything-twins, the scoped twins that outlived them, and a US$2 billion company running the same experiment today." href="/digital-twins/part-2-lets-simulate-everything.html">Part 2</a> checked that argument against a decade of programs. This post is a side quest: I went and stood inside one.</p>
+  <p>I'd been working my way through the digital-city-twin space: reading up on the stacks people build them on, and happily running my own simulations. Road traffic in <strong>SUMO</strong> (Simulation of Urban MObility), agent-based travel demand in <strong>MATSim</strong> (Multi-Agent Transport Simulation), that kind of thing. Sooner or later that curiosity turns to the question: what do the <em>real</em> twins look like, the official ones governments actually run?</p>
+  <p>In New South Wales (<span class="t" data-k="nsw">NSW</span>) the answer is the <strong>NSW Spatial Digital Twin</strong>, a government-run <span class="t" data-k="dim">2D/3D/4D</span> model of the state built by the Department of Customer Service (<span class="t" data-k="dcs">DCS</span>) Spatial Services with Data61, the digital research arm of the Commonwealth Scientific and Industrial Research Organisation (<span class="t" data-k="csiro">CSIRO</span>). Its public front door is the <strong>Spatial Digital Twin Explorer</strong> (<span class="t" data-k="sdt">SDT</span> Explorer), the viewer that in May 2025 replaced the long-serving Spatial Information eXchange (<span class="t" data-k="six">SIX</span>) Maps, laying authoritative spatial data over a precise basemap of every street, parcel and building. Esri, the company whose mapping platform runs it, calls it "one of the largest spatial digital twins in the world," now spanning more than nineteen council areas.</p>
+  <p>It isn't the only one. Most Australian states have stood up a twin, and they interlink into a loose national ecosystem.</p>
+
+  <table>
+    <thead>
+      <tr><th>Twin</th><th>Where</th><th>What it is</th><th>Stack</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>NSW SDT Explorer</strong></td>
+        <td>New South Wales</td>
+        <td>Successor to SIX Maps. Foundation spatial data in 2D/3D/4D, federated across government portals. The twin we're standing in.</td>
+        <td><span class="t" data-k="esri">Esri</span> &middot; <span class="t" data-k="arcgis">ArcGIS Enterprise</span></td>
+      </tr>
+      <tr>
+        <td>Digital Twin Victoria</td>
+        <td>Victoria</td>
+        <td>Launched Aug 2022 on a $37.4M program; 4,000+ datasets with 3D buildings, overshadowing and underground utilities.</td>
+        <td><span class="t" data-k="terria">TerriaJS</span> &middot; <span class="t" data-k="cesium">CesiumJS</span></td>
+      </tr>
+      <tr>
+        <td>Queensland Digital Twin</td>
+        <td>Queensland</td>
+        <td>Part of the same national family: land use, 3D photogrammetry and live feeds streamed as 3D Tiles in the browser.</td>
+        <td><span class="t" data-k="terria">TerriaJS</span> &middot; <span class="t" data-k="cesium">CesiumJS</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <p>Victoria and Queensland, and NSW's own earlier <code>digitaltwin.terria.io</code> viewer, run on CSIRO Data61's TerriaJS with Cesium. The SDT Explorer used here is the Esri-based successor.</p>
+</section>
+
+<section>
+  <h2><span class="no">&sect;2</span>The stack</h2>
+  <p>My own experiments had been on the <em>simulation</em> side of the twin world: engines that move agents and vehicles around a network. The official twin is the other half, the authoritative, continuously updated model of the physical city those simulations want to run against.</p>
+  <ul>
+    <li><strong>SUMO</strong> &middot; <span class="t" data-k="microsim">traffic microsimulation</span></li>
+    <li><strong>MATSim</strong> &middot; agent-based transport</li>
+    <li><strong>TerriaJS + Cesium</strong> &middot; open-source twin viewers</li>
+    <li><strong>Esri ArcGIS</strong> &middot; the NSW twin's platform</li>
+  </ul>
+  <p>SDT Explorer is a browser app over an <strong>ArcGIS Enterprise</strong> back end. Every dataset is a Representational State Transfer (<span class="t" data-k="rest">REST</span>) service you can query directly, and that was the moment the side quest suggested itself: if the layers are open services and there's an "Add your own data" button, then anything I could shape into a spatial file could sit on the same map.</p>
+
+  <table>
+    <thead>
+      <tr><th>Layer</th><th>What it is</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Viewer</strong><br>SDT Explorer</td><td>Web client for 2D/3D/4D, with <span class="t" data-k="identify">identify</span>, measure, swipe and line-of-sight tools.</td></tr>
+      <tr><td><strong>Platform</strong><br>ArcGIS Enterprise</td><td>The Spatial Collaboration Portal: hosting, sharing and federating foundation data.</td></tr>
+      <tr><td><strong>Services</strong><br>REST <span class="t" data-k="featureserver">FeatureServers</span></td><td>Each <span class="t" data-k="theme">theme</span> is an open, queryable endpoint returning JavaScript Object Notation (<span class="t" data-k="json">JSON</span>) geometry and attributes.</td></tr>
+      <tr><td><strong>Upload</strong><br>Add your own data</td><td>Bring a file up to 150 megabytes and it becomes a <span class="t" data-k="clientside">client-side</span> overlay layer instantly.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="no">&sect;3</span>Layers, formats, and the fabric of the <span class="t" data-k="cadastre">cadastre</span></h2>
+  <p>The base data is organised into a handful of authoritative <strong>themes</strong>, each a live service: Land Parcel &amp; Property (<span class="t" data-k="lot">lots</span>), Geocoded Addressing (<span class="t" data-k="geocoded">points</span>), Administrative Boundaries, Imagery, Elevation &amp; Depth, Transport and Water.</p>
+  <p>To add your own, the uploader accepts a short menu of formats: <strong><span class="t" data-k="shapefile">zipped shapefile</span></strong>, <span class="t" data-k="csv">CSV</span>, <span class="t" data-k="kmz">KMZ</span>, geotagged <span class="t" data-k="jpeg">JPEG</span>, <span class="t" data-k="gpx">GPX</span>, and a web service <span class="t" data-k="url">URL</span>. The zipped shapefile is the one that carries <span class="t" data-k="polygons">polygons</span> <em>and</em> a full <span class="t" data-k="attrtable">attribute table</span>, so it's what a lot-level census layer has to be.</p>
+
+  <figure>
+    <img src="/media/nsw-sdt-land-parcel-theme.jpg" alt="The NSW SDT Explorer viewer with the Add data panel open on the Quick Layers tab. The NSW Land Parcel Property Theme checkbox is ticked, and the aerial basemap behind it is covered in blue lot boundaries across Forest Lodge, Glebe and the University end of Broadway." width="1480" height="763">
+    <figcaption>FIG 1 - Enabling the official <b>NSW Land Parcel &amp; Property</b> theme from Quick Layers draws every lot boundary in blue over the SDT Explorer aerial basemap. This is the authoritative cadastre the whole exercise builds on.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2><span class="no">&sect;4</span>A census-night coincidence</h2>
+  <p>The timing was pure accident. The evening I was poking around the official twins happened to be <strong>census night, 11 August 2026</strong>. I'd filled in the form for my current location a few hours earlier. So when it clicked that the twin would take my own layers, the obvious playful question was: could I put the census itself on this map? It seemed like a fun thing to try on the one night of the year everybody is being counted.</p>
+  <p>Fresh census data takes many months to publish, and NSW won't see 2026 figures until well into 2027, so I reached back to the <strong>2021</strong> census night instead, the last time everyone was counted (10 August 2021). And there was a real puzzle to make it interesting. The Australian Bureau of Statistics (<span class="t" data-k="abs">ABS</span>) never publishes "where people actually were" below the <strong>Statistical Area Level 1</strong> (<span class="t" data-k="sa1">SA1</span>), a statistical area of a few hundred people. Nothing exists at the parcel level. Getting to a per-lot layer meant borrowing detail from the cadastre itself, in three moves.</p>
+
+  <h3>A. Get the census-night data</h3>
+  <p>From the ABS 2021 <strong>Place of Enumeration Profile</strong> (<span class="t" data-k="pep">PEP</span>) <span class="t" data-k="datapack">DataPack</span> (table P01, <span class="t" data-k="totpp">Tot_P_P</span>) for every NSW SA1, plus the <span class="t" data-k="meshblock">Mesh Block</span> counts spreadsheet for residents and <span class="t" data-k="dwellings">dwellings</span>. Both pulled straight from abs.gov.au.</p>
+
+  <h3>B. Scope it to Forest Lodge</h3>
+  <p>Query the ABS boundary service for the <strong>Forest Lodge</strong> suburb polygon, take the Mesh Blocks whose <span class="t" data-k="centroid">centre</span> falls inside it, and keep only their <strong>12 SA1s</strong>, clipping a state-wide file down to one square-kilometre neighbourhood.</p>
+
+  <h3>C. Transform and disaggregate to lots</h3>
+  <p><span class="t" data-k="disagg">Split</span> each SA1's count across its Mesh Blocks (by <span class="t" data-k="usualres">usual residents</span>), then across the <strong>lots</strong> inside each Mesh Block, weighted by the number of geocoded <strong>address points</strong> on the lot, so a 25-unit apartment block draws 25&times; a single house. Write the result as a zipped shapefile.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 720 250" role="img" aria-label="A diagram of the two-stage disaggregation. A published SA1 count of 327 persons is split across the Mesh Blocks inside it, weighted by usual residents. Each Mesh Block total is then split across the lots inside it, weighted by geocoded address points, so a 25-unit strata block draws 25 shares against a single house's one share.">
+      <defs>
+        <pattern id="g1" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/>
+        </pattern>
+        <marker id="m1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"/>
+        </marker>
+      </defs>
+      <rect x="0" y="0" width="720" height="250" fill="url(#g1)"/>
+
+      <text class="sv-band" x="16" y="28">PUBLISHED</text>
+      <text class="sv-band" x="524" y="28" style="fill:var(--flag)">MODELLED</text>
+
+      <rect x="16" y="44" width="180" height="78" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="30" y="66">SA1 count &middot; published</text>
+      <text class="sv-sub" x="30" y="84">the finest grain the ABS</text>
+      <text class="sv-sub" x="30" y="98">will publish: 327 persons</text>
+      <text class="sv-sub" x="30" y="112">across a few hundred people</text>
+
+      <line x1="202" y1="83" x2="264" y2="83" stroke="var(--ink-soft)" stroke-width="1.4" marker-end="url(#m1)"/>
+      <text class="sv-sub" x="230" y="74" text-anchor="middle">split by</text>
+      <text class="sv-sub" x="230" y="100" text-anchor="middle">residents</text>
+
+      <rect x="270" y="44" width="180" height="78" rx="5" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="284" y="66">MESH BLOCK share</text>
+      <text class="sv-sub" x="284" y="84">30 to 60 dwellings each,</text>
+      <text class="sv-sub" x="284" y="98">weighted by usual</text>
+      <text class="sv-sub" x="284" y="112">residents, else dwellings</text>
+
+      <line x1="456" y1="83" x2="518" y2="83" stroke="var(--flag)" stroke-width="1.4" marker-end="url(#m1)"/>
+      <text class="sv-sub" x="484" y="74" text-anchor="middle">split by</text>
+      <text class="sv-sub" x="484" y="100" text-anchor="middle">addresses</text>
+
+      <rect x="524" y="44" width="180" height="78" rx="5" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.6"/>
+      <text class="sv-lab-b" x="538" y="66" style="fill:var(--flag)">LOT estimate</text>
+      <text class="sv-sub" x="538" y="84">one surveyed parcel;</text>
+      <text class="sv-sub" x="538" y="98">weighted by geocoded</text>
+      <text class="sv-sub" x="538" y="112">address points on it</text>
+
+      <rect x="16" y="146" width="688" height="58" rx="5" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.2"/>
+      <text class="sv-lab-b" x="30" y="168">WHY ADDRESS POINTS</text>
+      <text class="sv-sub" x="30" y="186">A 25-unit strata block carries 25 geocoded points, a single house carries one, so the block draws 25 shares of</text>
+      <text class="sv-sub" x="30" y="198">its Mesh Block. Unit points suppress the building's base address, so the same building is never counted twice.</text>
+
+      <text class="sv-flag" x="16" y="236">lot values are modelled estimates - they sum back exactly to the published SA1 total, and no further</text>
+    </svg>
+    </div>
+    <figcaption>FIG 2 - The two-stage dasymetric disaggregation. <b>Only the leftmost box is published data</b>; everything to the right of it is modelled, and the ABS perturbs its published cells slightly in any case.</figcaption>
+  </figure>
+
+  <table>
+    <thead><tr><th>Forest Lodge, 2021 census night</th><th>Count</th></tr></thead>
+    <tbody>
+      <tr><td>SA1 areas</td><td>12</td></tr>
+      <tr><td>Mesh Blocks</td><td>56</td></tr>
+      <tr><td>Lots mapped</td><td>775</td></tr>
+      <tr><td>Persons placed</td><td>4,913</td></tr>
+    </tbody>
+  </table>
+  <p>Twenty-one attribute fields ride along on every lot: cadastre IDs, the Mesh Block and SA1 it sits in, the published counts it was derived from, the address-point weight, and the estimate itself (<code>PERSONS</code> / <code>PERSONS_R</code>). The file is 378 kilobytes and uploads to SDT Explorer in seconds, and the orange colour coding on the map is applied by the same build script.</p>
+  <p>The whole pipeline ran in two browser consoles: step A on <code>abs.gov.au</code>, because its DataPack downloads are only fetchable from that origin, and steps B and C on the SDT Explorer tab. No desktop mapping software, no build step, no libraries. The shapefile and ZIP writers are hand-rolled, so the whole thing fits in a console paste.</p>
+</section>
+
+<section>
+  <h2><span class="no">&sect;5</span>How many people were there in my building</h2>
+  <p>Here is my census data overlaid on the NSW digital portal. Nice to know that there were 45 people in this building on the last census night from 2021. I'll create a dataset to overlay on the digital twin portal once 2026 census data is available.</p>
+
+  <figure>
+    <img src="/media/nsw-sdt-census-lot-identify.jpg" alt="The SDT Explorer viewer with the uploaded census layer drawn as orange lot outlines over the aerial basemap of Forest Lodge. One strata lot is highlighted in cyan, and an identify popup titled census2021_night_persons_forest_lodge_lots.zip lists its attributes, including PERSONS 45.47 and PERSONS_R 45." width="1480" height="762">
+    <figcaption>FIG 3 - The estimate for the whole <span class="t" data-k="strata">strata</span> block on census night 2021. It flows from the block's 25 units taking a 25-address share of Mesh Block <code>10757722000</code>, itself a slice of SA1 <code>&hellip;3113</code>'s published 327 residents.</figcaption>
+  </figure>
+</section>
+
+<div class="sources">
+  <h2>Sources &amp; data</h2>
+  <ol>
+    <li>SDT Explorer, the NSW Spatial Collaboration Portal - <a href="https://portal.spatial.nsw.gov.au/explorer/index.html">portal.spatial.nsw.gov.au</a> &middot; NSW Spatial Digital Twin, Spatial Services - <a href="https://www.spatial.nsw.gov.au/digital_twin">spatial.nsw.gov.au</a></li>
+    <li>NSW Spatial Digital Twin, Esri Australia - <a href="https://esriaustralia.com.au/news/nsw-spatial-digital-twin-delivering-a-smarter-future">esriaustralia.com.au</a> &middot; SDT Explorer to replace SIX Maps, Spatial Source - <a href="https://www.spatialsource.com.au/spatial-digital-twin-explorer-to-replace-six-maps/">spatialsource.com.au</a></li>
+    <li>Digital Twin Victoria platform now live - <a href="https://www.land.vic.gov.au/maps-and-spatial/maps-and-spatial-news/2022/digital-twin-victoria-platform-now-live">land.vic.gov.au</a> &middot; Cesium on state-sized digital twins - <a href="https://cesium.com/blog/2022/02/11/cesium-supporting-state-sized-digital-twins/">cesium.com</a></li>
+    <li>ABS 2021 Census DataPacks, Place of Enumeration Profile - <a href="https://www.abs.gov.au/census/find-census-data/datapacks">abs.gov.au</a> &middot; ABS 2021 Census Mesh Block counts - <a href="https://www.abs.gov.au/census/guide-census-data/mesh-block-counts/latest-release">abs.gov.au</a></li>
+    <li>NSW Land Parcel &amp; Property Theme (FeatureServer) - <a href="https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Land_Parcel_Property_Theme/FeatureServer">portal.spatial.nsw.gov.au</a> &middot; NSW Geocoded Addressing Theme (FeatureServer) - <a href="https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Geocoded_Addressing_Theme/FeatureServer">portal.spatial.nsw.gov.au</a></li>
+  </ol>
+</div>
+
+  </article>
+
+  <p class="colophon"><span>City digital twin &middot; Part 3 of the series &middot;
+    Back to <a class="t" data-ref="Part 2 &middot; The track record"
+    data-tip="A decade of government everything-twins, the scoped twins that outlived them, and a US$2 billion company running the same experiment today."
+    href="/digital-twins/part-2-lets-simulate-everything.html">what the record says about
+    everything-twins</a></span></p>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+<div id="tip" role="tooltip"></div>
+
+<script>
+window.GLOSS = {
+  abs:{t:"ABS",d:"Australian Bureau of Statistics - the national agency that runs the census and publishes its results"},
+  arcgis:{t:"ArcGIS Enterprise",d:"Esri's self-hosted mapping server: stores the datasets and serves them to the browser"},
+  attrtable:{t:"Attribute table",d:"The spreadsheet riding along with the shapes - one row per parcel, one column per field"},
+  cadastre:{t:"Cadastre",d:"The official register of every land parcel in the state - its boundaries, its size and its legal identifier"},
+  centroid:{t:"Centroid",d:"The centre point of a shape; used to decide which suburb or Mesh Block a parcel belongs to when edges overlap"},
+  cesium:{t:"CesiumJS",d:"An open-source engine for streaming 3D terrain, buildings and imagery in a browser"},
+  clientside:{t:"Client-side",d:"The layer is drawn in your own browser for your session only - nothing is saved to the government server"},
+  csiro:{t:"CSIRO",d:"Commonwealth Scientific and Industrial Research Organisation - Australia's national science agency"},
+  csv:{t:"CSV",d:"Comma-Separated Values - a plain-text table; on this portal it can only carry points, not shapes"},
+  datapack:{t:"DataPack",d:"A bulk download of census tables as spreadsheets, one file per geography"},
+  dcs:{t:"DCS",d:"Department of Customer Service - the NSW government department whose Spatial Services unit maps the state"},
+  dim:{t:"2D / 3D / 4D",d:"Flat maps, 3D models of buildings and terrain, and 4D - the same 3D model tracked through time, so you can see how a place changes"},
+  disagg:{t:"Disaggregation",d:"Pushing a total published for a large area down onto the smaller pieces inside it, using something you can count (here, addresses) as the guide"},
+  dwellings:{t:"Dwellings",d:"Habitable homes, occupied or not; used here to spread counts where resident numbers are missing"},
+  esri:{t:"Esri",d:"The company behind ArcGIS, the dominant commercial mapping platform"},
+  featureserver:{t:"FeatureServer",d:"An ArcGIS endpoint that hands back the individual shapes in a dataset (lots, roads, address points) plus their attributes"},
+  geocoded:{t:"Geocoded address point",d:"Every street address has been given a precise latitude and longitude, so it can be placed on the map - including one point per apartment"},
+  gpx:{t:"GPX",d:"GPS Exchange Format - the format satnavs and fitness trackers use to record a route"},
+  identify:{t:"Identify",d:"Click any shape on the map to see the underlying record and all its attributes"},
+  jpeg:{t:"JPEG",d:"Joint Photographic Experts Group - an ordinary photo, here one carrying the coordinates where it was taken"},
+  json:{t:"JSON",d:"JavaScript Object Notation - a plain-text format for structured data that browsers read natively"},
+  kmz:{t:"KMZ",d:"Keyhole Markup language, Zipped - the compressed map format Google Earth popularised"},
+  lot:{t:"Lot",d:"One surveyed parcel of land with its own legal identifier - the unit the census counts were eventually attached to"},
+  matsim:{t:"MATSim",d:"Multi-Agent Transport Simulation - models a synthetic population of travellers and the daily trips each one makes"},
+  meshblock:{t:"Mesh Block",d:"The ABS's smallest building block of geography, usually 30\u201360 dwellings; several make up one SA1"},
+  microsim:{t:"Traffic microsimulation",d:"Models every single vehicle individually rather than traffic as an average flow"},
+  nsw:{t:"NSW",d:"New South Wales - the Australian state Sydney sits in"},
+  parcel:{t:"Parcel",d:"The smallest surveyed unit of land ownership - the block a house or apartment building sits on"},
+  pep:{t:"PEP",d:"Place of Enumeration - counts people where they physically were on census night, rather than where they usually live"},
+  polygons:{t:"Polygons",d:"Closed shapes - here, the outline of each land parcel - as opposed to single points or lines"},
+  rest:{t:"REST",d:"Representational State Transfer - the ordinary web convention where data is fetched by URL, so any dataset can be queried straight from a browser"},
+  sa1:{t:"SA1",d:"Statistical Area Level 1 - the smallest area the ABS publishes most census results for, typically 200\u2013800 people"},
+  sdt:{t:"SDT",d:"Spatial Digital Twin - the name of the NSW model, and of its public map viewer, SDT Explorer"},
+  shapefile:{t:"Zipped shapefile",d:"The long-standing standard for map data - a small set of files (shapes, index, attribute table, coordinate system) bundled into one .zip"},
+  six:{t:"SIX",d:"Spatial Information eXchange - the NSW government's previous public map viewer, retired in 2025"},
+  strata:{t:"Strata",d:"An apartment building where each unit is separately owned; the whole building sits on one shared land parcel"},
+  sumo:{t:"SUMO",d:"Simulation of Urban MObility - an open-source engine that simulates individual vehicles moving through a road network"},
+  terria:{t:"TerriaJS",d:"An open-source, browser-based map viewer built by CSIRO Data61; the base of several Australian government twins"},
+  theme:{t:"Theme",d:"One authoritative topic-based dataset, e.g. all land parcels, or all addresses"},
+  totpp:{t:"Tot_P_P",d:"The column holding Total Persons, the headline count for that area"},
+  url:{t:"URL",d:"Uniform Resource Locator - a web address; here, pointing at a live dataset hosted elsewhere"},
+  usualres:{t:"Usual residents",d:"People counted where they normally live, as opposed to where they happened to be on census night"},
+};
+</script>
+<script src="/assets/tip.js" defer></script>
+</body>
+</html>
