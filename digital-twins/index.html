@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building a City Digital Twin - Praneet Dhoolia</title>
-<meta name="description" content="A series on what it takes to model a city honestly: the mental model I started with, the corrections the literature forced on it, and why every correction points at a smaller, scoped twin.">
+<meta name="description" content="A series on what it takes to model a city honestly: the mental model I started with, the corrections the literature forced on it, why every correction points at a smaller, scoped twin, and what happened when I built one by hand.">
 <link rel="canonical" href="https://praneetdhoolia.github.io/digital-twins/">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css">
@@ -24,7 +24,7 @@
 <main class="wrap">
 
   <header class="masthead">
-    <p class="kicker">Series &middot; 3 parts &middot; August 2026</p>
+    <p class="kicker">Series &middot; 4 parts &middot; August 2026</p>
     <h1>Building a City Digital Twin</h1>
     <p class="standfirst">I set out to model a city, and started where most people start -
       with the whole thing. This series is what the literature, the real data, and my own
@@ -52,7 +52,13 @@
       twins the record vindicated: the NSW Spatial Digital Twin. On census night it takes the
       portal up on its &ldquo;add your own data&rdquo; button and pushes a census-night headcount
       down onto individual land parcels, a grain the Bureau of Statistics never publishes at,
-      which turns out to be a lesson in what a scoped twin will and will not tell you.</p>
+      which turns out to be a lesson in what a scoped twin will and will not tell you.
+      <strong>Part 4</strong> stops reading and starts building: a scoped twin made by hand,
+      with OpenStreetMap roads cropped by osmium and run through SUMO, put to one concrete
+      question - how long the Victoria Park precinct takes to clear when 63,000 people leave
+      the Brisbane 2032 stadium at once, and where it chokes. Thirteen real runs are baked
+      into an interactive map, with the assumptions and the sanity checks set out beside
+      them.</p>
   </div>
 
   <div class="part-cards">
@@ -84,6 +90,16 @@
         census stops at the SA1, so reaching the parcel meant borrowing detail from the cadastre
         itself, in two browser consoles and no desktop tooling.</p>
       <span class="read">Read Part 3 &rarr;</span>
+    </a>
+
+    <a class="part" href="/digital-twins/part-4-brisbane-2032-egress-with-sumo.html">
+      <p class="part-kicker">Part 4 &middot; Hands On With SUMO &middot; August 2026</p>
+      <h2>Brisbane 2032 egress from Victoria Park: hands on experiments with SUMO</h2>
+      <p class="sum">A scoped twin built by hand: OpenStreetMap roads cropped with osmium
+        and run through SUMO, asking how long the Victoria Park precinct takes to clear
+        after 63,000 people leave at once. Thirteen real runs baked into an interactive
+        map, with the assumptions and the sanity checks laid out beside it.</p>
+      <span class="read">Read Part 4 &rarr;</span>
     </a>
 
   </div>
