@@ -609,7 +609,8 @@ a.part .read {
   letter-spacing: 0.06em;
   color: var(--faint);
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 20px;
   align-items: center;
 }
 .colophon::before {
