@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>A synthetic city on one engine: built, then held to reality - Praneet Dhoolia</title>
-<meta name="description" content="What Part 4's hand-built SUMO twin grew into: a census-drawn population that chooses its own trips on one MATSim engine, every input on a ledger, and a scoreboard that checks twelve travel modes against their real ridership.">
+<title>A synthetic Newcastle: a city that moves, checked against the real one - Praneet Dhoolia</title>
+<meta name="description" content="A working digital twin of Greater Newcastle: half a million synthetic residents with homes, jobs and households, travelling by twelve modes on the region's real roads and timetables, watched in a 3D viewer and checked against how the real city travels.">
 <link rel="canonical" href="https://praneetdhoolia.github.io/digital-twins/part-5-a-synthetic-city-held-to-reality.html">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css">
@@ -25,105 +25,75 @@
 
   <div class="post-header">
     <p class="eyebrow ruled"><span><a href="/digital-twins/">City digital twin</a> &middot; Part 5 &middot; The synthetic city</span></p>
-    <h1>A synthetic city on one engine: <em>built, then held to reality</em></h1>
-    <p class="standfirst">Part 4 ended with an upgrade path: real demand, real targets, many runs, and a ledger of where every number came from. A second build had been running alongside it since 10 August. This is what that build became - a census-drawn population choosing its own trips on one engine, with every input on a ledger - and what happened when it was held to twelve real ridership figures.</p>
-    <p class="date"><time datetime="2026-10">October 2026</time> &middot; ~14 min read &middot; Part 5 of a series</p>
+    <h1>A synthetic Newcastle: <em>a city that moves, checked against the real one</em></h1>
+    <p class="standfirst">A weekend twin of one stadium precinct taught me what a small twin can do. Alongside it I was building a much bigger one: a working digital twin of Greater Newcastle, in which half a million synthetic residents live, travel by twelve modes on the region's real roads and timetables, and are checked against how the real city travels. This post shows what it looks like and what it can already say.</p>
+    <p class="date"><time datetime="2026-10">October 2026</time> &middot; ~11 min read &middot; Part 5 of a series &middot; with Pranav Dhoolia</p>
   </div>
 
   <article class="post-body">
 
 <section>
-  <h2>The build that ran alongside Part 4</h2>
+  <h2>What I built</h2>
   <p><a class="t" data-ref="Part 4 &middot; Hands on with SUMO"
-     data-tip="A scoped twin built by hand: OpenStreetMap roads cropped with osmium and run through SUMO, asking how long the Brisbane 2032 stadium precinct takes to clear after 63,000 people leave at once."
-     href="/digital-twins/part-4-brisbane-2032-egress-with-sumo.html">Part 4</a> was a weekend build: one precinct, one question, demand I wrote down myself, thirteen runs. It closed by listing what would make its numbers defensible - the official mode-split targets as inputs, real station capacities, real traffic counts to calibrate against, and a sweep of seeds - and by saying that the valuable object was never the map but "the precomputed grid with its provenance attached".</p>
-  <p>That list was not hypothetical. Since 10 August a second, much larger build had been running in parallel, on a city chosen for a question rather than an event. Newcastle, in New South Wales, opened a 2.7 km light rail in 2019. The state's Auditor-General found in 2018 that its business case had been written after the decision to build it, and no ex-post evaluation exists. The first design was a counterfactual study: simulate Newcastle with the tram and without it, and compare - <a class="t" data-ref="Part 1 &middot; The model"
-     data-tip="A city as entities, flows and senses - a state-space model - and six corrections to it, the last being that a twin earns its keep on comparisons, not forecasts."
-     href="/digital-twins/part-1-my-mental-model-of-a-city.html">Part 1's sixth correction</a> taken literally.</p>
-  <p>On 24 August the goal changed. Answering one question about one tram needed a model of the whole city's travel that could be trusted first, so the twin itself became the goal: twelve ways of travelling, each moving physically through the real network, each checked against its real-life ridership. The light rail became the first question the finished twin will be pointed at, not the reason it exists.</p>
+     data-tip="A scoped twin built by hand in SUMO: how long the Brisbane 2032 stadium precinct takes to clear after 63,000 people leave at once."
+     href="/digital-twins/part-4-brisbane-2032-egress-with-sumo.html">Previously</a> I built a twin by hand for one question: how long a stadium precinct takes to empty. It ended with a wish list - real demand instead of numbers I made up, real targets to check against, many runs instead of one, and a record of where every number came from. This is that wish list, built for a whole city.</p>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt5-viewer-3d.dark.jpg" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-viewer-3d.light.jpg" alt="The twin's 3D viewer over central Newcastle at a steep tilt. Every street is coloured by how delayed its traffic was over a simulated weekday, mostly green for flowing with red on the busiest stretches; rail lines run in purple into Newcastle Interchange, the Stockton ferry crosses the harbour in cyan, and buildings stand in 3D." width="1440" height="900">
+    </picture>
+    <figcaption><b>FIG 1</b> - Central Newcastle in the twin's own viewer, after a full simulated weekday. Each street is coloured by how much slower its traffic ran than when empty; the rail lines, the light rail and the Stockton ferry run on their real timetables.</figcaption>
+  </figure>
+
+  <p>The city is Newcastle, in New South Wales, across its five council areas. It was chosen for a question: the city opened a 2.7 km light rail in 2019 whose business case, the state's Auditor-General found, was written after the decision to build it, and nobody has measured what it changed since. Answering that needs a model of how the whole city travels that can be trusted first, so the twin became the goal and the light rail its first question.</p>
+  <p>In one sentence: every resident of the study area has a synthetic counterpart with a home, a household, an age, a job or a school, a driver's licence or not, and a car or not; each of them has a day to get through; and each chooses how to travel it - drive, get a lift, walk, cycle, ride a motorbike, take a taxi, a bus, a train, the light rail or the ferry - on the real network, while trucks and freight trains take their real share of the roads and level crossings.</p>
 
   <table>
-    <thead><tr><th>Part 4 did this</th><th>The Newcastle twin does this instead</th></tr></thead>
+    <thead><tr><th>The hand-built precinct twin</th><th>The Newcastle twin</th></tr></thead>
     <tbody>
-      <tr><td>Demand authored: attendance &times; car share &divide; 2.5</td><td>A synthetic population drawn from census tables, which chooses its own travel mode</td></tr>
-      <tr><td>A hand-cropped road extract</td><td>The whole region's OpenStreetMap, harvested over an extent derived from the council boundaries, plus real timetables for every bus, train, tram and ferry</td></tr>
-      <tr><td>One engine at the mesoscopic level</td><td>One agent-based engine in which every mode moves physically</td></tr>
-      <tr><td>Uncalibrated</td><td>Twelve modes scored against official figures, with a held-back set nobody may look at until the end</td></tr>
-      <tr><td>One seed per run</td><td>Runs compared only as bands, inside declared families</td></tr>
-      <tr><td>A provenance note under the map</td><td>A ledger of 600 input values and 968 files, each with its source, and a check that fails the build when a value has none</td></tr>
+      <tr><td>Demand I wrote down: attendance &times; car share &divide; 2.5</td><td>A population generated from the census, which chooses its own way to travel</td></tr>
+      <tr><td>One precinct's roads</td><td>The whole region: every road, footpath and cycle path, and every public transport timetable</td></tr>
+      <tr><td>Cars only</td><td>Twelve modes, each moving through the network</td></tr>
+      <tr><td>Nothing to check against</td><td>Twelve real ridership figures, checked every run</td></tr>
     </tbody>
   </table>
 </section>
 
 <section>
-  <h2>People are generated, not authored</h2>
-  <p>In Part 4 the crowd was a number: 63,000 people, 45% by car, 2.5 to a car. Everything downstream was arithmetic on my assumptions. The Newcastle twin starts somewhere else. It draws households and people for each of 1,500 census areas (<span class="t" data-k="sa1">SA1s</span>) so that, added up, they reproduce what the census published there: household sizes, dwellings, cars per household, age and sex, work status, schooling and income.</p>
-  <p>This is <a class="t" data-ref="Part 3 &middot; The side quest"
-     data-tip="Pushing a census-night headcount from the SA1 down to individual land parcels of the NSW Spatial Digital Twin, in two browser consoles."
-     href="/digital-twins/part-3-nsw-digital-twin-census-layer.html">Part 3's census exercise</a> grown up. There, a published SA1 count was split down onto land parcels. Here, the same published counts are used to generate the people themselves, and the rule from Part 3 still holds: the synthetic population must sum back to what was published, and nothing finer is claimed as observed.</p>
-  <p>Then each person gets a day. Home-anchored tours - to work, to school, to the shops, dropping a child off - are generated to match the state's <span class="t" data-k="hts">Household Travel Survey</span>: 3.47 trips per person per day. Destinations sit on real buildings and points of interest. Driver licences come from the transport department's published counts for each local government area and age band, not from a guess. Households own the cars the census says they own, so two drivers with one car have to share it.</p>
-  <p>One thing is deliberately <em>not</em> generated: how anyone travels. Nobody is assigned a mode. That is left to the simulation, which is the point of <a class="t" data-ref="Part 1 &middot; The model"
-     data-tip="Correction 3: people re-optimise when a policy changes their options, so a useful twin must model choice, not only flow."
-     href="/digital-twins/part-1-my-mental-model-of-a-city.html">Part 1's third correction</a>: people are not particles, so the model has to let them choose.</p>
+  <h2>The city, rebuilt from open data</h2>
+  <p>Everything under the people is public data, rebuilt by scripts so that it can be rebuilt again. The roads, footpaths and cycle paths come from OpenStreetMap across four thousand square kilometres; the timetables from the transport department's open feeds for buses, trains, the light rail and the ferry.</p>
 
   <figure>
-    <div class="fig-scroll">
-    <svg viewBox="0 0 720 250" role="img" aria-label="Three columns. Published: census tables for 1,500 SA1s, licence counts by area and age, and the Household Travel Survey. Synthesised: households and persons, then home-anchored tours with destinations. Chosen inside the simulation: mode, route and departure time. Only the first column is published data.">
-      <defs>
-        <pattern id="g1" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/>
-        </pattern>
-        <marker id="m1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"/>
-        </marker>
-      </defs>
-      <rect x="0" y="0" width="720" height="250" fill="url(#g1)"/>
+    <picture>
+      <source srcset="/media/dt5-network.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-network.light.png" alt="Map of the twin's network across Greater Newcastle: about 200,000 road links in grey and about 170,000 footpath and cycle path links in green, dense in the city centre and the suburbs around Lake Macquarie and Maitland." width="1400" height="1000">
+    </picture>
+    <figcaption><b>FIG 2</b> - The network the people move on: 200,935 road links and 169,509 footpath and cycle path links, so a walk to the bus stop is a walk on a real footpath, not a straight line.</figcaption>
+  </figure>
 
-      <text class="sv-band" x="16" y="28">PUBLISHED</text>
-      <text class="sv-band" x="262" y="28" style="fill:var(--ink)">SYNTHESISED</text>
-      <text class="sv-band" x="508" y="28" style="fill:var(--flag)">CHOSEN IN THE RUN</text>
+  <figure>
+    <picture>
+      <source srcset="/media/dt5-transit.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-transit.light.png" alt="Map of every timetabled public transport service in the twin: bus routes in green covering the city and suburbs, train lines in blue running north-west to Maitland and south towards Lake Macquarie, the light rail in purple in the city centre and the ferry across the harbour." width="1400" height="1000">
+    </picture>
+    <figcaption><b>FIG 3</b> - Every timetabled service, drawn on the streets and tracks it was mapped to: 996 bus route patterns, 270 train patterns, the light rail and the Stockton ferry.</figcaption>
+  </figure>
 
-      <rect x="16" y="42" width="200" height="54" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
-      <text class="sv-lab-b" x="30" y="64">census tables</text>
-      <text class="sv-sub" x="30" y="82">1,500 SA1s &middot; age, work, income, cars</text>
-      <rect x="16" y="106" width="200" height="54" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
-      <text class="sv-lab-b" x="30" y="128">licence counts</text>
-      <text class="sv-sub" x="30" y="146">by council area and age band</text>
-      <rect x="16" y="170" width="200" height="54" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
-      <text class="sv-lab-b" x="30" y="192">travel survey</text>
-      <text class="sv-sub" x="30" y="210">trips per day &middot; purposes &middot; distances</text>
+  <p>The people are generated from the 2021 census, one census area (<span class="t" data-k="sa1">SA1</span>) at a time, so that added up they match what was published there: household sizes, cars per household, age and sex, work and study, income. Driver licences come from the transport department's published counts, and each person's day is shaped by the state's <span class="t" data-k="hts">travel survey</span>: about three and a half trips, to real buildings. What nobody is given is a mode. That is the one thing they choose.</p>
 
-      <line x1="222" y1="100" x2="256" y2="100" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#m1)"/>
-      <line x1="222" y1="160" x2="256" y2="160" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#m1)"/>
-
-      <rect x="262" y="58" width="210" height="70" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
-      <text class="sv-lab-b" x="276" y="80">households &amp; persons</text>
-      <text class="sv-sub" x="276" y="98">sum back to every published cell</text>
-      <text class="sv-sub" x="276" y="112">cars owned, licences held</text>
-      <rect x="262" y="140" width="210" height="70" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
-      <text class="sv-lab-b" x="276" y="162">tours &amp; destinations</text>
-      <text class="sv-sub" x="276" y="180">3.47 trips per person per day</text>
-      <text class="sv-sub" x="276" y="194">on real buildings, no mode yet</text>
-
-      <line x1="478" y1="134" x2="502" y2="134" stroke="var(--flag)" stroke-width="1.3" marker-end="url(#m1)"/>
-
-      <rect x="508" y="80" width="196" height="108" rx="5" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.5"/>
-      <text class="sv-lab-b" x="522" y="104" style="fill:var(--flag)">mode &middot; route &middot; time</text>
-      <text class="sv-sub" x="522" y="124">each person tries options,</text>
-      <text class="sv-sub" x="522" y="138">scores them, keeps the best;</text>
-      <text class="sv-sub" x="522" y="152">ridership is an OUTPUT,</text>
-      <text class="sv-sub" x="522" y="166">never an input</text>
-
-      <text class="sv-flag" x="16" y="244">only the left column is data; the middle is constrained to it; the right is behaviour</text>
-    </svg>
-    </div>
-    <figcaption><b>FIG 1</b> - Where the people come from. In Part 4 the whole crowd, and how it travelled, sat in the pink box as my assumptions. Here the pink box holds only what people choose, and the choosing happens inside the simulation.</figcaption>
+  <figure>
+    <picture>
+      <source srcset="/media/dt5-people.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-people.light.png" alt="Hexagon density map of where the twin's synthetic residents live, densest in central Newcastle and its inner suburbs, with clusters at Maitland, Cessnock, Raymond Terrace, Port Stephens and around Lake Macquarie." width="1400" height="1000">
+    </picture>
+    <figcaption><b>FIG 4</b> - Where the synthetic residents live, from one run's quarter-sample of them. It is the region's real settlement pattern, drawn by people who do not exist.</figcaption>
   </figure>
 </section>
 
 <section>
-  <h2>One engine, and everything moves</h2>
-  <p>The engine is <a class="t" data-k="matsim" href="https://www.matsim.org/">MATSim</a>. Where SUMO moves vehicles whose routes you give it, MATSim moves people who each carry a plan for the day, and it iterates. Every simulated person executes their plan on the network, where the plans collide in queues. Each plan is then scored: time spent at activities is good, time spent travelling, waiting and walking to a stop is bad, fares and parking cost money. Between iterations a share of people try something different - a new route, a different departure time, another mode - and over a few hundred iterations the population settles into a state where few can do better. The mode shares come out of that settling. Nobody types them in.</p>
+  <h2>A day in the twin</h2>
+  <p>The engine is <a class="t" data-k="matsim" href="https://www.matsim.org/">MATSim</a>. Every synthetic person carries a plan for the day and tries it on the network, where the plans meet in queues. Each plan is scored - time at work or at home is good, time stuck in traffic or waiting at a stop is bad, fares and parking cost money - and between rounds some people try something else: another route, another time, another mode. After a couple of hundred rounds the city settles, and how many people drive, walk or ride the train is simply where it settled.</p>
 
   <figure>
     <div class="fig-scroll">
@@ -169,63 +139,36 @@
       <text class="sv-flag" x="704" y="250" text-anchor="end">mode shares emerge; none is typed in</text>
     </svg>
     </div>
-    <figcaption><b>FIG 2</b> - The co-evolutionary loop MATSim runs. Part 4 ran its engine once per scenario; this one runs 250 times per scenario, and what is read at the end is where the population settled.</figcaption>
+    <figcaption><b>FIG 5</b> - How the people choose. Nobody types in how many people take the bus; it comes out of 250 rounds of everyone trying, scoring and adjusting.</figcaption>
   </figure>
-
-  <p>The first design used two simulators: MATSim for the city, SUMO for a signal-accurate model of the tram corridor, joined by an outer loop. On 25 August SUMO was removed by recorded decision. The record is blunt about its corridor model: "built six times, simulated zero times". Every question it had been kept for turned out to have a native MATSim form - level crossings as timed road closures, the tram's charging dwell from its timetable, a lost traffic lane as a network patch. Its one unique offer, thirty seeded replications for travel-time variance, never fitted on one workstation. Part 4 chose the mesoscopic engine for the same reason: speed buys runs, and runs buy comparisons.</p>
-  <p>One engine made a stricter rule affordable: <strong>nothing <span class="t" data-k="teleport">teleports</span></strong>. Walkers, cyclists, motorcyclists, cars, taxis, buses, trains, trams, ferries and trucks all move through the same network with their own speeds and road space, and a car can overtake a walker. A passenger getting a lift boards the driver's actual car, and the driver detours to pick them up. Where a physical model would have to invent something, the twin declines. Coal trains are the example: putting them on the passenger model's tracks would "fabricate an interaction", so trains appear as what the road network actually feels - the boom gates at two level crossings closing 405 times on a weekday, for passenger and coal trains together.</p>
-  <p>The traffic signals are the clearest case of deriving instead of assuming. Sydney's adaptive signal system, <span class="t" data-k="scats">SCATS</span>, has published algorithms, but Transport for NSW would not release the operated phase plans and offsets. The first design's fallback was to sweep a cycle time. The twin instead implements the published algorithm: each intersection measures how saturated its approaches were, stretches or shortens its cycle towards a target, and re-splits green time. What stays unobtained - the operated offsets - is written down as unobtained, not invented.</p>
-</section>
-
-<section>
-  <h2>The ledger is the product</h2>
-  <p>Part 4 put its provenance in a table under the map. The twin makes it structural. Every value a run can be sensitive to - 600 of them, from walking speed to the price of parking - is declared in a registry, never typed into a script. Each one says where it came from, and each one that was assumed, taken from the literature, measured or derived carries a range to sweep it over, a stated rule for holding it fixed, or the identity it is derived from. A check counts any number a script decides for itself; it stands at zero, and a change that adds one is not finished.</p>
 
   <figure>
-    <div class="fig-scroll">
-    <svg viewBox="0 0 720 262" role="img" aria-label="Bar chart of the 600 declared input values by source. Assumed 223, definition 152, literature 87, derived 56, measured 43, observed 39. Observed, measured and derived total 138. Every assumed value carries a sweep range or a held-fixed rule.">
-      <rect x="0" y="0" width="720" height="262" fill="url(#g2)"/>
-      <text class="sv-band" x="16" y="26">600 DECLARED INPUT VALUES, BY SOURCE</text>
-
-      <text class="sv-lab" x="16" y="58">observed</text>
-      <rect x="140" y="46" width="77" height="16" fill="var(--accent)"/>
-      <text class="sv-sub" x="224" y="58" style="fill:var(--ink)">39</text>
-      <text class="sv-lab" x="16" y="86">measured</text>
-      <rect x="140" y="74" width="85" height="16" fill="var(--accent)"/>
-      <text class="sv-sub" x="232" y="86" style="fill:var(--ink)">43</text>
-      <text class="sv-lab" x="16" y="114">derived</text>
-      <rect x="140" y="102" width="110" height="16" fill="var(--accent)"/>
-      <text class="sv-sub" x="257" y="114" style="fill:var(--ink)">56</text>
-      <text class="sv-lab" x="16" y="142">literature</text>
-      <rect x="140" y="130" width="171" height="16" fill="var(--ink-soft)"/>
-      <text class="sv-sub" x="318" y="142" style="fill:var(--ink)">87</text>
-      <text class="sv-lab" x="16" y="170">definition</text>
-      <rect x="140" y="158" width="299" height="16" fill="var(--ink-soft)" opacity=".55"/>
-      <text class="sv-sub" x="446" y="170" style="fill:var(--ink)">152</text>
-      <text class="sv-lab" x="16" y="198">assumed</text>
-      <rect x="140" y="186" width="438" height="16" fill="var(--flag)"/>
-      <text class="sv-sub" x="585" y="198" style="fill:var(--ink)">223</text>
-
-      <text class="sv-sub" x="16" y="232">blue: from this city's own data &middot; grey: from published studies, or a definition such as a unit or a switch</text>
-      <text class="sv-flag" x="16" y="250">pink: assumed, and therefore swept over a stated range or held fixed with a stated reason</text>
-    </svg>
-    </div>
-    <figcaption><b>FIG 3</b> - What the twin rests on. More than a third of its inputs are still assumptions, and the ledger says so; what it refuses is an assumption nobody can find. The registry is rendered into a <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/cities/newcastle/docs/reference/CONFIG_REFERENCE.md">public reference</a>.</figcaption>
+    <picture>
+      <source srcset="/media/dt5-day.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-day.light.png" alt="Stacked area chart of trips starting in each fifteen minutes of a simulated weekday by mode, with a morning peak around 08:30 and a larger afternoon peak around 16:00, dominated by car drivers, then car passengers, walking, trucks, cycling, taxis and public transport." width="1400" height="620">
+    </picture>
+    <figcaption><b>FIG 6</b> - A simulated weekday in Greater Newcastle: every trip by every simulated traveller, residents, visitors, through traffic and trucks, by the time it starts, scaled up from the quarter sample the run simulates.</figcaption>
   </figure>
 
-  <p>The files get the same treatment. All 968 derived and downloaded files are listed in a manifest with a hash, a row count, the script that produced them, the source, the retrieval date and the licence - 733 under CC-BY and 220 under the OpenStreetMap licence, whose share-alike terms follow anything built from them. The manifest is checked in CI, so a file that changes without its entry changing fails the build.</p>
-  <p>The rule that grew out of this is stronger than "label your assumptions": <strong>what can be derived is never assumed</strong>. A sweep is the fallback only where derivation is genuinely impossible, and the reason has to be stated. It sounds pedantic until it pays. Early on, a study area typed into a script as a rectangle quietly clipped 87 of the 1,500 census areas out of the road network, and nobody noticed for three phases. Now no coordinate may appear in code: the extent is derived from the council boundaries, and a check fails the build if anyone types one in. The check's own docstring puts the philosophy best: "A gate you can satisfy by editing prose is not a gate."</p>
+  <p>The twin's viewer is where it comes alive. It opens any run, finished or still going, and draws the whole region: each street by how delayed it was, each rail, light rail and ferry line from the run's own timetable, and beside the map the twelve modes against their real targets.</p>
+
+  <figure>
+    <img src="/media/dt5-viewer-orbit.gif" alt="Animated view in the twin's 3D viewer, turning slowly over central Newcastle, the harbour and Stockton, with streets coloured by simulated delay and rail lines in purple." width="640" height="360">
+    <figcaption><b>FIG 7</b> - Turning over the city in the viewer. Everything drawn comes from the run: the delays, the lines, the ferry.</figcaption>
+  </figure>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt5-viewer-day.dark.jpg" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-viewer-day.light.jpg" alt="The viewer's full view of a finished run: the whole region's network coloured by delay on the right, and on the left the run's card - settled, accounting closes, 250 of 250 iterations in 27 hours 51 minutes - and the table of the twelve modes against their targets." width="1440" height="900">
+    </picture>
+    <figcaption><b>FIG 8</b> - The same run from above, with its card: 158,161 people simulated, 250 rounds in just under 28 hours on one workstation, and every mode read against its target.</figcaption>
+  </figure>
 </section>
 
 <section>
-  <h2>Held to twelve real numbers</h2>
-  <p>Part 4 had sanity checks and no targets. The twin has twelve: car driver, car passenger, walk, bike, motorbike, taxi, bus, heavy rail, light rail, ferry, truck and freight train. Each is scored on the basis its real figure is published on. The travel survey gives residents' shares of trips. Opal card data gives weekday boardings at the disclosed stations, on the light rail and at the ferry wharves. Trucks are scored against classified road counts, and freight trains against the timetable and a published survey of coal movements. There is never an umbrella "public transport" row: a model that gets public transport right by overshooting trains and undershooting trams is wrong twice.</p>
-  <p>Three rules keep the scoring honest:</p>
-  <ul>
-    <li><strong>A gate.</strong> Every 100 iterations the run reads all twelve modes. If any mode is 20% or more off its target, the standing rule is to stop and look for the cause at the root - missing data, a bias, a mechanism that is not there - rather than paper over it with a constant. (A control run that exists to be compared with a treatment runs on to its horizon, and is read there.)</li>
-    <li><strong>A holdout.</strong> Of 210 validation targets, 143 are held back. The calibration code is structurally unable to read them, and they are opened once, at the end.</li>
-    <li><strong>Bands, not diffs.</strong> Part 1's fourth correction said one run is not the answer. It came back in an unexpected form: three MATSim runs of the same build, same seed, diverge by the second iteration, because a counter inside MATSim's random numbers races across twenty threads and a handful of people get different routes. The mode shares came out the same, but no difference between two runs can be read as exact. The transit mapper is worse: rebuilt from the same inputs, it lays nearly one route in five on different streets. So every run belongs to a declared <span class="t" data-k="family">comparability family</span>, nothing is compared across a family, a sample size or a network build, and a difference is read as a band.</li>
-  </ul>
+  <h2>How close to the real city</h2>
+  <p>A twin is only worth what it can be checked against, so each of the twelve modes is scored on the basis its real figure is published on: the travel survey's shares of residents' trips, the Opal card's boardings at train stations, on the light rail and at the ferry wharves, and road counts for trucks. There is no single "public transport" row that could hide trains overshooting while trams undershoot.</p>
 
   <figure>
     <div class="fig-scroll">
@@ -262,37 +205,30 @@
       <text class="sv-flag" x="16" y="364">truck and freight train are checked as levels and representation, not as a deviation</text>
     </svg>
     </div>
-    <figcaption><b>FIG 4</b> - The honest scoreboard: 2 of 12 modes inside 10% of the real figure. Data: the run's own twelve-mode reading, published on the twin's <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/STATUS.md">status board</a>.</figcaption>
+    <figcaption><b>FIG 9</b> - The honest scoreboard: 2 of 12 modes inside 10% of the real figure. Data: the run's own twelve-mode reading, published on the twin's <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/STATUS.md">status board</a>.</figcaption>
   </figure>
+
+  <p>Two of twelve is not a finished twin, and I would rather show that than tune it into looking like one. Every mode has a knob that could be turned until it matches; turning them would make the chart green and teach the model nothing. The misses point at things the city does that the twin does not yet: people drive most trips under a kilometre, because the walk to a parked car costs them nothing yet; almost half of the attempts to plan a public transport journey find no route; and people without a car, with no lift and no bus, fall back on cycling and taxis far more than real people do. The light rail, the question the project started from, is still the furthest off.</p>
 </section>
 
 <section>
-  <h2>What the scoreboard says</h2>
-  <p>Two of twelve is not a calibrated twin, and I would rather say so than tune it into looking like one. Every mode past the bar has a named mechanism behind it, and none of them is a constant waiting to be nudged. People drive 59% of trips shorter than a kilometre, because the model does not yet charge the walk to and from a parked car. Almost half of public-transport routing requests find no transit route at all. And a person without a car, on a trip no driver is bound to and no transit serves, is left with walking, cycling or a taxi - which is where bike's and taxi's overshoot sits. Heavy rail is more than double its real boardings and the light rail is three-quarters short. The mode this whole project started from is, for now, the furthest from the truth.</p>
-  <p>The discipline that keeps this honest is the one that is hardest to hold: the <span class="t" data-k="asc">mode constants</span> stay as priors. Every choice model has a constant per mode that can absorb almost any error, and solving those constants against the scoreboard would pull most rows towards their targets within a few runs. It would also hide every missing mechanism behind a number. So the twin changes what people can do, not how much it likes each mode, and it accepts a red scoreboard while the mechanisms are built.</p>
-
-  <div class="callout flag">
-    <span class="k">Built is not calibrated</span>
-    <p>Nothing in this post is a forecast, and no parameter has yet been fitted to the targets. What exists is a machine that can be checked: every input traced, every mode scored on its own basis, every run recorded with the reason it ended. Part 4's lesson still holds - pick the metric before the policy - and the twin now has twelve metrics that nobody gets to pick after the fact.</p>
-  </div>
+  <h2>What it rests on</h2>
+  <p>Every number the twin uses - six hundred of them, from walking speed to the price of parking - is written down with where it came from, and each one that is assumed carries a range to test it over. Every one of its 968 data files is listed with its source, its licence and the script that made it. When data was refused, it was derived instead: the transport department would not release its traffic signal plans, so the signals run the adaptive algorithm the signal system publishes. It is the record a precinct-sized twin can do without and a city-sized one cannot.</p>
 </section>
 
 <section>
-  <h2>What a run costs</h2>
-  <p>A run simulates a quarter of the population, sampled by household so that families travel together: about 158,000 people on a network of 368,000 links, with every bus, train, tram and ferry on its real timetable. Two hundred and fifty iterations take about 28 hours on one workstation with 64 GB of memory. There are 250 run directories on disk. More than half are short probes that price a change before anyone commits a day to it, and only a handful are results in the strict sense: full runs that reached their last iteration.</p>
-  <p>The workstation turned out to be the weakest part. By late September, 41% of the machine-hours spent on runs had gone to runs that died - to a forced Windows Update restart at iteration 237 of 250, to a disk controller crash, to a shutdown from the Start menu. None of that is simulation code, and neither is most of what now prevents it. Keeping a two-month build honest with that little human time is its own piece of technology, and it is the subject of the next post.</p>
+  <h2>What comes next</h2>
+  <p>The next steps are the missing behaviours the scoreboard points to, then the question the twin was built for: Newcastle with its light rail, and without it. Building all this took fifty days, and I did not write most of it by hand; how it was built, and why a second city took days rather than months, is the next post.</p>
 </section>
 
 <div class="sources">
   <h2>Sources &amp; anchors</h2>
   <ol>
     <li>The twin's repository, public - <a href="https://github.com/praneetdhoolia/city-digital-twin">github.com/praneetdhoolia/city-digital-twin</a> &middot; its goal - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/GOAL.md">docs/GOAL.md</a> &middot; its status board - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/STATUS.md">docs/STATUS.md</a> &middot; its project reports - <a href="https://praneetdhoolia.github.io/city-digital-twin/">praneetdhoolia.github.io/city-digital-twin</a></li>
-    <li>The origin design, the Newcastle light rail counterfactual - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/cities/newcastle/docs/archived/design/newcastle-lr-proposal.md">newcastle-lr-proposal.md</a></li>
-    <li>MATSim - <a href="https://www.matsim.org/">matsim.org</a> &middot; Horni, Nagel &amp; Axhausen (eds.), <em>The Multi-Agent Transport Simulation MATSim</em>, Ubiquity Press (2016) - <a href="https://doi.org/10.5334/baw">doi.org/10.5334/baw</a> &middot; pt2matsim, the timetable and network mapper - <a href="https://github.com/matsim-org/pt2matsim">github.com/matsim-org/pt2matsim</a></li>
-    <li>Population and demand: the synthetic population, tours and licence rates - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/population-and-demand.md">population-and-demand.md</a> &middot; ABS Census DataPacks - <a href="https://www.abs.gov.au/census/find-census-data/datapacks">abs.gov.au</a></li>
-    <li>Network, timetables and the derivation rule - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/network-and-inputs.md">network-and-inputs.md</a> &middot; signals and level crossings, SCATS as its published algorithm - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/signals-and-crossings.md">signals-and-crossings.md</a></li>
-    <li>The decision to remove SUMO and keep one engine - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/DECISIONS.md">DECISIONS.md, section 9.74</a> &middot; freight trains as crossing closures - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/motorbike-truck-and-freight.md">motorbike-truck-and-freight.md</a></li>
-    <li>Targets, their bases and the scoreboard - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/public-transport-and-yardsticks.md">public-transport-and-yardsticks.md</a> &middot; gates, holdout and families - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/monitoring-and-gates.md">monitoring-and-gates.md</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/sampling-and-families.md">sampling-and-families.md</a></li>
+    <li>Figures 1, 7 and 8: the twin's run viewer on run <code>20260929T072135_250it_25pct</code> &middot; figures 2 to 4 and 6: drawn from the same run's network, timetables, persons and trips &middot; map data &copy; OpenStreetMap contributors (ODbL), buildings from Overture Maps</li>
+    <li>MATSim - <a href="https://www.matsim.org/">matsim.org</a> &middot; Horni, Nagel &amp; Axhausen (eds.), <em>The Multi-Agent Transport Simulation MATSim</em>, Ubiquity Press (2016) - <a href="https://doi.org/10.5334/baw">doi.org/10.5334/baw</a> &middot; pt2matsim - <a href="https://github.com/matsim-org/pt2matsim">github.com/matsim-org/pt2matsim</a></li>
+    <li>The origin question, the Newcastle light rail - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/cities/newcastle/docs/archived/design/newcastle-lr-proposal.md">newcastle-lr-proposal.md</a> &middot; the population and demand - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/population-and-demand.md">population-and-demand.md</a> &middot; ABS Census DataPacks - <a href="https://www.abs.gov.au/census/find-census-data/datapacks">abs.gov.au</a></li>
+    <li>The network, timetables and signals - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/network-and-inputs.md">network-and-inputs.md</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/signals-and-crossings.md">signals-and-crossings.md</a> &middot; the targets and the scoreboard - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/public-transport-and-yardsticks.md">public-transport-and-yardsticks.md</a></li>
   </ol>
 </div>
 
@@ -302,9 +238,9 @@
     <span>Back to <a class="t" data-ref="Part 4 &middot; Hands on with SUMO"
     data-tip="A scoped twin built by hand in SUMO, and the upgrade path it named: real targets, real counts, many seeds, and provenance attached."
     href="/digital-twins/part-4-brisbane-2032-egress-with-sumo.html">the hand-built SUMO twin</a></span>
-    <span>Next: <a class="t" data-ref="Part 6 &middot; Built by agents"
-    data-tip="How 64 AI coding-agent sessions built the twin without losing context or inventing data, and why that made a second city, Mumbai, possible in days."
-    href="/digital-twins/part-6-a-twin-built-by-agents.html">a twin built by agents</a></span></p>
+    <span>Next: <a class="t" data-ref="Part 6 &middot; Two cities"
+    data-tip="Mumbai on the same framework - 27 million synthetic residents, its trains from the printed timetables - and how AI coding agents built both cities."
+    href="/digital-twins/part-6-two-cities-one-framework.html">a second city</a></span></p>
 
 </main>
 
@@ -319,12 +255,8 @@
 <script>
 window.GLOSS = {
   sa1:{t:"SA1",d:"Statistical Area Level 1 - the smallest area the Australian Bureau of Statistics publishes most census results for, typically 200 to 800 people."},
-  hts:{t:"Household Travel Survey",d:"Transport for NSW's continuous survey of how households in the state travel on an average day: trips per person, purposes, distances and modes. The twin uses it for trip rates and as a target, never to impose shares."},
-  matsim:{t:"MATSim",d:"Multi-Agent Transport Simulation - an open-source Java framework in which every synthetic person executes, scores and revises a daily plan over many iterations. Click to visit."},
-  teleport:{t:"Teleportation",d:"The common shortcut of moving a trip from origin to destination at an assumed speed without simulating it on the network. The twin forbids it: every mode takes up road, track or footpath space."},
-  scats:{t:"SCATS",d:"Sydney Coordinated Adaptive Traffic System - the adaptive signal system used across NSW and many other cities. It measures how saturated each approach is and adjusts cycle lengths and green splits in response."},
-  family:{t:"Comparability family",d:"A set of runs that share one model, one set of inputs and one network build. Any change that could move the results opens a new family, and runs are never compared across one."},
-  asc:{t:"Mode constant",d:"The alternative-specific constant: a fixed bonus or penalty per mode in the choice model, covering everything the model does not describe. Tuning it can make any mode hit its target while hiding why it missed."}
+  hts:{t:"Household Travel Survey",d:"Transport for NSW's continuous survey of how households travel on an average day: trips per person, purposes, distances and modes. The twin uses it to shape each day and as a target, never to impose shares."},
+  matsim:{t:"MATSim",d:"Multi-Agent Transport Simulation - an open-source Java framework in which every synthetic person executes, scores and revises a daily plan over many rounds. Click to visit."}
 };
 </script>
 <script src="/assets/tip.js" defer></script>

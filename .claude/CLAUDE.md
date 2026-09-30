@@ -123,7 +123,13 @@ sources and colophon added. `python .github/scripts/check_posts.py` (also CI,
    another part of the post names it by what it holds ("the stack, above", "the results
    below"), never by a number.
    - Every image is a `<figure>` holding an `<img>` with `width` and `height`, then
-     `<figcaption><b>FIG N</b> - caption</figcaption>`; figures are numbered from 1. Diagrams are
+     `<figcaption><b>FIG N</b> - caption</figcaption>`; figures are numbered from 1. An image
+     drawn once per theme goes in a `<picture>`: `<source srcset="...dark..." media="(prefers-color-scheme:
+     dark)">` then the light `<img>` (the digital-twins maps and viewer images, `media/dt<part>-*.light|dark.*`).
+     A moving interactive thing is shown as a GIF recording of it playing, not an embedded frame.
+   - Lead with what was achieved and show it (maps, the simulator's own viewer, charts); how it
+     works gets a short section. Cross-reference earlier writing with a plain "Previously" or a
+     descriptive phrase linked with the tooltip markup - never "Part 3 did X" in the prose. Diagrams are
      inline SVG using the `.sv-*` text classes, wide ones inside `<div class="fig-scroll">`.
    - `.callout` / `.callout.flag` for a takeaway or a caveat.
    - Ends with `<div class="sources">` - `Sources &amp; anchors` for an essay, `Code &amp;
@@ -200,7 +206,7 @@ sources and colophon added. `python .github/scripts/check_posts.py` (also CI,
 | `about/index.html` | The `/about/` page. |
 | `retrieval-agent/` | Series: `index.html` landing page + `part-1…5-*.html`. |
 | `digital-twins/` | Series: `index.html` landing page + `part-<n>-*.html` (Parts 1&ndash;7). |
-| `digital-twins/the-city-twice/` | The proposal Part 7 is about, hosted as sent: `index.html`, its `data/*.js` (the Newcastle trails come from the twin run `20260929T012258_250it_25pct`), and `vendor/` (third-party code and fonts with their licences). Part 7's figures are redrawn from these data files, never screenshots. |
+| `digital-twins/the-city-twice/` | The proposal Part 7 is about, hosted as sent: `index.html`, its `data/*.js` (the Newcastle trails come from the twin run `20260929T012258_250it_25pct`), and `vendor/` (third-party code and fonts with their licences). Part 7's figures are redrawn from these data files, and its three slide GIFs (`media/dt7-slide-*.gif`) are recordings of the page playing. |
 | `software-engineering-agent-langgraph.html`, `universal-assistant-langgraph-mcp.html` | Standalone posts. |
 | `assets/tip.js` | The shared glossary / source / cross-reference tooltip engine. |
 | `assets/site.css` | The single shared stylesheet (light + dark, system fonts, responsive). Includes the **essay-artifact layer** - `figure`/`figcaption`, `.fig-scroll`, the `.sv-*` SVG text classes, `.callout` (and `.callout.flag`), `.sources`, `.colophon`, `.eyebrow.ruled`, and the `.t` / `#tip` glossary tooltip - so a post that argues with diagrams needs no bespoke CSS. |

@@ -8,22 +8,6 @@
 <link rel="canonical" href="https://praneetdhoolia.github.io/digital-twins/part-7-the-city-twice.html">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css">
-<style>
-  /* post-specific: live slides of the hosted proposal, loaded only when the reader asks for one,
-     and the three-kinds table. */
-  .post-body figure.live { max-width: none; padding: 12px 12px 10px; }
-  .live-frame { position: relative; height: 540px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #0b0d12; }
-  .post-body .live-frame iframe { width: 100%; height: 100%; margin: 0; border: 0; border-radius: 0; }
-  .live-frame .live-open { position: absolute; inset: 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
-                           border: 0; cursor: pointer; background: radial-gradient(circle at 50% 45%, #1b2436 0%, #0b0d12 70%); color: #f2efe7;
-                           font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
-  .live-frame .live-open b { font-family: var(--sans); font-size: 22px; letter-spacing: 0; text-transform: none; font-weight: 600; }
-  .live-frame .live-open span { color: #b9b3a6; }
-  .live-frame .live-open:hover b, .live-frame .live-open:focus-visible b { text-decoration: underline; }
-  .live-bar { display: flex; justify-content: flex-end; gap: 16px; font-family: var(--mono); font-size: 11.5px; padding: 0 4px 8px; }
-  .post-body table.kinds td:first-child { white-space: nowrap; font-weight: 600; }
-  @media (max-width: 720px) { .live-frame { height: 72vh; } }
-</style>
 </head>
 <body>
 
@@ -43,7 +27,7 @@
     <p class="eyebrow ruled"><span><a href="/digital-twins/">City digital twin</a> &middot; Part 7 &middot; The proposal</span></p>
     <h1>The City, Twice: <em>a proposal, and how it was made</em></h1>
     <p class="standfirst">A twin that could stand up a city of 27 million people on one contract caught the attention of a state government in India, planning a logistics city on Mumbai's edge. This is the proposal we prepared - The City, Twice, published here in full - and how it was made: two drafts written to two very different briefs, and an honest map of which parts are the running twin, which are real ground carrying illustrative layers, and which are a direction of travel.</p>
-    <p class="date"><time datetime="2026-10">October 2026</time> &middot; ~16 min read &middot; Part 7 of a series</p>
+    <p class="date"><time datetime="2026-10">October 2026</time> &middot; ~15 min read &middot; Part 7 of a series &middot; with Pranav Dhoolia</p>
   </div>
 
   <article class="post-body">
@@ -51,9 +35,9 @@
 <section>
   <h2>The request</h2>
   <p>The ask was short. A state government wants to build a new city on the edge of the Mumbai region, around the belt of warehouses that already takes the port's containers inland and sends them across the country. The city exists to serve that logistics hub. Could we propose software to plan it, visualise it, estimate it and simulate it - and what, exactly, could we offer?</p>
-  <p>The brief pointed at this series as evidence of what we had tried, and at the twin in <a class="t" data-ref="Part 6 &middot; Built by agents"
-     data-tip="How 64 AI coding-agent sessions built the twin without losing context or inventing data, and why a second city, Mumbai, took days."
-     href="/digital-twins/part-6-a-twin-built-by-agents.html">Part 6</a> as the most ambitious thing we had built. It asked for plain English, every abbreviation spelled out, a hover definition for every specialist term, references and links, and a strong visual voice. It said there were no other details yet, that this was a starting pitch, and that animations of what we could build towards over time were welcome. The proposal would be written, like the twin, with an AI agent doing the research and the building.</p>
+  <p>The brief pointed at this series as evidence of what we had tried, and at <a class="t" data-ref="Part 6 &middot; Two cities"
+     data-tip="Mumbai on the same framework - 27 million synthetic residents, its trains from the printed timetables - and how AI coding agents built both cities."
+     href="/digital-twins/part-6-two-cities-one-framework.html">the Newcastle and Mumbai twin</a> as the most ambitious thing we had built. It asked for plain English, every abbreviation spelled out, a hover definition for every specialist term, references and links, and a strong visual voice. It said there were no other details yet, that this was a starting pitch, and that animations of what we could build towards over time were welcome. The proposal would be written, like the twin, with an AI agent doing the research and the building.</p>
 </section>
 
 <section>
@@ -61,7 +45,7 @@
   <p>The first draft was titled "Build Bhiwandi Twice": once in software, where a wrong road or a forecast three times too high costs nothing to fix, then once on the ground. It was a good document in the way the earlier posts in this series try to be good. It laid out how cargo moves through the region today, what was being planned, and where the belt is already under strain - choke points on the roads, a river crossing its danger mark, warehouse fires. It surveyed fourteen ports, logistics hubs and new cities, and found that what arrived was often a third to a half of what the plan had promised. It offered a twin that would estimate everything "as a range, never one number", and it set a rule before any prediction: the model must first reproduce a change that has already happened.</p>
   <p>That is <a class="t" data-ref="Part 1 &middot; The model"
      data-tip="A city as entities, flows and senses - a state-space model - and six corrections to it: uneven senses, the shadow of observation, choosing people, ensembles, governance as controller, comparisons over forecasts."
-     href="/digital-twins/part-1-my-mental-model-of-a-city.html">Part 1's corrections</a> written as a proposal, and I still think every sentence of it is right. It was also the wrong document for the moment. It argued where the reader needed to see. It asked a planning department to read a study before it had any picture of what a twin could show it, and a starting pitch is not a study.</p>
+     href="/digital-twins/part-1-my-mental-model-of-a-city.html">the corrections I made to my first model of a city</a>, written as a proposal, and I still think every sentence of it is right. It was also the wrong document for the moment. It argued where the reader needed to see. It asked a planning department to read a study before it had any picture of what a twin could show it, and a starting pitch is not a study.</p>
 </section>
 
 <section>
@@ -105,7 +89,7 @@
       <text class="sv-sub" x="30" y="156">declared inputs, versioned files</text>
       <text class="sv-lab" x="30" y="181">Any city. In weeks.</text>
       <text class="sv-sub" x="30" y="196">Newcastle and Mumbai on one</text>
-      <text class="sv-sub" x="30" y="209">framework (Part 6)</text>
+      <text class="sv-sub" x="30" y="209">framework</text>
 
       <rect x="252" y="20" width="216" height="232" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
       <text class="sv-band" x="266" y="44" style="fill:var(--ink)">REAL GROUND,</text>
@@ -141,9 +125,9 @@
 
 <section>
   <h2>What is running: the people in Newcastle</h2>
-  <p>The most important slide is the least futuristic. "Every trip. Simulated." flies over Newcastle at night while coloured trails move through the streets: cars, trucks, taxis, motorbikes, bikes, walkers, buses on their routes, trains and the light rail on their lines, over two hours of a weekday morning. Nothing on it is drawn by hand. The trails are people from a completed run of the twin in <a class="t" data-ref="Part 5 &middot; The synthetic city"
-     data-tip="A census-drawn population choosing its own trips on one MATSim engine, every input on a ledger, held to twelve real ridership figures."
-     href="/digital-twins/part-5-a-synthetic-city-held-to-reality.html">Part 5</a> - a quarter of the population, the light rail as built, 250 iterations - taken from the run's own output and thinned for the browser.</p>
+  <p>The most important slide is the least futuristic. "Every trip. Simulated." flies over Newcastle at night while coloured trails move through the streets: cars, trucks, taxis, motorbikes, bikes, walkers, buses on their routes, trains and the light rail on their lines, over two hours of a weekday morning. Nothing on it is drawn by hand. The trails are people from a completed run of <a class="t" data-ref="Part 5 &middot; The synthetic city"
+     data-tip="A working twin of Greater Newcastle: half a million synthetic residents travelling by twelve modes on the real roads and timetables, checked against the real city."
+     href="/digital-twins/part-5-a-synthetic-city-held-to-reality.html">the Newcastle twin</a> - a quarter of the population, the light rail as built, 250 iterations - taken from the run's own output and thinned for the browser.</p>
 
   <figure>
     <div class="fig-scroll">
@@ -152,15 +136,14 @@
     <figcaption><b>FIG 2</b> - The proposal's Newcastle data, redrawn: trips between 07:00 and 09:00 on a weekday from the twin's run <code>20260929T012258_250it_25pct</code>, by mode. The deck carries a display sample per mode - 4,000 car trips, 363 bus trips, 37 on the light rail and so on - not the modes' true shares, and this figure draws a fixed fraction of that sample.</figcaption>
   </figure>
 
-  <figure class="live">
-    <div class="live-bar"><a href="/digital-twins/the-city-twice/index.html#people" target="_blank" rel="noopener">Open in a new tab &#8599;</a></div>
-    <div class="live-frame"><button type="button" class="live-open" data-ch="people"><span>Live slide</span><b>Every trip. Simulated.</b><span>Click to load the proposal here</span></button></div>
-    <figcaption><b>FIG 3</b> - The slide itself, running live from the hosted proposal. Drag to move; Ctrl or Command and drag to turn and tilt.</figcaption>
+  <figure>
+    <img src="/media/dt7-slide-people.gif" alt="The proposal's Newcastle slide playing: coloured trails of cars, buses, trains, the light rail, trucks, bikes and walkers moving through central Newcastle at night in 3D while the clock runs from 07:10." width="800" height="450">
+    <figcaption><b>FIG 3</b> - The slide itself, recorded playing from the hosted proposal: the morning's trips moving through central Newcastle as its clock runs.</figcaption>
   </figure>
 
-  <p>The engine-room slide puts numbers under the pictures: 27 million synthetic residents in the Mumbai-region model, one for every real person; twelve travel modes, each simulated on real roads and real timetables; every model input carrying a source, a unit and a tested range; every data file rebuildable from its raw source. Each of those is the twin as <a class="t" data-ref="Part 5 &middot; The synthetic city"
-     data-tip="The registry of declared inputs, the hashed manifest, and the twelve-mode scoreboard."
-     href="/digital-twins/part-5-a-synthetic-city-held-to-reality.html">Part 5</a> and Part 6 describe it. The slide's last line - "Give us the compute, and the whole city runs overnight" - is the most literal sentence in the deck: the Mumbai model is waiting on exactly that machine.</p>
+  <p>The engine-room slide puts numbers under the pictures: 27 million synthetic residents in the Mumbai-region model, one for every real person; twelve travel modes, each simulated on real roads and real timetables; every model input carrying a source, a unit and a tested range; every data file rebuildable from its raw source. Each of those is the twin <a class="t" data-ref="Part 6 &middot; Two cities"
+     data-tip="Mumbai on the same framework - 27 million synthetic residents, its trains from the printed timetables - and how AI coding agents built both cities."
+     href="/digital-twins/part-6-two-cities-one-framework.html">as it stands</a>. The slide's last line - "Give us the compute, and the whole city runs overnight" - is the most literal sentence in the deck: the Mumbai model is waiting on exactly that machine.</p>
 </section>
 
 <section>
@@ -181,18 +164,20 @@
   <p>The lenses slide is the Cities: Skylines idea made literal: one city, one colour language, and a switch that flips it between traffic, zoning, water, sewage, power, heat, air quality, noise and land value. The traffic lens colours real roads by their class; the water, sewage and power networks are laid along real streets and, as the slide says, are illustrative.</p>
 
   <h3>Wired to the real city</h3>
-  <p>The control-room slide shows the loop Part 1 drew as governance: sense, see, foresee, act. A pump station's outlet pressure falls, the twin plays the fault forward through the water network, forecasts how many homes lose pressure in the next forty minutes, and sends the control room the fix - start a standby pump, open a valve - instead of the alarm. The chain it names is the real one a city would use, from field controllers through SCADA and industrial messaging to the city's command centre. The incident itself is a scripted cycle.</p>
+  <p>The control-room slide shows the loop I <a class="t" data-ref="Part 1 &middot; The model"
+     data-tip="A city as entities, flows and senses, with governance as the controller of the loop: sense, decide, act."
+     href="/digital-twins/part-1-my-mental-model-of-a-city.html">previously</a> drew as governance: sense, see, foresee, act. A pump station's outlet pressure falls, the twin plays the fault forward through the water network, forecasts how many homes lose pressure in the next forty minutes, and sends the control room the fix - start a standby pump, open a valve - instead of the alarm. The chain it names is the real one a city would use, from field controllers through SCADA and industrial messaging to the city's command centre. The incident itself is a scripted cycle.</p>
 
   <h3>Rehearse the monsoon, plan the big day</h3>
   <p>The flood slide raises the water on the real terrain and counts roads under water and buildings wet; the deck says plainly that this is a "bathtub fill" on the elevation model, and that a proper drainage and river model would replace it. The crowd slide is the one I find most persuasive, because it is <a class="t" data-ref="Part 4 &middot; Hands on with SUMO"
      data-tip="A hand-built SUMO twin of the Brisbane 2032 stadium precinct, where staggering the release cut the worst leaver's wait by a factor of six."
-     href="/digital-twins/part-4-brisbane-2032-egress-with-sumo.html">Part 4's lesson</a> on foot. An immersion procession converges on a lake ghat. As usual, every procession leaves within half an hour for one ghat and the crowd crosses into the dangerous band. In the twin's plan, releases are staggered over three hours and the northern processions are routed to a second ghat on the river.</p>
+     href="/digital-twins/part-4-brisbane-2032-egress-with-sumo.html">the stadium lesson</a> on foot. An immersion procession converges on a lake ghat. As usual, every procession leaves within half an hour for one ghat and the crowd crosses into the dangerous band. In the twin's plan, releases are staggered over three hours and the northern processions are routed to a second ghat on the river.</p>
 
   <figure>
     <div class="fig-scroll">
     <svg viewBox="0 0 720 300" role="img" aria-label="Peak crowd density over four hours from 17:00 for an immersion procession to a lake ghat. As usual, with every procession leaving within 30 minutes to one ghat, density peaks at 6.9 people per square metre, in the dangerous band. With releases staggered over three hours and a second ghat, it peaks at 1.4."><rect x="70" y="194.0" width="630" height="56.0" fill="var(--accent-wash)" opacity="0.5"/><text class="sv-sub" x="694" y="206.0" text-anchor="end">free walking</text><rect x="70" y="138.0" width="630" height="56.0" fill="var(--flag-wash)" opacity="0.5"/><text class="sv-sub" x="694" y="150.0" text-anchor="end">slowed</text><rect x="70" y="110.0" width="630" height="28.0" fill="var(--flag-wash)" opacity="0.5"/><text class="sv-sub" x="694" y="122.0" text-anchor="end">jammed</text><rect x="70" y="40.0" width="630" height="70.0" fill="var(--flag-wash)" opacity="0.9"/><text class="sv-sub" x="694" y="52.0" text-anchor="end">dangerous (5+)</text><text class="sv-sub" x="62" y="253.0" text-anchor="end">0</text><text class="sv-sub" x="62" y="197.0" text-anchor="end">2</text><text class="sv-sub" x="62" y="141.0" text-anchor="end">4</text><text class="sv-sub" x="62" y="113.0" text-anchor="end">5</text><text class="sv-sub" x="62" y="57.0" text-anchor="end">7</text><line x1="70.0" y1="250" x2="70.0" y2="255" stroke="var(--ink)"/><text class="sv-sub" x="70.0" y="268" text-anchor="middle">17:00</text><line x1="227.5" y1="250" x2="227.5" y2="255" stroke="var(--ink)"/><text class="sv-sub" x="227.5" y="268" text-anchor="middle">18:00</text><line x1="385.0" y1="250" x2="385.0" y2="255" stroke="var(--ink)"/><text class="sv-sub" x="385.0" y="268" text-anchor="middle">19:00</text><line x1="542.5" y1="250" x2="542.5" y2="255" stroke="var(--ink)"/><text class="sv-sub" x="542.5" y="268" text-anchor="middle">20:00</text><line x1="700.0" y1="250" x2="700.0" y2="255" stroke="var(--ink)"/><text class="sv-sub" x="700.0" y="268" text-anchor="middle">21:00</text><polyline points="75.2,152.3 80.5,121.2 85.8,110.0 91.0,119.0 96.2,105.5 101.5,119.0 106.8,107.8 112.0,87.9 117.2,85.6 122.5,110.0 127.8,87.9 133.0,90.1 138.2,85.6 143.5,56.8 148.8,96.6 154.0,101.0 159.2,87.9 164.5,81.2 169.8,98.8 175.0,63.2 180.2,78.9 185.5,63.2 190.8,119.0 196.0,176.6 201.2,161.2 206.5,169.9 211.8,161.2 217.0,163.2 222.2,159.0 227.5,141.1 232.8,125.7 238.0,181.1 243.2,172.2 248.5,187.8 253.8,183.4 259.0,183.4 264.2,190.1 269.5,187.8 274.8,187.8 280.0,198.8 285.2,196.8 290.5,178.9 295.8,203.2 301.0,185.6 306.2,176.6 311.5,196.8 316.8,190.1 322.0,214.4 327.2,196.8 332.5,187.8 337.8,210.0 343.0,225.6 348.2,225.6 353.5,218.9 358.8,227.9 364.0,225.6 369.2,223.4 374.5,225.6 379.8,230.1 385.0,227.9 390.2,230.1 395.5,227.9 400.8,225.6 406.0,230.1 411.2,234.3 416.5,234.3 421.8,234.3 427.0,236.6 432.2,230.1 437.5,234.3 442.8,232.4 448.0,250.0 453.2,250.0 458.5,236.6 463.8,250.0 469.0,250.0 474.3,250.0 479.5,250.0 484.8,250.0 490.0,250.0 495.2,250.0 500.5,250.0 505.8,250.0 511.0,250.0 516.2,250.0 521.5,250.0 526.8,250.0 532.0,250.0 537.2,250.0 542.5,250.0 547.8,250.0 553.0,250.0 558.2,250.0 563.5,250.0 568.8,250.0 574.0,250.0 579.2,250.0 584.5,250.0 589.8,250.0 595.0,250.0 600.2,250.0 605.5,250.0 610.8,250.0 616.0,250.0 621.2,250.0 626.5,250.0 631.8,250.0 637.0,250.0 642.2,250.0 647.5,250.0 652.8,250.0 658.0,250.0" fill="none" stroke="var(--flag)" stroke-width="2"/><polyline points="75.2,232.4 80.5,221.2 85.8,216.7 91.0,218.9 96.2,225.6 101.5,216.7 106.8,216.7 112.0,223.4 117.2,223.4 122.5,216.7 127.8,216.7 133.0,214.4 138.2,216.7 143.5,214.4 148.8,210.0 154.0,218.9 159.2,216.7 164.5,212.2 169.8,216.7 175.0,218.9 180.2,221.2 185.5,218.9 190.8,216.7 196.0,223.4 201.2,218.9 206.5,221.2 211.8,223.4 217.0,227.9 222.2,223.4 227.5,223.4 232.8,221.2 238.0,223.4 243.2,214.4 248.5,221.2 253.8,214.4 259.0,214.4 264.2,210.0 269.5,218.9 274.8,218.9 280.0,212.2 285.2,218.9 290.5,221.2 295.8,212.2 301.0,221.2 306.2,221.2 311.5,212.2 316.8,216.7 322.0,214.4 327.2,214.4 332.5,221.2 337.8,221.2 343.0,223.4 348.2,218.9 353.5,218.9 358.8,216.7 364.0,223.4 369.2,218.9 374.5,223.4 379.8,223.4 385.0,221.2 390.2,225.6 395.5,214.4 400.8,227.9 406.0,227.9 411.2,230.1 416.5,223.4 421.8,225.6 427.0,223.4 432.2,221.2 437.5,227.9 442.8,230.1 448.0,227.9 453.2,225.6 458.5,225.6 463.8,227.9 469.0,223.4 474.3,221.2 479.5,225.6 484.8,225.6 490.0,225.6 495.2,232.4 500.5,227.9 505.8,225.6 511.0,230.1 516.2,234.3 521.5,232.4 526.8,232.4 532.0,221.2 537.2,227.9 542.5,227.9 547.8,223.4 553.0,230.1 558.2,223.4 563.5,221.2 568.8,227.9 574.0,232.4 579.2,227.9 584.5,230.1 589.8,223.4 595.0,227.9 600.2,227.9 605.5,232.4 610.8,230.1 616.0,230.1 621.2,232.4 626.5,232.4 631.8,232.4 637.0,232.4 642.2,227.9 647.5,223.4 652.8,225.6 658.0,236.6 663.2,234.3 668.5,227.9 673.8,234.3 679.0,236.6 684.2,232.4 689.5,230.1 694.8,234.3 700.0,232.4 705.2,236.6 710.5,236.6 715.8,234.3 721.0,234.3 726.2,250.0 731.5,234.3 736.8,236.6 742.0,250.0 747.2,236.6 752.5,250.0 757.7,250.0 763.0,250.0 768.2,250.0 773.5,250.0 778.8,236.6 784.0,250.0 789.2,250.0 794.5,236.6 799.8,250.0 805.0,250.0 810.2,236.6 815.5,236.6 820.8,236.6 826.0,250.0 831.2,236.6 836.5,236.6 841.8,236.6 847.0,236.6 852.2,250.0 857.5,250.0 862.8,250.0 868.0,236.6 873.2,250.0 878.5,250.0 883.8,236.6 889.0,250.0 894.2,250.0 899.5,250.0 904.8,250.0 910.0,250.0 915.2,250.0 920.5,250.0 925.8,250.0 931.0,250.0 936.2,250.0 941.5,250.0 946.8,250.0 952.0,250.0 957.3,250.0 962.5,250.0" fill="none" stroke="var(--accent)" stroke-width="2"/><rect x="70" y="278" width="14" height="4" fill="var(--flag)"/><text class="sv-sub" x="90" y="283">as usual: all processions within 30 min, one ghat &middot; peak 6.9 people/m&#178;</text><rect x="70" y="292" width="14" height="4" fill="var(--accent)"/><text class="sv-sub" x="90" y="297">twin plan: staggered over three hours, a second ghat &middot; peak 1.4 people/m&#178;</text><text class="sv-band" x="16" y="22">PEAK CROWD DENSITY, PEOPLE PER SQUARE METRE</text></svg>
     </div>
-    <figcaption><b>FIG 5</b> - The proposal's two crowd plans, redrawn from its data: the highest density anywhere on the route, every few minutes, against Fruin's levels of service. The crowds are illustrative; the mechanism - spread the release, add an exit - is the one Part 4 measured for cars.</figcaption>
+    <figcaption><b>FIG 5</b> - The proposal's two crowd plans, redrawn from its data: the highest density anywhere on the route, every few minutes, against Fruin's levels of service. The crowds are illustrative; the mechanism - spread the release, add an exit - is the one the stadium twin measured for cars.</figcaption>
   </figure>
 
   <h3>Scroll through time, draw it and watch it rise</h3>
@@ -205,16 +190,14 @@
     <figcaption><b>FIG 6</b> - The seven real districts the planning slide can trace, drawn to scale from the proposal's data, with their areas.</figcaption>
   </figure>
 
-  <figure class="live">
-    <div class="live-bar"><a href="/digital-twins/the-city-twice/index.html#plan" target="_blank" rel="noopener">Open in a new tab &#8599;</a></div>
-    <div class="live-frame"><button type="button" class="live-open" data-ch="plan"><span>Live slide</span><b>Draw it. Watch it rise.</b><span>Click to load the proposal here</span></button></div>
-    <figcaption><b>FIG 7</b> - The planning slide running live: a real district traced, its networks raised, its real buildings grown in place. Press "Trace another district" to pick another.</figcaption>
+  <figure>
+    <img src="/media/dt7-slide-plan.gif" alt="The planning slide playing: a real Bhiwandi district is traced road by road, its streets, water mains and power cables come up, its real buildings grow out of the ground, then old warehouses are replaced by new ones while the counters of buildings, floor area, roads, mains and cables fill in." width="720" height="405">
+    <figcaption><b>FIG 7</b> - The planning slide, recorded playing from start to finish: a real district traced, its networks raised, its real buildings grown in place, then the plan replacing old warehouses with new ones.</figcaption>
   </figure>
 
-  <figure class="live">
-    <div class="live-bar"><a href="/digital-twins/the-city-twice/index.html#lenses" target="_blank" rel="noopener">Open in a new tab &#8599;</a></div>
-    <div class="live-frame"><button type="button" class="live-open" data-ch="lenses"><span>Live slide</span><b>Every system. One switch.</b><span>Click to load the proposal here</span></button></div>
-    <figcaption><b>FIG 8</b> - The lenses slide running live. It cycles through the nine lenses on its own; click one to hold it.</figcaption>
+  <figure>
+    <img src="/media/dt7-slide-lenses.gif" alt="The lenses slide cycling through all nine views of the same district: zoning, water mains, sewers, power feeders, surface heat, air quality, noise, land value and traffic." width="720" height="405">
+    <figcaption><b>FIG 8</b> - The lenses slide through its whole cycle: zoning, water, sewage, power, heat, air, noise, land value and traffic, one switch at a time.</figcaption>
   </figure>
 </section>
 
@@ -223,20 +206,20 @@
   <p>The right-hand column says where this could go. "Predict everything" shows twelve city models on one shared ground truth - flood depth, heat islands, water demand, pipe bursts, power peaks, air quality, road wear, land value, waste routes, ambulance reach, disease hotspots, rooftop solar - and their colours over the city. "Ask the city" shows a planner typing a question in plain English, Marathi or Hindi, and the twin running the storm, the traffic and the port together before answering. Both are shown as they would look, not as things that run today.</p>
   <p>"The best twins on Earth" is <a class="t" data-ref="Part 2 &middot; The track record"
      data-tip="The everything-twins governments funded, the scoped twins that outlived them, and what survives: scoped capabilities."
-     href="/digital-twins/part-2-lets-simulate-everything.html">Part 2</a> turned into a shopping list. Eight twins are pinned on a globe - Shanghai, Xiong'an, Hangzhou, Singapore, Dubai, Rotterdam, Helsinki, Valencia - each with the one thing it does best and the one thing we would take from it: city-scale streaming, a twin before the concrete, live signal control, underground layers, one asset registry, port operations, open semantic 3D, leak prediction. Part 2 argued that what survives is scoped. The slide keeps that lesson in its structure: each borrowed idea is one scoped capability, and the one thing the proposal adds that most of them lack is the thing this series has been building - people who move. The road map closes the column: the base twin in ninety days, people and freight moving and checked against real counts in the first year, live feeds in the second, and a twin that drafts and scores plans from the third.</p>
+     href="/digital-twins/part-2-lets-simulate-everything.html">the track record</a> turned into a shopping list. Eight twins are pinned on a globe - Shanghai, Xiong'an, Hangzhou, Singapore, Dubai, Rotterdam, Helsinki, Valencia - each with the one thing it does best and the one thing we would take from it: city-scale streaming, a twin before the concrete, live signal control, underground layers, one asset registry, port operations, open semantic 3D, leak prediction. Previously I argued that what survives is scoped. The slide keeps that lesson in its structure: each borrowed idea is one scoped capability, and the one thing the proposal adds that most of them lack is the thing this series has been building - people who move. The road map closes the column: the base twin in ninety days, people and freight moving and checked against real counts in the first year, live feeds in the second, and a twin that drafts and scores plans from the third.</p>
 </section>
 
 <section>
   <h2>How the page is built</h2>
   <p>The deck is one HTML file and eight data files, and it runs in any modern browser. <span class="t" data-k="maplibre">MapLibre GL</span> draws the map, with satellite imagery, terrain lifted from an elevation model, and 3D buildings streamed from Overture's footprints through <span class="t" data-k="pmtiles">PMTiles</span>, extruded to their recorded heights where a height is recorded and estimated where it is not. <span class="t" data-k="deckgl">deck.gl</span> draws everything that moves: its trips layer plays each person's or truck's path against a clock, which is how a MATSim run becomes a night-time flyover. Every slide is a camera position, a mood and a set of layers; scrolling flies between them, and each slide's data loads only when it is first needed, while the next slides' buildings download in the background.</p>
-  <p>The Newcastle trails are the one piece of the deck that comes straight out of the twin: the run's output, cut to a two-hour window, sampled per mode and written as a data file the page replays. For this site the page's code and fonts are served from here rather than from content delivery networks; only the map tiles stream from their providers, which is why the live slides need a connection.</p>
+  <p>The Newcastle trails are the one piece of the deck that comes straight out of the twin: the run's output, cut to a two-hour window, sampled per mode and written as a data file the page replays. For this site the page's code and fonts are served from here rather than from content delivery networks; only the map tiles stream from their providers, which is why the proposal needs a connection.</p>
 </section>
 
 <section>
   <h2>Where the pitch and the record differ</h2>
   <p>A proposal sells a direction, and this series keeps a record, so it is worth being exact about the three places where the two do not say the same thing.</p>
   <ul>
-    <li><strong>"Our calibrated run."</strong> The Newcastle slide's caption calls it that. In the twin's own terms it is a completed run, not a calibrated one: it put 1 of 12 modes inside 10% of real ridership, and the next run, the scoreboard in Part 5, put 2. No parameter has yet been fitted to the targets.</li>
+    <li><strong>"Our calibrated run."</strong> The Newcastle slide's caption calls it that. In the twin's own terms it is a completed run, not a calibrated one: it put 1 of 12 modes inside 10% of real ridership, and the next run, the scoreboard shown previously, put 2. No parameter has yet been fitted to the targets.</li>
     <li><strong>The engine room's inputs.</strong> The slide counts 594 declared inputs, the registry's size the day the deck was built; it is 600 now. The 968 versioned files match.</li>
     <li><strong>The Mumbai model.</strong> Its 27 million synthetic residents exist, on a network and timetables built from Indian sources. It has no ridership reading yet: the smallest honest run needs a machine several times larger than the one it was built on.</li>
   </ul>
@@ -267,7 +250,7 @@
   <p class="colophon"><span>City digital twin &middot; Part 7 of the series &middot;</span>
     <span>Back to <a class="t" data-ref="Part 6 &middot; Built by agents"
     data-tip="How 64 AI coding-agent sessions built the twin without losing context or inventing data, and why a second city, Mumbai, took days."
-    href="/digital-twins/part-6-a-twin-built-by-agents.html">a twin built by agents</a></span>
+    href="/digital-twins/part-6-two-cities-one-framework.html">a twin built by agents</a></span>
     <span>Series: <a class="t" data-ref="City digital twin &middot; 7 parts"
     data-tip="The whole series on one page, from the first mental model to the proposal."
     href="/digital-twins/">all seven parts</a></span></p>
@@ -288,18 +271,6 @@ window.GLOSS = {
   pmtiles:{t:"PMTiles",d:"A single-file format for map tiles that a browser can read piece by piece over ordinary web requests, so a whole world of building footprints needs no tile server."},
   deckgl:{t:"deck.gl",d:"An open-source library for drawing large datasets on a map with the graphics card. Its trips layer animates paths against a clock, leaving fading trails."}
 };
-</script>
-<script>
-/* A live slide loads the hosted proposal only when its reader asks: each one is a full 3D city. */
-document.querySelectorAll('.live-open').forEach(function (b) {
-  b.addEventListener('click', function () {
-    var f = document.createElement('iframe');
-    f.src = '/digital-twins/the-city-twice/index.html#' + b.getAttribute('data-ch');
-    f.title = 'The City, Twice - live slide';
-    f.setAttribute('allow', 'fullscreen');
-    b.parentNode.replaceChild(f, b);
-  });
-});
 </script>
 <script src="/assets/tip.js" defer></script>
 </body>
