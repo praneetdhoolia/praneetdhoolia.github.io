@@ -48,7 +48,13 @@ the markdown originals are gone from the working tree but remain in git history.
   `assets/site.css` (committed here, linked by every page), and **author-placed media embeds**
   that are part of the content - e.g. the YouTube `<iframe>` demo in
   `universal-assistant-langgraph-mcp.html`, which predates this rule and is the author's own
-  material. Do not add new third-party embeds without asking.
+  material. A third, declared by the author in October 2026: the hosted proposal at
+  `digital-twins/the-city-twice/` (Part 8) is a live 3D map. Its code and fonts are copied into
+  its own `vendor/` folder, unchanged and with their licences (MapLibre GL 5.24.0, pmtiles 3.2.1,
+  deck.gl 9.1.14, Instrument Serif and Inter); only its map tiles - Esri imagery, Mapzen terrain,
+  the OpenFreeMap basemap and Overture buildings - stream from their providers. It is the
+  author's artefact as sent: do not restyle or rewrite it, and do not add new third-party embeds
+  without asking.
 - **Every page is responsive and theme-aware** (light + dark via `prefers-color-scheme`), with no
   horizontal body scroll. Wide content - code blocks, tables - scrolls inside its own box.
 
@@ -117,7 +123,13 @@ sources and colophon added. `python .github/scripts/check_posts.py` (also CI,
    another part of the post names it by what it holds ("the stack, above", "the results
    below"), never by a number.
    - Every image is a `<figure>` holding an `<img>` with `width` and `height`, then
-     `<figcaption><b>FIG N</b> - caption</figcaption>`; figures are numbered from 1. Diagrams are
+     `<figcaption><b>FIG N</b> - caption</figcaption>`; figures are numbered from 1. An image
+     drawn once per theme goes in a `<picture>`: `<source srcset="...dark..." media="(prefers-color-scheme:
+     dark)">` then the light `<img>` (the digital-twins maps and viewer images, `media/dt<part>-*.light|dark.*`).
+     A moving interactive thing is shown as a GIF recording of it playing, not an embedded frame.
+   - Lead with what was achieved and show it (maps, the simulator's own viewer, charts); how it
+     works gets a short section. Cross-reference earlier writing with a plain "Previously" or a
+     descriptive phrase linked with the tooltip markup - never "Part 3 did X" in the prose. Diagrams are
      inline SVG using the `.sv-*` text classes, wide ones inside `<div class="fig-scroll">`.
    - `.callout` / `.callout.flag` for a takeaway or a caveat.
    - Ends with `<div class="sources">` - `Sources &amp; anchors` for an essay, `Code &amp;
@@ -193,7 +205,8 @@ sources and colophon added. `python .github/scripts/check_posts.py` (also CI,
 | `index.html` | Landing page: reverse-chron list of all writing, one summary per entry. |
 | `about/index.html` | The `/about/` page. |
 | `retrieval-agent/` | Series: `index.html` landing page + `part-1…5-*.html`. |
-| `digital-twins/` | Series: `index.html` landing page + `part-<n>-*.html`. |
+| `digital-twins/` | Series: `index.html` landing page + `part-<n>-*.html` (Parts 1&ndash;8). |
+| `digital-twins/the-city-twice/` | The proposal Part 8 is about, hosted as sent: `index.html`, its `data/*.js` (the Newcastle trails come from the twin run `20260929T012258_250it_25pct`), and `vendor/` (third-party code and fonts with their licences). Part 8's figures are redrawn from these data files, and its three slide GIFs (`media/dt8-slide-*.gif`) are recordings of the page playing. |
 | `software-engineering-agent-langgraph.html`, `universal-assistant-langgraph-mcp.html` | Standalone posts. |
 | `assets/tip.js` | The shared glossary / source / cross-reference tooltip engine. |
 | `assets/site.css` | The single shared stylesheet (light + dark, system fonts, responsive). Includes the **essay-artifact layer** - `figure`/`figcaption`, `.fig-scroll`, the `.sv-*` SVG text classes, `.callout` (and `.callout.flag`), `.sources`, `.colophon`, `.eyebrow.ruled`, and the `.t` / `#tip` glossary tooltip - so a post that argues with diagrams needs no bespoke CSS. |
@@ -206,5 +219,6 @@ sources and colophon added. `python .github/scripts/check_posts.py` (also CI,
 | `.githooks/commit-msg` | Strips any `claude.ai/code` session link from commit messages. |
 | `.github/workflows/strip-session-ref.yml` | Server-side scrub of a session link from a PR body. |
 | `.github/scripts/check_posts.py` | The post-anatomy check (standard library only): every post against the shell above, the index and series landings against the files on disk, and no em dash in any served file. Run before every commit. |
-| `.github/workflows/check-posts.yml` | Runs `check_posts.py` on every PR and every push to `main`. |
+| `.github/scripts/check_svg_text.py` | Lays every post out in a headless browser and fails any inline-SVG label that runs past its box or the diagram's edge (the author's rule, October 2026: no text clipping outside boxes). Needs Playwright; run it after drawing or editing a diagram. |
+| `.github/workflows/check-posts.yml` | Runs `check_posts.py` and `check_svg_text.py` on every PR and every push to `main`. |
 | `.gitattributes` | Pins LF endings for `*.sh` / `.githooks/*` so hooks stay runnable on Linux. |

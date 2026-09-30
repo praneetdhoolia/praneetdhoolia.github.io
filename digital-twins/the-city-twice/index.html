@@ -1,0 +1,1822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>The City, Twice</title>
+<!-- Hosted copy of the proposal "The City, Twice" (Part 7 of the digital twins series). Its code and fonts are
+     served from this site (vendor/: MapLibre GL 5.24.0, pmtiles 3.2.1, deck.gl 9.1.14, Instrument Serif and Inter);
+     only the map tiles - imagery, terrain, basemap and 3D buildings - stream from their providers. -->
+<link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
+<link rel="preconnect" href="https://s3.amazonaws.com" crossorigin>
+<link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
+<link rel="preconnect" href="https://overturemaps-extras-us-west-2.s3.amazonaws.com" crossorigin>
+<link rel="stylesheet" href="vendor/fonts/fonts.css">
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<script src="vendor/maplibre-gl.js"></script>
+<script src="vendor/pmtiles.js"></script>
+<script src="vendor/deck.gl.js"></script>
+<style>
+:root{
+  --ink:#06080c; --glass:rgba(10,12,18,.58); --glass-2:rgba(18,20,28,.72); --line:rgba(255,255,255,.10);
+  --gold:#d9b46a; --gold-2:#f3d9a0; --ivory:#f5f0e6; --muted:#a8a396; --dim:#6f6b63;
+  --ok:#3ddc97; --warn:#ffb020; --bad:#ff4d4d; --crit:#ff2fd0;
+  --serif:'Instrument Serif', 'Times New Roman', serif; --sans:'Inter', system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--ivory);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;touch-action:none;overscroll-behavior:none}
+/* themed scrollbars everywhere: thin gold thumb on a clear track */
+*{scrollbar-width:thin;scrollbar-color:rgba(217,180,106,.45) transparent}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(217,180,106,.4);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(217,180,106,.7)}
+::-webkit-scrollbar-corner{background:transparent}
+/* no panel may spill past the screen: long ones scroll inside, with the themed bar */
+.panel,.clones,.att,.chat,.right,.legend{max-height:calc(100vh - 48px);overflow-y:auto;overflow-x:hidden}
+.grid{max-height:calc(100vh - 48px);overflow-y:auto;overflow-x:hidden;padding-right:4px}
+#map{position:fixed;inset:0}
+#map canvas{outline:none}
+.vignette{position:fixed;inset:0;pointer-events:none;z-index:2;
+  background:radial-gradient(120% 90% at 60% 45%,transparent 45%,rgba(4,5,8,.55) 85%,rgba(4,5,8,.85) 100%),
+             linear-gradient(90deg,rgba(4,5,8,.72) 0%,rgba(4,5,8,.25) 34%,transparent 55%)}
+.veil{position:fixed;inset:0;background:var(--ink);z-index:50;display:grid;place-items:center;transition:opacity 1.2s ease}
+.veil.gone{opacity:0;pointer-events:none}
+.veil .mark{font-family:var(--serif);font-size:28px;letter-spacing:.02em;color:var(--gold-2);opacity:.85}
+.veil .bar{width:180px;height:1px;background:var(--line);margin:18px auto 0;overflow:hidden}
+.veil .bar i{display:block;height:100%;width:40%;background:var(--gold);animation:load 1.4s ease-in-out infinite}
+@keyframes load{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+
+/* chapter card */
+.card{position:fixed;left:clamp(16px,5vw,76px);bottom:clamp(28px,9vh,110px);z-index:10;max-width:min(560px,86vw);
+  opacity:0;transform:translateY(18px);transition:opacity .9s ease,transform .9s ease;pointer-events:none}
+.card.on{opacity:1;transform:none;pointer-events:auto}
+.card h1{font-family:var(--serif);font-weight:400;font-size:clamp(44px,6.2vw,92px);line-height:.95;margin:0 0 18px;letter-spacing:-.01em}
+.card h1 em{font-style:italic;color:var(--gold-2)}
+.card h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,4.2vw,62px);line-height:1;margin:0 0 16px}
+.card h2 em{font-style:italic;color:var(--gold-2)}
+.card p.lede{font-size:clamp(15px,1.25vw,19px);font-weight:300;color:#e6e0d3;line-height:1.5;margin:0 0 18px;max-width:34em}
+.card ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.card li{font-size:clamp(14px,1.1vw,17px);font-weight:400;color:#ece6d9;display:flex;gap:12px;align-items:baseline}
+.card li::before{content:"";flex:0 0 18px;height:1px;background:var(--gold);transform:translateY(-4px)}
+.hint{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:12;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);transition:opacity .6s}
+.hint b{color:var(--gold-2);font-weight:500}
+
+/* rail */
+.rail{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:20;display:grid;gap:10px}
+.rail button{width:8px;height:8px;border-radius:50%;border:0;padding:0;background:rgba(255,255,255,.22);cursor:pointer;transition:all .3s}
+.rail button:hover{background:rgba(255,255,255,.6)}
+.rail button.on{background:var(--gold);box-shadow:0 0 0 4px rgba(217,180,106,.18);height:22px;border-radius:5px}
+.prog{position:fixed;left:0;top:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-2));z-index:20;transition:width .8s ease}
+
+/* glass widgets (right side) */
+.w{position:fixed;z-index:11;background:var(--glass);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  border:1px solid var(--line);border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.45);opacity:0;transform:translateY(12px);
+  transition:opacity .8s ease .25s,transform .8s ease .25s;pointer-events:none;color:var(--ivory)}
+.w.on{opacity:1;transform:none;pointer-events:auto}
+.w .t{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.right{right:64px;top:50%;transform:translateY(calc(-50% + 12px))}
+.right.on{transform:translateY(-50%)}
+.big{font-family:var(--serif);font-size:44px;line-height:1;color:var(--gold-2)}
+.num{font-variant-numeric:tabular-nums}
+
+/* lens bar */
+.lensbar{left:50%;bottom:28px;transform:translate(-50%,12px);padding:8px;display:flex;gap:4px;border-radius:999px}
+.lensbar.on{transform:translate(-50%,0)}
+.lensbar button{background:transparent;border:0;color:var(--muted);font:500 12px var(--sans);padding:10px 14px;border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.02em;white-space:nowrap}
+.lensbar button i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.lensbar button.on{background:rgba(255,255,255,.1);color:var(--ivory)}
+.lensbar button:hover{color:var(--ivory)}
+.legend{right:64px;bottom:28px;padding:14px 16px;min-width:220px}
+.ramp{height:8px;border-radius:4px;margin:8px 0 6px}
+.ramp-l{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+
+/* chips */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:12px;padding:7px 12px;border-radius:999px;border:1px solid var(--line);color:#ddd6c8;background:rgba(255,255,255,.03);cursor:pointer}
+.chip.on{border-color:var(--gold);color:var(--gold-2);background:rgba(217,180,106,.08)}
+
+/* modes legend */
+.modes{display:grid;grid-template-columns:repeat(2,auto);gap:6px 18px;font-size:12px;color:#ddd6c8}
+.modes span{display:flex;align-items:center;gap:8px}
+.modes i{width:18px;height:3px;border-radius:2px;display:inline-block;box-shadow:0 0 8px currentColor}
+
+/* scada */
+.steps{display:flex;gap:6px;margin-bottom:14px}
+.steps div{flex:1;text-align:center;font-size:11px;letter-spacing:.16em;padding:8px 0;border-radius:8px;background:rgba(255,255,255,.04);color:var(--dim);transition:all .4s}
+.steps div.on{background:rgba(217,180,106,.14);color:var(--gold-2)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:rgba(255,255,255,.04);border-radius:12px;padding:10px 12px;border:1px solid transparent;transition:border-color .4s}
+.tile.alarm{border-color:rgba(255,77,77,.6);background:rgba(255,77,77,.08)}
+.tile .k{font-size:11px;color:var(--muted)}
+.tile .v{font-size:22px;font-weight:500;margin-top:2px}
+.tile svg{display:block;margin-top:4px}
+.action{margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(61,220,151,.1);border:1px solid rgba(61,220,151,.35);font-size:13px;opacity:0;transition:opacity .5s}
+.action.on{opacity:1}
+.pipe{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);margin-top:14px;flex-wrap:wrap}
+.pipe b{font-weight:500;color:#ddd6c8;padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.05)}
+
+/* prediction grid */
+.grid{position:fixed;right:64px;top:50%;transform:translateY(-50%);z-index:11;display:grid;grid-template-columns:repeat(3,172px);gap:10px;opacity:0;transition:opacity .8s .2s;pointer-events:none}
+.grid.on{opacity:1;pointer-events:auto}
+.pc{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:14px;padding:12px 12px 11px;cursor:default;transition:transform .3s,border-color .3s}
+.pc:hover{transform:translateY(-3px);border-color:rgba(217,180,106,.5)}
+.pc svg{width:30px;height:30px;display:block;margin-bottom:8px}
+.pc b{display:block;font-size:14px;font-weight:500;margin-bottom:3px}
+.pc span{font-size:11.5px;color:var(--muted);line-height:1.35;display:block}
+
+/* sliders */
+.scrub{width:100%;-webkit-appearance:none;appearance:none;height:28px;background:transparent;cursor:ew-resize}
+.scrub::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--gold) var(--p,0%),rgba(255,255,255,.18) var(--p,0%))}
+.scrub::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ivory);margin-top:-8px;box-shadow:0 0 0 6px rgba(217,180,106,.25)}
+.scrub::-moz-range-track{height:2px;background:rgba(255,255,255,.18)}
+.scrub::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--ivory);border:0}
+.timeline{left:50%;bottom:28px;transform:translate(-50%,12px);width:min(760px,70vw);padding:14px 22px 10px}
+.timeline.on{transform:translate(-50%,0)}
+.tl-top{display:flex;justify-content:space-between;align-items:end}
+.tl-year{font-family:var(--serif);font-size:54px;line-height:.9;color:var(--gold-2)}
+.tl-ticks{display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim);letter-spacing:.08em}
+.att{right:64px;top:90px;width:330px;padding:16px}
+.att ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.att li{display:grid;grid-template-columns:8px 1fr auto;gap:10px;align-items:center;font-size:12.5px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.035)}
+.att li i{width:8px;height:8px;border-radius:50%}
+.att li small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.att li em{font-style:normal;font-size:11px;color:var(--gold-2);text-align:right}
+.bars{display:flex;align-items:end;gap:3px;height:54px;margin-top:12px}
+.bars div{flex:1;background:linear-gradient(180deg,var(--gold),rgba(217,180,106,.25));border-radius:2px 2px 0 0;min-height:2px;transition:height .3s}
+.kpi-row{display:flex;gap:18px;margin-top:12px}
+.kpi-row div{font-size:11px;color:var(--muted)}
+.kpi-row b{display:block;font-size:20px;font-weight:500;color:var(--ivory)}
+
+/* crowd / flood / plan widgets */
+.panel{right:64px;top:50%;transform:translateY(calc(-50% + 12px));width:320px;padding:18px}
+.panel.on{transform:translateY(-50%)}
+.seg{display:flex;background:rgba(255,255,255,.05);border-radius:999px;padding:3px;margin:4px 0 14px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);font:500 12px var(--sans);padding:9px 0;border-radius:999px;cursor:pointer}
+.seg button.on{background:var(--ivory);color:var(--ink)}
+.meter{display:flex;align-items:baseline;gap:8px}
+.meter .big{font-size:52px}
+.fruin{display:flex;height:6px;border-radius:3px;overflow:hidden;margin:10px 0 4px}
+.fruin i{flex:1}
+.clock{font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted)}
+
+/* cloned */
+.clones{right:64px;top:50%;transform:translateY(calc(-50% + 12px));width:min(560px,44vw);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.clones.on{transform:translateY(-50%)}
+.cl{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.035);cursor:pointer;transition:background .3s}
+.cl:hover,.cl.on{background:rgba(217,180,106,.12)}
+.cl b{font-size:13px;font-weight:600;display:block}
+.cl .s{font-family:var(--serif);font-size:24px;color:var(--gold-2);line-height:1.1;margin:2px 0}
+.cl span{font-size:11.5px;color:var(--muted);line-height:1.3;display:block}
+.pin{width:14px;height:14px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 6px rgba(217,180,106,.25),0 0 30px var(--gold);position:relative}
+.pin::after{content:attr(data-name);position:absolute;left:20px;top:-4px;white-space:nowrap;font:500 12px var(--sans);color:var(--ivory);text-shadow:0 1px 6px #000}
+.pin.ours{background:#fff;box-shadow:0 0 0 7px rgba(255,255,255,.2),0 0 40px #fff}
+.pin.ours::after{font-weight:600}
+
+/* copilot */
+.chat{right:64px;top:50%;transform:translateY(calc(-50% + 12px));width:380px;padding:18px;display:grid;gap:12px}
+.chat.on{transform:translateY(-50%)}
+.bub{padding:12px 14px;border-radius:14px;font-size:13.5px;line-height:1.45}
+.bub.q{background:var(--ivory);color:var(--ink);justify-self:end;border-bottom-right-radius:4px;max-width:88%}
+.bub.a{background:rgba(255,255,255,.06);border-bottom-left-radius:4px}
+.bub.a ol{margin:8px 0 0;padding-left:18px}
+.run{display:grid;gap:6px;margin-top:8px}
+.run div{font-size:11.5px;color:var(--muted);display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center}
+.run div i{height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;display:block}
+.run div i b{display:block;height:100%;background:var(--gold);width:0;transition:width 1.4s ease}
+.caret{display:inline-block;width:7px;height:15px;background:var(--gold);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* engine room */
+.engine{position:fixed;inset:0;z-index:9;display:grid;place-items:center;opacity:0;transition:opacity 1s;pointer-events:none;background:linear-gradient(90deg,transparent 22%,rgba(4,5,8,.62) 45%,rgba(4,5,8,.7) 100%)}
+.engine.on{opacity:1;pointer-events:auto}
+.eng-grid{display:grid;grid-template-columns:repeat(4,minmax(150px,210px));gap:28px 40px;margin-left:clamp(0px,30vw,520px)}
+.eng-grid > div:not(.stack){border-top:1px solid rgba(217,180,106,.4);padding-top:14px}
+.eng-grid > div > b{font-family:var(--serif);font-weight:400;font-size:clamp(40px,4vw,64px);color:var(--gold-2);display:block;line-height:1}
+.eng-grid > div > span{font-size:13px;color:#d8d1c3;display:block;margin-top:8px;line-height:1.4}
+.stack{grid-column:1/-1;display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.stack div{border:0;padding:10px 14px;border-radius:10px;background:var(--glass-2);font-size:12.5px;color:#e6dfd0;border:1px solid var(--line)}
+.stack .arr{background:none;border:0;color:var(--gold);padding:0}
+
+/* roadmap */
+.road{position:fixed;left:50%;bottom:clamp(28px,8vh,80px);transform:translateX(-50%);z-index:11;width:min(1100px,90vw);display:grid;grid-template-columns:repeat(4,1fr);gap:14px;opacity:0;transition:opacity .9s .3s;pointer-events:none}
+.road.on{opacity:1;pointer-events:auto}
+.road div{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:16px;padding:18px;position:relative}
+.road div::before{content:"";position:absolute;left:18px;top:-7px;width:12px;height:12px;border-radius:50%;background:var(--gold);box-shadow:0 0 18px var(--gold)}
+.road small{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-2)}
+.road b{display:block;font-family:var(--serif);font-weight:400;font-size:28px;margin:6px 0 8px}
+.road > div > span{font-size:12.5px;color:#d8d1c3;line-height:1.45;display:block}
+.road-line{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(clamp(28px,8vh,80px) + 168px);width:min(1100px,90vw);height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);z-index:11;opacity:0;transition:opacity .9s}
+.road.on + .road-line{opacity:.6}
+
+.card[data-ch=time]{bottom:150px}
+.card[data-ch=road]{bottom:auto;top:clamp(40px,10vh,110px)}
+.plan-stage{font-size:12.5px;color:var(--gold-2);margin:-2px 0 12px;letter-spacing:.02em;min-height:18px}
+.again{margin-top:14px;width:100%;border:1px solid rgba(217,180,106,.45);background:rgba(217,180,106,.08);color:var(--gold-2);font:500 12.5px var(--sans);padding:10px;border-radius:999px;cursor:pointer}
+.again:hover{background:rgba(217,180,106,.18)}
+.haze{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0;transition:opacity .8s}
+.haze.on{opacity:1}
+.netleg{display:flex;gap:14px;font-size:12px;color:#ddd6c8;margin-bottom:14px}
+.netleg span{display:flex;align-items:center;gap:6px}
+.netleg i{width:14px;height:3px;border-radius:2px;box-shadow:0 0 8px currentColor}
+/* how to drive the map: one quiet line, top centre */
+.howto{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:25;display:flex;align-items:center;gap:12px;padding:7px 16px;border-radius:999px;
+  background:rgba(8,10,15,.46);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);
+  font:400 11.5px var(--sans);color:#b9b3a6;letter-spacing:.02em;white-space:nowrap;pointer-events:none;transition:opacity .6s}
+.howto b{font-weight:500;color:var(--gold-2)}
+.howto i{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.28)}
+.howto.dim{opacity:.35}
+@media (max-width:900px){.howto{display:none}}
+/* sources */
+.sources{position:fixed;right:64px;top:50%;transform:translateY(-50%);z-index:11;width:min(520px,40vw);max-height:70vh;overflow:auto;padding:18px 20px;opacity:0;pointer-events:none;transition:opacity .8s .3s}
+.sources.on{opacity:1;pointer-events:auto;transform:translateY(-50%)}
+.sources a{display:block;font-size:12px;color:#d8d1c3;text-decoration:none;padding:6px 0;border-bottom:1px solid var(--line)}
+.sources a:hover{color:var(--gold-2)}
+.sources a small{color:var(--dim)}
+
+/* glossary */
+.term{border-bottom:1px dotted rgba(243,217,160,.7);cursor:help}
+#tip{position:fixed;z-index:60;max-width:300px;background:#f5f0e6;color:#14161c;font-size:12.5px;line-height:1.45;padding:10px 12px;border-radius:10px;pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+#tip.on{opacity:1;transform:none}
+#tip b{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7a5a1c;margin-bottom:3px}
+.tag{display:inline-block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:4px 8px;border-radius:999px;margin-top:14px}
+
+.maplibregl-ctrl-attrib{background:rgba(0,0,0,.35)!important;color:#999!important;font-size:10px}
+.maplibregl-ctrl-attrib a{color:#bbb!important}
+.maplibregl-ctrl-bottom-right{z-index:30}
+
+@media (max-width:900px){
+  .right,.panel,.chat,.clones,.att,.legend,.sources{right:16px;left:16px;width:auto;top:auto;bottom:16px;transform:none}
+  .grid{grid-template-columns:repeat(2,1fr);right:16px;left:16px;top:auto;bottom:16px;transform:none}
+  .card{bottom:auto;top:40px}
+  .eng-grid{grid-template-columns:repeat(2,1fr);margin:0 16px}
+  .road{grid-template-columns:1fr 1fr}
+  .lensbar{max-width:92vw;overflow-x:auto}
+  .rail{display:none}
+}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="haze" id="haze"></div>
+<div class="vignette"></div>
+<div class="prog" id="prog"></div>
+<div class="veil" id="veil"><div><div class="mark">The City, Twice</div><div class="bar"><i></i></div></div></div>
+<nav class="rail" id="rail"></nav>
+<div class="hint" id="hint">Scroll, or press <b>→</b></div>
+<div class="howto" id="howto">
+  <span><b>Drag</b> move</span><i></i>
+  <span><b><span class="mod">Ctrl/⌘</span> + Drag</b> turn &amp; tilt</span><i></i>
+  <span><b>Pinch</b> or <b><span class="mod">Ctrl/⌘</span> + Scroll</b> zoom</span><i></i>
+  <span><b>Scroll</b> or <b>&larr; &rarr;</b> slides</span>
+</div>
+<div id="tip"></div>
+
+<!-- ============ chapter cards ============ -->
+<section class="card" data-ch="hero">
+  <h1>The city,<br><em>twice.</em></h1>
+  <p class="lede">A living 3D <span class="term" data-t="Digital twin">twin</span> of any city. Every street, pipe, person and minute, in one place, before a single rupee is spent on the ground.</p>
+</section>
+
+<section class="card" data-ch="anycity">
+  <h2>Any city.<br><em>In weeks.</em></h2>
+  <ul>
+    <li>Satellite, maps, census and timetables in</li>
+    <li>A working 3D city out</li>
+    <li>Runs in any web browser</li>
+  </ul>
+</section>
+
+<section class="card" data-ch="people">
+  <h2>Every trip.<br><em>Simulated.</em></h2>
+  <ul>
+    <li>Cars, buses, trains, light rail, trucks, bikes, feet</li>
+    <li>Every person has a day, a home and a reason to travel</li>
+    <li>Checked mode by mode against real ridership</li>
+  </ul>
+  <span class="tag">Newcastle, Australia · our calibrated run, morning peak</span>
+</section>
+
+<section class="card" data-ch="freight">
+  <h2>Ship to shop,<br><em>every hour.</em></h2>
+  <ul>
+    <li>Port gate, warehouse, highway, rail: one chain</li>
+    <li>Every truck with a route and a clock</li>
+    <li>See the jam before it forms</li>
+  </ul>
+  <span class="tag">Mumbai port hinterland · freight corridors on real roads</span>
+</section>
+
+<section class="card" data-ch="lenses">
+  <h2>Every system.<br><em>One switch.</em></h2>
+  <ul>
+    <li>Traffic, zoning, water, sewage, power</li>
+    <li>Heat, air, noise, land value</li>
+    <li>One colour language, learnt once</li>
+  </ul>
+</section>
+
+<section class="card" data-ch="scada">
+  <h2>Wired to the<br><em>real city.</em></h2>
+  <ul>
+    <li>Live feeds from pumps, substations and gauges</li>
+    <li>The twin sees the fault and plays it forward</li>
+    <li>The control room gets the fix, not the alarm</li>
+  </ul>
+</section>
+
+<section class="card" data-ch="predict">
+  <h2>Predict<br><em>everything.</em></h2>
+  <p class="lede">Not just traffic. Twelve city models on one shared ground truth.</p>
+</section>
+
+<section class="card" data-ch="flood">
+  <h2>Rehearse<br><em>the monsoon.</em></h2>
+  <ul>
+    <li>Real terrain, real drains, real rainfall</li>
+    <li>Which roads close, which homes flood</li>
+    <li>Warnings hours ahead, not minutes</li>
+  </ul>
+</section>
+
+<section class="card" data-ch="crowd">
+  <h2>Plan the<br><em>big day.</em></h2>
+  <ul>
+    <li>Processions, finals, marathons, pilgrimages</li>
+    <li>Every walker, every lane, every minute</li>
+    <li>Find the crush point, then design it away</li>
+  </ul>
+</section>
+
+<section class="card" data-ch="time">
+  <h2>Scroll through<br><em>time.</em></h2>
+  <ul>
+    <li>Every road, pipe and building, with its age</li>
+    <li>Past, present and projected</li>
+    <li>The twin lists what needs you next</li>
+  </ul>
+</section>
+
+<section class="card" data-ch="plan">
+  <h2>Draw it.<br><em>Watch it rise.</em></h2>
+  <ul>
+    <li>Trace a real district, road to road</li>
+    <li>Its networks come up, then every real building</li>
+    <li>Then the plan: old godowns out, new ones in</li>
+  </ul>
+</section>
+
+<section class="card" data-ch="clones">
+  <h2>The best twins<br><em>on Earth.</em></h2>
+  <p class="lede">We studied them. We take the best of each, and add the one thing most lack: people who move.</p>
+</section>
+
+<section class="card" data-ch="ask">
+  <h2>Ask the<br><em>city.</em></h2>
+  <ul>
+    <li>Plain English, Marathi or Hindi</li>
+    <li>The twin runs the models and shows you</li>
+    <li>Answers in the meeting, not in a month</li>
+  </ul>
+</section>
+
+<section class="card" data-ch="engine">
+  <h2>The<br><em>engine room.</em></h2>
+  <p class="lede">Built by people who write the simulators, not just the dashboards. Give us the compute, and the whole city runs overnight.</p>
+</section>
+
+<section class="card" data-ch="road">
+  <h2>From first map<br><em>to living city.</em></h2>
+</section>
+
+<section class="card" data-ch="close">
+  <h1>Build it<br><em>twice.</em></h1>
+  <p class="lede">Once in the twin, where mistakes are free. Then once for real.</p>
+</section>
+
+<!-- ============ widgets ============ -->
+<div class="w right" data-w="people" style="padding:16px 18px;width:250px">
+  <div class="t">Travel modes</div>
+  <div class="modes" id="modesLegend"></div>
+  <div class="t" style="margin-top:14px">Clock</div>
+  <div class="big num" id="ncClock">07:00</div>
+</div>
+
+<div class="w right" data-w="freight" style="padding:16px 18px;width:300px">
+  <div class="t">Corridors</div>
+  <div id="corrList" style="display:grid;gap:8px;font-size:12.5px"></div>
+  <div class="t" style="margin-top:14px"><span class="term" data-t="TEU">Containers</span> leaving the port</div>
+  <div class="big num">8.17 M</div>
+  <div style="font-size:11px;color:var(--muted);margin-top:4px">a year, <span class="term" data-t="JNPA">JNPA</span>, 2025–26</div>
+</div>
+
+<div class="w lensbar" data-w="lenses" id="lensbar"></div>
+<div class="w legend" data-w="lenses" id="lensLegend"></div>
+
+<div class="w panel" data-w="scada" style="width:360px">
+  <div class="steps" id="steps"><div>SENSE</div><div>SEE</div><div>FORESEE</div><div>ACT</div></div>
+  <div class="tiles" id="tiles"></div>
+  <div class="action" id="action"></div>
+  <div class="pipe"><b class="term" data-t="PLC / RTU">PLC · RTU</b>→<b class="term" data-t="SCADA">SCADA</b>→<b class="term" data-t="OPC UA / MQTT">OPC UA · MQTT</b>→<b>Twin</b>→<b class="term" data-t="ICCC">ICCC</b></div>
+</div>
+
+<div class="grid" data-w="predict" id="predGrid"></div>
+
+<div class="w panel" data-w="flood">
+  <div class="t">Water level above sea</div>
+  <div class="meter"><span class="big num" id="fLevel">0.0</span><span style="color:var(--muted)">m</span></div>
+  <input type="range" class="scrub" id="fSlider" min="0" max="12" step="0.1" value="0">
+  <div class="kpi-row">
+    <div><b class="num" id="fRoads">0</b>km of road under water</div>
+    <div><b class="num" id="fBld">0</b>buildings wet</div>
+  </div>
+  <div style="font-size:11px;color:var(--dim);margin-top:12px">Bathtub fill on the elevation model. A full <span class="term" data-t="SWMM">SWMM</span> + river model replaces it in the twin.</div>
+</div>
+
+<div class="w panel" data-w="crowd">
+  <div class="t">Immersion procession · lake ghat</div>
+  <div class="seg" id="crowdSeg"><button class="on" data-s="a">As usual</button><button data-s="b">Twin plan</button></div>
+  <div class="t">Peak crowd density</div>
+  <div class="meter"><span class="big num" id="cPeak">–</span><span style="color:var(--muted)">people / m²</span></div>
+  <div class="fruin"><i style="background:var(--ok)"></i><i style="background:var(--ok)"></i><i style="background:var(--warn)"></i><i style="background:var(--warn)"></i><i style="background:var(--bad)"></i><i style="background:var(--crit)"></i></div>
+  <div class="ramp-l"><span>free</span><span>2</span><span>4</span><span><span class="term" data-t="Fruin levels">danger 5+</span></span></div>
+  <div class="clock" style="margin-top:12px">Now <b id="cClock" style="color:var(--ivory)">17:00</b> · this frame <b id="cNow" style="color:var(--ivory)">0</b> p/m²</div>
+  <div id="cPlan" style="font-size:12px;color:#d8d1c3;margin-top:10px;line-height:1.5"></div>
+  <div class="chips" style="margin-top:14px"><span class="chip on">Procession</span><span class="chip">Cricket final</span><span class="chip">Marathon</span><span class="chip">Concert</span><span class="chip">Pilgrim walk</span></div>
+</div>
+
+<div class="w timeline" data-w="time">
+  <div class="tl-top">
+    <div class="tl-year num" id="tlYear">2026</div>
+    <div class="chips" id="tlChips"><span class="chip on" data-a="bld">Buildings</span><span class="chip on" data-a="road">Roads</span><span class="chip on" data-a="pipe">Water pipes</span></div>
+  </div>
+  <input type="range" class="scrub" id="tlSlider" min="1970" max="2060" step="1" value="2026">
+  <div class="tl-ticks"><span>1970</span><span>1990</span><span>2010</span><span>TODAY</span><span>2040</span><span>2060</span></div>
+</div>
+<div class="w att" data-w="time">
+  <div class="t">Needs attention next</div>
+  <ol id="attList"></ol>
+  <div class="t" style="margin-top:14px">Past design life</div>
+  <div class="kpi-row" style="margin-top:4px">
+    <div><b class="num" id="kPipe">0%</b>of pipes</div>
+    <div><b class="num" id="kRoad">0%</b>of roads</div>
+    <div><b class="num" id="kBld">0</b>buildings</div>
+  </div>
+  <div class="bars" id="capex"></div>
+  <div class="ramp-l"><span>work due, next 10 years</span></div>
+</div>
+
+<div class="w panel" data-w="plan">
+  <div class="t" id="planName">District · live estimate</div>
+  <div class="plan-stage" id="planStage">Finding a district…</div>
+  <div class="netleg"><span><i style="background:#fff1cf"></i>Roads</span><span><i style="background:#37d0ff"></i>Water</span><span><i style="background:#c08a4a"></i>Sewers</span><span><i style="background:#ffe066"></i>Power</span></div>
+  <div class="tiles" id="planKpis"></div>
+  <button class="again" id="planAgain">Trace another district</button>
+  <div style="font-size:11px;color:var(--dim);margin-top:12px">Real district boundaries, roads and buildings. Pipe and cable layouts follow the streets and are illustrative.</div>
+</div>
+
+<div class="w clones" data-w="clones" id="clones"></div>
+
+<div class="w chat" data-w="ask" id="chat"></div>
+
+<div class="engine" data-w="engine">
+  <div class="eng-grid">
+    <div><b class="num">27 M</b><span>synthetic residents in our Mumbai-region model, one for every real person</span></div>
+    <div><b class="num">12</b><span>travel modes, each simulated on real roads and real timetables</span></div>
+    <div><b class="num">594</b><span>model inputs, each with a source, a unit and a tested range</span></div>
+    <div><b class="num">968</b><span>versioned data files, every one rebuildable from its raw source</span></div>
+    <div class="stack">
+      <div>Satellite · <span class="term" data-t="OSM">OSM</span> · census · timetables · sensors</div><div class="arr">→</div>
+      <div>3D city model</div><div class="arr">→</div>
+      <div><span class="term" data-t="Agent-based simulation">Agent-based</span> simulators · <span class="term" data-t="MATSim">MATSim</span> · <span class="term" data-t="SUMO">SUMO</span> · hydraulics</div><div class="arr">→</div>
+      <div><span class="term" data-t="Surrogate model">AI stand-ins</span> for instant what-ifs</div><div class="arr">→</div>
+      <div>This screen</div>
+    </div>
+  </div>
+</div>
+
+<div class="road" data-w="road">
+  <div><small>90 days</small><b>The base twin</b><span>Your city in 3D: land, buildings, roads, networks and people, in the browser.</span></div>
+  <div><small>Year 1</small><b>It moves</b><span>People and freight simulated, checked against real counts, every lens switched on.</span></div>
+  <div><small>Year 2</small><b>It listens</b><span>Live <span class="term" data-t="SCADA">SCADA</span> and sensor feeds; flood, heat, water and power predictions.</span></div>
+  <div><small>Year 3+</small><b>It advises</b><span>Plans drafted and scored by the twin; answers in plain language, in the meeting.</span></div>
+</div>
+<div class="road-line"></div>
+
+<div class="w sources" data-w="close" id="sources"></div>
+
+<script>
+'use strict';
+/* ============================ glossary ============================ */
+const GLOSS = {
+  'Digital twin':'A computer copy of a real city that stays in step with it: the same streets, pipes, buildings and people, updated from real data, so you can test a change before making it.',
+  'TEU':'Twenty-foot equivalent unit: the standard size of a shipping container. A 40-foot box counts as 2 TEU.',
+  'JNPA':'Jawaharlal Nehru Port Authority, India\'s busiest container port, near Mumbai.',
+  'SCADA':'Supervisory Control And Data Acquisition: the control system a utility uses to watch and run pumps, valves, substations and gauges.',
+  'PLC / RTU':'Programmable Logic Controller / Remote Terminal Unit: the small field computers at a pump or substation that read sensors and switch equipment.',
+  'OPC UA / MQTT':'Open industrial messaging standards (OPC Unified Architecture; Message Queuing Telemetry Transport) that carry live readings from SCADA to other systems such as the twin.',
+  'ICCC':'Integrated Command and Control Centre: the city control room built under India\'s Smart Cities Mission.',
+  'SWMM':'Storm Water Management Model, the US EPA\'s open model of rain, drains and flooding.',
+  'Fruin levels':'John Fruin\'s levels of service for crowds. Above about 2 people per m² walking slows; above 5 people per m² a crowd becomes dangerous.',
+  'OSM':'OpenStreetMap: the free, editable map of the world, built by volunteers.',
+  'Agent-based simulation':'Instead of averaging flows, the model simulates each person or vehicle as an agent with its own plan for the day, then lets them interact.',
+  'MATSim':'Multi-Agent Transport Simulation: open-source software that simulates every traveller in a city through a whole day, and lets them learn better plans over many rounds.',
+  'SUMO':'Simulation of Urban MObility: open-source traffic simulation, vehicle by vehicle, down to lanes and traffic signals.',
+  'Surrogate model':'A fast AI model trained on thousands of full simulation runs, so a what-if that takes hours to simulate is answered in seconds.',
+  'PCI':'Pavement Condition Index: a 0–100 score for a road surface. Below about 40 it needs rebuilding, not patching.',
+  'MLD':'Million litres per day, the usual unit for water supply.',
+  'LOS':'Level of service: a letter grade from A (free flow) to F (breakdown).',
+};
+const tip = document.getElementById('tip');
+document.addEventListener('mouseover', e => {
+  const t = e.target.closest('.term'); if (!t) return;
+  const k = t.dataset.t; tip.innerHTML = `<b>${k}</b>${GLOSS[k] || ''}`; tip.classList.add('on');
+  const r = t.getBoundingClientRect(); const w = 300;
+  tip.style.left = Math.min(innerWidth - w - 12, Math.max(12, r.left)) + 'px';
+  tip.style.top = (r.top > 170 ? r.top - tip.offsetHeight - 10 : r.bottom + 10) + 'px';
+});
+document.addEventListener('mouseout', e => { if (e.target.closest('.term')) tip.classList.remove('on'); });
+
+/* ============================ helpers ============================ */
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const hex = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+const hh = s => { let x = 2166136261; for (let i = 0; i < s.length; i++){ x ^= s.charCodeAt(i); x = Math.imul(x, 16777619); } return ((x >>> 0) % 100000) / 100000; };
+const fmtT = s => { s = ((s % 86400) + 86400) % 86400; return String(Math.floor(s / 3600)).padStart(2, '0') + ':' + String(Math.floor(s / 60) % 60).padStart(2, '0'); };
+const MODE = {car:'#ffc857', truck:'#ff6b3d', bus:'#3ddc97', rail:'#4cc9f0', tram:'#c77dff', ferry:'#00f5d4', walk:'#f4f1ea',
+              bike:'#a3e635', taxi:'#ffe066', motorbike:'#ff8fab', auto_rickshaw:'#ffe066', ride:'#ffb4a2'};
+const MODE_NAME = {car:'Car', truck:'Truck', bus:'Bus', rail:'Train', tram:'Light rail', ferry:'Ferry', walk:'Walk', bike:'Bike', taxi:'Taxi', motorbike:'Motorbike'};
+const TW = window.TW || {};
+
+/* ============================ map ============================ */
+const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const DEM = 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
+/* ---- building tiles ----
+   The buildings come from one large file on a remote server, fetched a tile at a time. Three things make them fast:
+   1. a queue: at most six tiles download at once, always the ones nearest the camera first, so the city fills in
+      from the foreground outward instead of in random blocks;
+   2. a cache: tiles are kept in memory and in the browser's own database, so a second visit is instant;
+   3. prefetch: while one chapter plays, the tiles around the next chapters' cameras download in the background. */
+const BLD_URL = 'https://overturemaps-extras-us-west-2.s3.amazonaws.com/tiles/2026-08-19.0/buildings.pmtiles';
+const pmProto = new pmtiles.Protocol(), PMT = new pmtiles.PMTiles(BLD_URL); pmProto.add(PMT);
+PMT.getHeader().catch(() => {});                         // the file's index starts downloading before the map exists
+const TQ = (() => {
+  const mem = new Map(), jobs = new Map(), queue = []; let live = 0, pre = 0;
+  const idb = new Promise(res => { try { const r = indexedDB.open('twin-building-tiles', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('t'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e){ res(null); } });
+  const idbGet = k => idb.then(d => d && new Promise(res => { try { const q = d.transaction('t').objectStore('t').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); } catch (e){ res(null); } }));
+  const idbPut = (k, v) => idb.then(d => { if (d) try { d.transaction('t', 'readwrite').objectStore('t').put(v, k); } catch (e){} });
+  const centre = (z, x, y) => { const n = 2 ** z; return [(x + 0.5) / n * 360 - 180, Math.atan(Math.sinh(Math.PI * (1 - 2 * (y + 0.5) / n))) * 180 / Math.PI]; };
+  const camAt = () => { try { const q = map.getFreeCameraOptions().position.toLngLat(); const c = map.getCenter();
+    return [q.lng * 0.65 + c.lng * 0.35, q.lat * 0.65 + c.lat * 0.35]; } catch (e){ return null; } };   // between the eye and what it looks at
+  const remember = (k, v) => { mem.set(k, v); if (mem.size > 500) mem.delete(mem.keys().next().value); };
+  function pump(){
+    const cam = camAt();
+    while (queue.length){
+      // live tiles always go first; prefetch only fills idle slots
+      let bi = -1, bs = Infinity;
+      for (let i = 0; i < queue.length; i++){
+        const j = queue[i]; if (j.pre && (live + pre >= 6 || pre >= 3)) continue;          // prefetch never holds more than half the connections
+        const sc = j.pre ? j.rank : (cam ? Math.hypot((j.c[0] - cam[0]) * Math.cos(cam[1] * Math.PI / 180), j.c[1] - cam[1]) : 0);
+        if (sc < bs){ bs = sc; bi = i; }
+      }
+      if (bi < 0 || (!queue[bi].pre && live + pre >= 6)) return;
+      const j = queue.splice(bi, 1)[0];
+      if (!j.pre && j.waiters === 0){ jobs.delete(j.k); continue; }
+      j.pre ? pre++ : live++; const wasPre = j.pre;
+      PMT.getZxy(j.z, j.x, j.y).then(r => { const d = r && r.data ? r.data : new ArrayBuffer(0); remember(j.k, d); idbPut(j.k, d); j.done(d); })
+        .catch(() => j.done(null)).finally(() => { wasPre ? pre-- : live--; jobs.delete(j.k); pump(); });
+    }
+  }
+  function get(z, x, y, signal, isPre, rank){
+    const k = z + '/' + x + '/' + y;
+    if (mem.has(k)) return Promise.resolve(mem.get(k));
+    let j = jobs.get(k);
+    if (!j){
+      let done; const pr = new Promise(r => done = r);
+      j = {k, z, x, y, c:centre(z, x, y), pre:isPre, rank:rank || 0, waiters:0, pr, done:d => done(d)};
+      jobs.set(k, j);
+      idbGet(k).then(v => { if (v){ remember(k, v); jobs.delete(k); j.done(v); } else { queue.push(j); pump(); } });
+    }
+    if (!isPre){ j.pre = false; j.waiters++; if (signal) signal.addEventListener('abort', () => { j.waiters--; }); }
+    return j.pr;
+  }
+  /* the z13 and z14 tiles around a chapter's camera, nearest the eye first */
+  function prefetch(cam){
+    if (!cam) return;
+    const [lng, lat] = cam.center, b = (cam.bearing || 0) * Math.PI / 180, back = 0.012 * Math.tan((cam.pitch || 0) * Math.PI / 180);
+    const eye = [lng - Math.sin(b) * back, lat - Math.cos(b) * back];
+    for (const [z, R] of [[14, 3200], [13, 7000]]){
+      const n = 2 ** z, tx = v => Math.floor((v + 180) / 360 * n), ty = v => Math.floor((1 - Math.log(Math.tan(Math.PI / 4 + v * Math.PI / 360)) / Math.PI) / 2 * n);
+      const dl = R / (111320 * Math.cos(lat * Math.PI / 180)), dt = R / 110574;
+      for (let x = tx(lng - dl); x <= tx(lng + dl); x++) for (let y = ty(lat + dt); y <= ty(lat - dt); y++){
+        const c = centre(z, x, y); const r = Math.hypot((c[0] - eye[0]) * Math.cos(lat * Math.PI / 180), c[1] - eye[1]) + (z === 13 ? 0.02 : 0);
+        get(z, x, y, null, true, r);
+      }
+    }
+  }
+  return {get, prefetch, stats:() => ({live, pre, queued:queue.length, jobs:jobs.size, mem:mem.size, liveQueued:queue.filter(q => !q.pre).length})};
+})();
+/* MapLibre's image-tile queue can read a cancel handle it has already discarded when a fast flight cancels
+   imagery requests; harmless (the queue carries on), so that one message is kept out of the console */
+addEventListener('unhandledrejection', e => { const m = String(e.reason && e.reason.message || e.reason); if (/reading 'signal'/.test(m)) e.preventDefault(); });
+maplibregl.addProtocol('pmtiles', (params, ac) => {
+  ac = ac || new AbortController();
+  const m = params.url.match(/\/(\d+)\/(\d+)\/(\d+)$/);
+  if (params.type === 'json' || !m || location.search.includes('rawtiles')) return pmProto.tile(params, ac);   // ?rawtiles: the old direct loading, for comparison
+  // the map hands tile data to a worker, which takes ownership of it: always give it a copy of the cached bytes
+  return TQ.get(+m[1], +m[2], +m[3], ac && ac.signal, false).then(d => ({data:d && d.byteLength ? d.slice(0) : new Uint8Array()}));
+});
+const H1 = ['match', ['slice', ['to-string', ['id']], 0, 1], '0',0,'1',1,'2',2,'3',3,'4',4,'5',5,'6',6,'7',7,'8',8,'9',9,'a',10,'b',11,'c',12,'d',13,'e',14, 15];
+const H2 = ['match', ['slice', ['to-string', ['id']], 1, 2], '0',0,'1',1,'2',2,'3',3,'4',4,'5',5,'6',6,'7',7,'8',8,'9',9,'a',10,'b',11,'c',12,'d',13,'e',14, 15];
+const BH = ['case', ['has', 'height'], ['get', 'height'], ['has', 'num_floors'], ['*', ['get', 'num_floors'], 3.3], ['+', 3.2, ['*', H2, 0.8]]];
+const ROOF = ['match', H1, [0,1,2], '#d8d2c4', [3,4], '#c7bfae', [5,6], '#e7e2d7', 7, '#b3ada0', [8,9], '#d3c9b5', 10, '#98aec4', 11, '#c29f86', [12,13], '#dcd6ca', '#cbc4b6'];
+const BLD_DAY = {'fill-extrusion-color': ROOF, 'fill-extrusion-opacity': .95};
+const isFS = () => true;
+
+const map = new maplibregl.Map({
+  container:'map', center:[72.8235, 19.0060], zoom:14.6, pitch:72, bearing:28, maxPitch:85,
+  attributionControl:{compact:true}, maplibreLogo:false, fadeDuration:250, canvasContextAttributes:{antialias:true, preserveDrawingBuffer:true},
+  style:{version:8, projection:{type:'mercator'}, glyphs:'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+    sources:{
+      sat:{type:'raster', tiles:[ESRI], tileSize:256, maxzoom:19, attribution:'Imagery © Esri, Maxar, Earthstar Geographics'},
+      dem:{type:'raster-dem', tiles:[DEM], encoding:'terrarium', tileSize:256, maxzoom:14, attribution:'Terrain: Mapzen / AWS Open Data'},
+      demf:{type:'raster-dem', tiles:[DEM], encoding:'terrarium', tileSize:256, maxzoom:14},
+      omt:{type:'vector', url:'https://tiles.openfreemap.org/planet', attribution:'© OpenMapTiles © OpenStreetMap contributors'},
+      bld:{type:'vector', url:'pmtiles://https://overturemaps-extras-us-west-2.s3.amazonaws.com/tiles/2026-08-19.0/buildings.pmtiles', promoteId:{building:'id'}, minzoom:13, attribution:'Buildings: Overture Maps Foundation (ODbL)'},
+    },
+    layers:[
+      {id:'bg', type:'background', paint:{'background-color':'#05070b'}},
+      {id:'sat', type:'raster', source:'sat', paint:{'raster-fade-duration':250, 'raster-saturation':-0.1, 'raster-contrast':0.08}},
+    ],
+    sky:{'sky-color':'#0d1a33', 'horizon-color':'#f1b779', 'fog-color':'#e7c095', 'fog-ground-blend':0.55, 'horizon-fog-blend':0.75, 'sky-horizon-blend':0.65, 'atmosphere-blend':['interpolate',['linear'],['zoom'],0,1,8,1,11,0]},
+    light:{anchor:'map', position:[1.3, 250, 40], color:'#ffe2b8', intensity:0.45},
+  }
+});
+map.getCanvas().setAttribute('tabindex', '-1');
+map.scrollZoom.disable();
+map.keyboard.disable();            // arrow keys change chapters; they never move the camera
+map.on('error', e => { const m = (e && e.error && e.error.message) || ''; if (!/tile|Failed to fetch|AJAX|status|aborted/i.test(m)) console.warn(m); });
+
+const G = {type:'FeatureCollection', features:[]};
+const fc = feats => ({type:'FeatureCollection', features:feats});
+const line = (c, p) => ({type:'Feature', properties:p || {}, geometry:{type:'LineString', coordinates:c}});
+const poly = (r, p, id) => ({type:'Feature', id, properties:p || {}, geometry:{type:'Polygon', coordinates:[r]}});
+const pt = (c, p) => ({type:'Feature', properties:p || {}, geometry:{type:'Point', coordinates:c}});
+
+let ready = false;
+map.on('load', () => {
+  // land use (zoning lens)
+  map.addLayer({id:'lu', type:'fill', source:'omt', 'source-layer':'landuse', layout:{visibility:'none'},
+    filter:['in', ['get','class'], ['literal', ['residential','commercial','industrial','retail','school','college','university','hospital','railway','cemetery']]],
+    paint:{'fill-color':['match',['get','class'],'residential','#56c271','commercial','#3d8bff','retail','#3d8bff','industrial','#f5b83d','railway','#f5b83d','#b58cff'], 'fill-opacity':0.55}});
+  map.addLayer({id:'lu-edge', type:'line', source:'omt', 'source-layer':'landuse', layout:{visibility:'none'},
+    filter:['in', ['get','class'], ['literal', ['residential','commercial','industrial','retail']]],
+    paint:{'line-color':'#ffffff', 'line-opacity':0.25, 'line-width':1}});
+  map.addLayer({id:'parks', type:'fill', source:'omt', 'source-layer':'park', layout:{visibility:'none'}, paint:{'fill-color':'#2e8b57', 'fill-opacity':0.5}});
+  // flood fill on real elevation
+  map.addLayer({id:'flood', type:'color-relief', source:'demf', layout:{visibility:'none'}, paint:{'color-relief-opacity':0.85, 'color-relief-color':floodRamp(0)}});
+  // lens hexes
+  map.addSource('hex', {type:'geojson', data:G});
+  map.addLayer({id:'hex', type:'fill-extrusion', source:'hex', layout:{visibility:'none'}, paint:{'fill-extrusion-opacity':0.58, 'fill-extrusion-color':'#fff', 'fill-extrusion-height':0}});
+  // networks
+  for (const id of ['road','sewer','water','feed','hv','region','rail','river','corr','incident','plan-outline']) map.addSource(id, {type:'geojson', data:G, lineMetrics: id === 'corr'});
+  map.addLayer({id:'region-glow', type:'line', source:'region', layout:{visibility:'none','line-cap':'round','line-join':'round'}, paint:{'line-color':'#ffcf7a','line-width':['interpolate',['linear'],['zoom'],9,2,14,7],'line-blur':4,'line-opacity':0.35}});
+  map.addLayer({id:'region', type:'line', source:'region', layout:{visibility:'none','line-cap':'round','line-join':'round'}, paint:{'line-color':'#ffe2a8','line-width':['interpolate',['linear'],['zoom'],9,0.6,14,2],'line-opacity':0.75}});
+  map.addLayer({id:'rail', type:'line', source:'rail', layout:{visibility:'none'}, paint:{'line-color':'#8fd3ff','line-width':1.2,'line-opacity':0.6,'line-dasharray':[2,2]}});
+  map.addLayer({id:'road', type:'line', source:'road', layout:{visibility:'none','line-cap':'round','line-join':'round'},
+    paint:{'line-color':['interpolate',['linear'],['get','t'],0,'#2ecc71',0.55,'#b8e05a',0.75,'#ffc53d',0.9,'#ff6b3d',1,'#ff2f4e'],
+           'line-width':['interpolate',['linear'],['zoom'],11,['*',0.5,['get','k']],15,['*',1.6,['get','k']]], 'line-opacity':0.9}});
+  map.addLayer({id:'sewer', type:'line', source:'sewer', layout:{visibility:'none','line-cap':'round'}, paint:{'line-color':'#c08a4a','line-width':['interpolate',['linear'],['zoom'],11,1,15,3],'line-opacity':0.9}});
+  map.addLayer({id:'sewer-flow', type:'symbol', source:'sewer', layout:{visibility:'none','symbol-placement':'line','symbol-spacing':70,'text-field':'›','text-size':16,'text-font':['Noto Sans Regular'],'text-keep-upright':false,'text-allow-overlap':true}, paint:{'text-color':'#ffd9a3','text-opacity':0.8}});
+  map.addLayer({id:'water-glow', type:'line', source:'water', layout:{visibility:'none','line-cap':'round'}, paint:{'line-color':'#37d0ff','line-width':['interpolate',['linear'],['zoom'],11,['/',['get','d'],150],15,['/',['get','d'],40]],'line-blur':6,'line-opacity':0.5}});
+  map.addLayer({id:'water', type:'line', source:'water', layout:{visibility:'none','line-cap':'round'},
+    paint:{'line-color':'#8be8ff','line-width':['interpolate',['linear'],['zoom'],11,['/',['get','d'],450],15,['/',['get','d'],130]],'line-opacity':0.95}});
+  map.addLayer({id:'feed', type:'line', source:'feed', layout:{visibility:'none','line-cap':'round'},
+    paint:{'line-color':['interpolate',['linear'],['get','l'],0.3,'#ffe066',0.7,'#ffb020',0.9,'#ff4d4d'],'line-width':['interpolate',['linear'],['zoom'],11,1,15,3],'line-opacity':0.9}});
+  map.addLayer({id:'hv-glow', type:'line', source:'hv', layout:{visibility:'none'}, paint:{'line-color':'#fff27a','line-width':10,'line-blur':8,'line-opacity':0.45}});
+  map.addLayer({id:'hv', type:'line', source:'hv', layout:{visibility:'none'}, paint:{'line-color':'#fff7b0','line-width':2.2,'line-dasharray':[6,2]}});
+  map.addLayer({id:'incident', type:'line', source:'incident', layout:{visibility:'none','line-cap':'round'}, paint:{'line-color':'#ff4d4d','line-width':['interpolate',['linear'],['zoom'],11,2,15,5],'line-opacity':0,'line-blur':1}});
+
+  // ---- dynamic network lenses: drawn on the OpenStreetMap road tiles, so they follow the camera anywhere ----
+  const RC = ['match', ['get', 'class'], ['motorway', 'trunk'], 5, 'primary', 4, 'secondary', 3, 'tertiary', 2, 'minor', 1, 'service', 0.5, 0];
+  const netFilter = ['in', ['get', 'class'], ['literal', ['motorway','trunk','primary','secondary','tertiary','minor','service']]];
+  const W = f => ['interpolate', ['linear'], ['zoom'], 10, ['*', f * 0.35, RC], 14, ['*', f, RC], 17, ['*', f * 2.4, RC]];
+  map.addLayer({id:'net-traffic', type:'line', source:'omt', 'source-layer':'transportation', filter:netFilter, layout:{visibility:'none', 'line-cap':'round', 'line-join':'round'},
+    paint:{'line-color':['match', ['get', 'class'], ['motorway','trunk'], '#ff3b4e', 'primary', '#ff7a3d', 'secondary', '#ffc53d', 'tertiary', '#b8e05a', '#2ecc71'], 'line-width':W(0.9), 'line-opacity':0.85}});
+  map.addLayer({id:'net-water-glow', type:'line', source:'omt', 'source-layer':'transportation', filter:netFilter, layout:{visibility:'none', 'line-cap':'round'},
+    paint:{'line-color':'#37d0ff', 'line-width':W(2.2), 'line-blur':5, 'line-opacity':0.45}});
+  map.addLayer({id:'net-water', type:'line', source:'omt', 'source-layer':'transportation', filter:netFilter, layout:{visibility:'none', 'line-cap':'round'},
+    paint:{'line-color':'#8be8ff', 'line-width':W(0.7), 'line-opacity':0.95}});
+  map.addLayer({id:'net-sewer', type:'line', source:'omt', 'source-layer':'transportation', filter:['in', ['get', 'class'], ['literal', ['secondary','tertiary','minor','service','primary']]], layout:{visibility:'none', 'line-cap':'round'},
+    paint:{'line-color':'#c08a4a', 'line-width':W(0.8), 'line-opacity':0.9}});
+  map.addLayer({id:'net-sewer-flow', type:'symbol', source:'omt', 'source-layer':'transportation', filter:['in', ['get', 'class'], ['literal', ['secondary','tertiary','minor']]],
+    layout:{visibility:'none', 'symbol-placement':'line', 'symbol-spacing':80, 'text-field':'›', 'text-size':15, 'text-font':['Noto Sans Regular'], 'text-keep-upright':false, 'text-allow-overlap':true}, paint:{'text-color':'#ffd9a3', 'text-opacity':0.75}});
+  map.addLayer({id:'net-power-glow', type:'line', source:'omt', 'source-layer':'transportation', filter:['in', ['get', 'class'], ['literal', ['motorway','trunk','primary']]], layout:{visibility:'none'},
+    paint:{'line-color':'#fff27a', 'line-width':W(2.4), 'line-blur':7, 'line-opacity':0.4}});
+  map.addLayer({id:'net-power', type:'line', source:'omt', 'source-layer':'transportation', filter:['in', ['get', 'class'], ['literal', ['motorway','trunk','primary','secondary','tertiary']]], layout:{visibility:'none', 'line-cap':'round'},
+    paint:{'line-color':['match', ['get', 'class'], ['motorway','trunk'], '#ff4d4d', 'primary', '#ffb020', '#ffe066'], 'line-width':W(0.75), 'line-opacity':0.9}});
+  // keeps the OpenStreetMap tiles loading at every zoom, so the dynamic lenses always have roads, land use and water to read
+  map.addLayer({id:'omt-keepalive', type:'line', source:'omt', 'source-layer':'transportation', paint:{'line-opacity':0, 'line-width':1}});
+  map.addLayer({id:'corr-glow', type:'line', source:'corr', layout:{visibility:'none','line-cap':'round','line-join':'round'}, paint:{'line-color':'#ff7a2d','line-width':16,'line-blur':14,'line-opacity':0.3}});
+  map.addLayer({id:'corr', type:'line', source:'corr', layout:{visibility:'none','line-cap':'round','line-join':'round'}, paint:{'line-color':'#ff9a4a','line-width':1.6,'line-opacity':0.7}});
+  // plan
+  map.addSource('plan', {type:'geojson', data:G, promoteId:'i'});
+  map.addSource('plan-spine', {type:'geojson', data:G});
+  map.addSource('plan-site', {type:'geojson', data:G});
+  map.addSource('plan-streets', {type:'geojson', data:G});
+  map.addSource('plan-old', {type:'geojson', data:G});
+  map.addLayer({id:'plan-site', type:'fill', source:'plan-site', layout:{visibility:'none'}, paint:{'fill-color':'#05070b','fill-opacity':0}});
+  map.addLayer({id:'plan-spine', type:'fill', source:'plan-spine', layout:{visibility:'none'}, paint:{'fill-color':'#3f9a62','fill-opacity':0.85}});
+  map.addLayer({id:'plan-streets', type:'line', source:'plan-streets', layout:{visibility:'none', 'line-cap':'round', 'line-join':'round'}, paint:{'line-color':'#fff4dc','line-width':['interpolate',['linear'],['zoom'],13,0.6,17,3],'line-opacity':0}});
+  map.addLayer({id:'plan-outline-glow', type:'line', source:'plan-outline', layout:{visibility:'none', 'line-cap':'round', 'line-join':'round'}, paint:{'line-color':'#ffcf7a','line-width':12,'line-blur':9,'line-opacity':0.55}});
+  map.addLayer({id:'plan-outline', type:'line', source:'plan-outline', layout:{visibility:'none', 'line-cap':'round', 'line-join':'round'}, paint:{'line-color':'#fff1cf','line-width':2.4}});
+  // buildings
+  map.addLayer({id:'bld', type:'fill-extrusion', source:'bld', 'source-layer':'building', minzoom:12.5,
+    paint:{...BLD_DAY, 'fill-extrusion-height':BH, 'fill-extrusion-base':['coalesce',['get','min_height'],0], 'fill-extrusion-vertical-gradient':false}});
+  map.addLayer({id:'plan-old', type:'fill-extrusion', source:'plan-old', layout:{visibility:'none'},
+    paint:{'fill-extrusion-color':'#ff9a6b', 'fill-extrusion-height':['get','hh'], 'fill-extrusion-opacity':0.8}});
+  map.addLayer({id:'plan', type:'fill-extrusion', source:'plan', layout:{visibility:'none'},
+    paint:{'fill-extrusion-color':['match',['get','t'],'glass','#a9cbeb','crown','#e8f4ff','podium','#eadcc2','stone','#f2e8d8','row','#f6efe3','warehouse','#dde2e8','hub','#eef3f8','tree','#3d8c58','#fff'],
+           'fill-extrusion-height':['get','hh'], 'fill-extrusion-base':['get','bb'], 'fill-extrusion-opacity':0.97, 'fill-extrusion-vertical-gradient':true}});
+  // a bigger detailed region: keep full-detail building tiles far out toward the horizon, not only under the camera
+  if (map.setSourceTileLodParams) map.setSourceTileLodParams(5, 15, 'bld');
+  ready = true;
+  initData();
+  const first = startIndex();
+  go(first, true);
+  need(CH[first].id).then(() => { setTimeout(() => $('#veil').classList.add('gone'), 300); map.once('idle', prefetchAll); });
+});
+
+/* ============================ deck.gl ============================ */
+const overlay = new deck.MapboxOverlay({interleaved:false, layers:[], onError:e => { console.warn(e); return true; }});   // a layer error never takes the screen
+map.addControl(overlay);
+
+/* ============================ data ============================ */
+const D = {};
+function tripify(list, colorFn, key){
+  return list.map(o => ({path:o.p.map(p => [p[0], p[1]]), ts:o.p.map(p => p[2]), c:colorFn(o), k:key && o[key]}));
+}
+const NEED = {plan:['districts'], hero:['region'], road:['region'], close:['region'], people:['newcastle'], engine:['newcastle'],
+              freight:['freight','rails'], ask:['freight','rails'], scada:['utilities'], flood:['roads'], crowd:['crowd'], time:['roads','utilities']};
+const INIT = {
+  districts(){},
+  roads(){
+    D.roadFC = fc(TW.roads.map(r => line(r.c, {k:r.k, t:r.t})));
+    map.getSource('road').setData(D.roadFC);
+    D.roadsNear = TW.roads.filter(r => Math.hypot((r.c[0][0] - 73.065) * 105000, (r.c[0][1] - 19.2988) * 110600) < 8000);
+  },
+  region(){ map.getSource('region').setData(fc(TW.region.map(r => line(r.c, {k:r.k})))); },
+  rails(){ map.getSource('rail').setData(fc(TW.rails.map(c => line(c)))); },
+  utilities(){
+    const U = TW.utilities;
+    map.getSource('water').setData(fc(U.water.map(w => line(w.c, {d:w.d, y:w.y, id:w.id}))));
+    const wById = Object.fromEntries(U.water.map(w => [w.id, w]));
+    D.incident = U.incident.filter(x => wById[x.i]).map(x => ({...x, c:wById[x.i].c})).sort((a, b) => a.d - b.d);
+    map.getSource('incident').setData(fc(D.incident.map(x => line(x.c, {d:x.d}))));
+    D.scada = U.scada;
+  },
+  freight(){
+    map.getSource('corr').setData(fc(TW.freight.corridors.map(c => line(c.c, {n:c.n}))));
+    D.freight = TW.freight.trucks.map(p => ({path:p.map(q => [q[0], q[1]]), ts:p.map(q => q[2])}));
+    D.freightT = Math.max(...D.freight.map(d => d.ts[d.ts.length - 1]));
+    $('#corrList').innerHTML = TW.freight.corridors.map(c => `<div style="display:flex;justify-content:space-between;gap:10px"><span>${c.n.replace('Bhiwandi', 'Hub')}</span><span style="color:var(--muted)">${c.km} km</span></div>`).join('');
+  },
+  newcastle(){
+    D.nc = [];
+    const order = ['walk','bike','car','taxi','motorbike','truck','bus','tram','rail','ferry'];
+    for (const m of order){
+      for (const p of (TW.newcastle.trails[m] || [])) D.nc.push({path:p.map(q => [q[0], q[1]]), ts:p.map(q => q[2]), c:hex(MODE[m] || '#fff'), m,
+        w:(m === 'rail' || m === 'tram' || m === 'ferry') ? 7 : (m === 'bus' || m === 'truck') ? 4.5 : 2.8});
+    }
+    const present = order.filter(m => (TW.newcastle.trails[m] || []).length);
+    $('#modesLegend').innerHTML = present.map(m => `<span><i style="background:${MODE[m]};color:${MODE[m]}"></i>${MODE_NAME[m]}</span>`).join('');
+  },
+  crowd(){
+    const C = TW.crowd;
+    D.crowd = {a:C.a.map(p => ({path:p.map(q => [q[0], q[1]]), ts:p.map(q => q[2])})), b:C.b.map(p => ({path:p.map(q => [q[0], q[1]]), ts:p.map(q => q[2])})), da:C.da, db:C.db};
+  },
+};
+const LOADING = {};
+function load(name){
+  if (!LOADING[name]) LOADING[name] = new Promise(res => {
+    const el = document.createElement('script'); el.src = 'data/' + name + '.js'; el.async = true;
+    el.onload = () => { try { INIT[name](); } catch (e){ console.warn(name, e); } res(); };
+    el.onerror = () => res();
+    document.head.appendChild(el);
+  });
+  return LOADING[name];
+}
+function need(id){ return Promise.all((NEED[id] || []).map(load)); }
+function prefetchAhead(i){
+  for (let k = 1; k <= 2; k++){ const c = CH[i + k]; if (c && !c.globe && c.layers.includes('bld')) TQ.prefetch(c.cam); }
+}
+/* after the first chapter is up, fetch the rest one at a time while the browser is idle, in chapter order */
+function prefetchAll(){
+  const order = []; for (const c of CH) for (const n of (NEED[c.id] || [])) if (!order.includes(n)) order.push(n);
+  const idle = window.requestIdleCallback || (f => setTimeout(f, 400));
+  const nextOne = () => { const n = order.find(x => !LOADING[x]); if (n) load(n).then(() => idle(nextOne, {timeout:3000})); };
+  idle(nextOne, {timeout:3000});
+}
+function initData(){ buildPredGrid(); buildLenses(); buildClones(); buildSources(); buildTiles(); }
+
+/* ============================ round models ============================ */
+const NC_CIRCLE = [151.752, -32.925, 11000];
+function setCircle(){
+  // buildings are drawn whole in every chapter: no clip, no taper, no ring
+  map.setFilter('bld', null);
+  if (!tlOn) map.setPaintProperty('bld', 'fill-extrusion-height', BH);
+}
+
+/* ============================ chapters ============================ */
+const ORB = 0.018;          // degrees of bearing per frame when drifting
+const CH = [
+  {id:'hero', circle:[72.8235,19.0060,5200], cam:{center:[72.8235,19.0060], zoom:14.6, pitch:74, bearing:28}, terrain:true, drift:ORB, layers:['bld','region','region-glow'], mood:'dusk'},
+  {id:'anycity', globe:true, cam:{center:[112, 2], zoom:2.15, pitch:0, bearing:0}, drift:0, layers:[], mood:'space', pins:'ours'},
+  {id:'people', circle:NC_CIRCLE, cam:{center:[151.7700,-32.9265], zoom:14.6, pitch:62, bearing:-28}, drift:ORB*0.6, layers:['bld'], mood:'night', deck:'nc'},
+  {id:'freight', circle:[73.050,19.150,75000], cam:{center:[73.05,19.12], zoom:10.55, pitch:46, bearing:-12}, terrain:true, drift:0, layers:['region','corr','corr-glow','rail','bld'], mood:'night', deck:'freight'},
+  {id:'lenses', circle:[73.060,19.293,16000], cam:{center:[73.058,19.292], zoom:13.35, pitch:55, bearing:-18}, drift:ORB*0.4, layers:['bld'], mood:'ghost', lens:'traffic'},
+  {id:'scada', cam:{center:[73.052,19.300], zoom:14.0, pitch:52, bearing:12}, drift:0, layers:['water','water-glow','incident','bld'], mood:'ghost', deck:'scada'},
+  {id:'predict', circle:[73.060,19.293,16000], cam:{center:[73.062,19.292], zoom:12.95, pitch:55, bearing:-35}, drift:ORB*0.4, layers:['hex','bld'], mood:'ghost', auto:'predict'},
+  {id:'flood', cam:{center:[73.02,19.285], zoom:12.7, pitch:58, bearing:-65}, terrain:true, drift:0, layers:['flood','bld'], mood:'storm'},
+  {id:'crowd', cam:{center:[73.0585,19.2835], zoom:14.7, pitch:58, bearing:-10}, drift:0, layers:['bld'], mood:'night', deck:'crowd'},
+  {id:'time', cam:{center:[73.062,19.297], zoom:14.2, pitch:56, bearing:22}, drift:0, layers:['bld','road','water'], mood:'ghost', timeline:true},
+  {id:'plan', cam:{center:[73.0300,19.2700], zoom:14.1, pitch:52, bearing:-20}, terrain:false, drift:0, layers:['bld','plan','plan-site','plan-outline','plan-outline-glow'], mood:'dusk', planner:true},
+  {id:'clones', globe:true, cam:{center:[60, 25], zoom:1.9, pitch:0, bearing:0}, drift:0, layers:[], mood:'space', pins:'clones'},
+  {id:'ask', cam:{center:[73.03,19.19], zoom:10.9, pitch:50, bearing:-8}, drift:0, layers:['corr','corr-glow','bld','flood'], mood:'night', deck:'freight', ask:true},
+  {id:'engine', circle:NC_CIRCLE, cam:{center:[151.7600,-32.9245], zoom:13.3, pitch:62, bearing:40}, drift:ORB*0.5, layers:['bld'], mood:'night', deck:'nc'},
+  {id:'road', circle:[72.8330,18.9950,7000], cam:{center:[72.8330,18.9950], zoom:13.4, pitch:70, bearing:-20}, terrain:true, drift:ORB*0.5, layers:['bld','region','region-glow'], mood:'dusk'},
+  {id:'close', circle:[72.8235,19.0060,5200], cam:{center:[72.8235,19.0060], zoom:15.0, pitch:76, bearing:200}, terrain:true, drift:ORB, layers:['bld','region','region-glow'], mood:'night'},
+];
+/* the opening chapter's nearest building tiles start downloading while the page is still starting up */
+TQ.prefetch(CH[startIndex()].cam);
+const TOGGLED = ['net-traffic','net-water','net-water-glow','net-sewer','net-sewer-flow','net-power','net-power-glow','lu','lu-edge','parks','flood','hex','region','region-glow','rail','road','sewer','sewer-flow','water','water-glow','feed','hv','hv-glow','incident','corr','corr-glow','plan','plan-old','plan-site','plan-streets','plan-spine','plan-outline','plan-outline-glow'];
+
+const MOODS = {
+  dusk:{sky:['#0d1a33','#f1b779','#e7c095'], sat:{'raster-brightness-max':0.95,'raster-saturation':-0.05,'raster-contrast':0.08}, bld:{...BLD_DAY}, light:['#ffe2b8',0.3]},
+  night:{sky:['#03060d','#26334d','#1a2130'], sat:{'raster-brightness-max':0.32,'raster-saturation':-0.45,'raster-contrast':0.15}, bld:{'fill-extrusion-color':['match',H1,[0,1,2],'#e7c27c',[3,4],'#cf9f5a',[5,6,7],'#6d5f4e',[8,9],'#f3d9a4',[10,11],'#8a7760','#a58a66'],'fill-extrusion-opacity':0.92}, light:['#9fb3d9',0.35]},
+  ghost:{sky:['#05080f','#1c2536','#141a26'], sat:{'raster-brightness-max':0.3,'raster-saturation':-0.9,'raster-contrast':0.1}, bld:{'fill-extrusion-color':'#8e96a6','fill-extrusion-opacity':0.55}, light:['#ffffff',0.3]},
+  storm:{sky:['#1b2330','#6b7a8c','#59667a'], sat:{'raster-brightness-max':0.7,'raster-saturation':-0.35,'raster-contrast':0.05}, bld:{'fill-extrusion-color':'#c9ccd2','fill-extrusion-opacity':0.9}, light:['#dfe8f5',0.35]},
+  space:{sky:['#000000','#1b3a6b','#000000'], sat:{'raster-brightness-max':1,'raster-saturation':0.05,'raster-contrast':0.1}, bld:{...BLD_DAY}, light:['#ffffff',0.4]},
+};
+let HAZE_C = '231,192,149';
+function setMood(k){
+  const M = MOODS[k];
+  HAZE_C = hex(M.sky[2]).join(',');
+  map.setSky({'sky-color':M.sky[0], 'horizon-color':M.sky[1], 'fog-color':M.sky[2], 'fog-ground-blend':0.55, 'horizon-fog-blend':0.75, 'sky-horizon-blend':0.65,
+              'atmosphere-blend':['interpolate',['linear'],['zoom'],0,1,8,1,11,0]});
+  for (const [p, v] of Object.entries(M.sat)) map.setPaintProperty('sat', p, v);
+  for (const [p, v] of Object.entries(M.bld)) map.setPaintProperty('bld', p, v);
+  map.setLight({anchor:'map', position:[1.3, 250, 40], color:M.light[0], intensity:M.light[1]});
+}
+
+let cur = -1, drift = 0, lastInteract = 0, markers = [];
+const rail = $('#rail');
+CH.forEach((c, i) => { const b = document.createElement('button'); b.title = ''; b.onclick = () => go(i); rail.appendChild(b); });
+function startIndex(){ const h = location.hash.slice(1); const i = CH.findIndex(c => c.id === h); return i < 0 ? 0 : i; }
+
+function chapterReady(c){
+  if (c.id === 'flood') floodEnter();
+  if (c.timeline) resetBuildingTimeline(true);
+}
+function go(i, instant){
+  if (!ready) return;
+  i = clamp(i, 0, CH.length - 1);
+  if (i === cur) return;
+  const prev = CH[cur], c = CH[i];
+  if (prev && prev.exit) prev.exit();
+  if (prev && prev.id === 'plan') clearPlan();
+  cur = i;
+  history.replaceState(null, '', '#' + c.id);
+  $$('.card').forEach(el => el.classList.toggle('on', el.dataset.ch === c.id));
+  $$('[data-w]').forEach(el => el.classList.toggle('on', el.dataset.w === c.id));
+  $$('.rail button').forEach((b, j) => b.classList.toggle('on', j === i));
+  $('#prog').style.width = ((i + 1) / CH.length * 100) + '%';
+  $('#hint').style.opacity = i === 0 ? 1 : 0;
+  // projection, terrain, mood
+  // long flights happen on the globe, so the camera travels over the earth instead of a flat world map;
+  // a city chapter switches to the flat projection once the camera has landed
+  const far = !instant && prev && ((prev.globe || c.globe) || Math.abs(prev.cam.center[0] - c.cam.center[0]) > 5);
+  if (c.globe || far) map.setProjection({type:'globe'}); else map.setProjection({type:'mercator'});
+  map.setTerrain(c.terrain ? {source:'dem', exaggeration:1.15} : null);
+  setMood(c.mood);
+  for (const id of TOGGLED) map.setLayoutProperty(id, 'visibility', c.layers.includes(id) ? 'visible' : 'none');
+  map.setLayoutProperty('bld', 'visibility', c.layers.includes('bld') ? 'visible' : 'none');
+  markers.forEach(m => m.remove()); markers = [];
+  if (c.pins) addPins(c.pins);
+  resetBuildingTimeline(c.timeline);
+  setCircle(c.circle);
+  map.setPaintProperty('region', 'line-opacity', c.id === 'freight' ? 0.28 : 0.75);
+  if (c.lens) setLens(c.lens);
+  need(c.id).then(() => { if (CH[cur] === c) chapterReady(c); });
+  map.once('idle', () => { if (CH[cur] === c) prefetchAhead(i); });
+  if (c.id === 'crowd') crowdEnter();
+  if (c.planner) planEnter();
+  if (c.ask) askEnter();
+  if (c.id === 'scada') scadaT0 = performance.now();
+  if (c.id === 'predict') predictEnter();
+  if (DYN_CH.has(c.id)){ D.dyn = null; dynLast = null; dynAt = 0; }
+  drift = c.drift || 0;
+  const cam = {...c.cam};
+  if (instant || !prev) map.jumpTo(cam);
+  else if (far){
+    map.flyTo({...cam, duration:4200, curve:1.6, essential:true});
+    if (!c.globe) map.once('moveend', () => { if (CH[cur] === c) map.setProjection({type:'mercator'}); });
+  }
+  else map.easeTo({...cam, duration:2600, easing:t => 1 - Math.pow(1 - t, 3)});
+}
+
+/* navigation: keys, wheel, touch */
+let navLock = 0, wheelAcc = 0;
+function step(d){ const n = performance.now(); if (n < navLock) return; navLock = n + 1100; go(cur + d); }
+document.addEventListener('keydown', e => {
+  if (/input|textarea/i.test(e.target.tagName) && !['PageDown','PageUp'].includes(e.key)) return;
+  if (['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); step(1); }
+  if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); step(-1); }
+  if (e.key === 'Home') go(0); if (e.key === 'End') go(CH.length - 1);
+});
+/* pinch and ctrl+wheel zoom the city, never the page: a trackpad pinch arrives as a wheel event
+   with ctrlKey set, caught here in the capture phase before any panel sees it */
+function zoomCity(factor, x, y){
+  if (!ready) return;
+  lastInteract = performance.now();
+  const z = clamp(map.getZoom() + factor, 1, 19);
+  const around = (x === undefined) ? map.getCenter() : map.unproject([x, y]);
+  map.easeTo({zoom:z, around, duration:0});
+}
+let wheelTimer = 0;
+addEventListener('wheel', e => {
+  if (e.ctrlKey || e.metaKey){
+    e.preventDefault(); e.stopPropagation();
+    const d = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+    zoomCity(-clamp(d, -60, 60) * 0.012, e.clientX, e.clientY);
+    return;
+  }
+  if (e.target.closest('.scrub,.sources,.timeline')) return;
+  wheelAcc += e.deltaY; clearTimeout(wheelTimer); wheelTimer = setTimeout(() => wheelAcc = 0, 200);
+  if (Math.abs(wheelAcc) > 60){ step(Math.sign(wheelAcc)); wheelAcc = 0; }
+}, {passive:false, capture:true});
+/* Safari's trackpad pinch */
+let gScale = 1;
+for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) addEventListener(ev, e => {
+  e.preventDefault();
+  if (ev === 'gesturestart') gScale = 1;
+  else if (ev === 'gesturechange'){ zoomCity(Math.log2(e.scale / gScale), e.clientX, e.clientY); gScale = e.scale; }
+}, {passive:false});
+/* ctrl + / ctrl - / ctrl 0 zoom the city too */
+addEventListener('keydown', e => {
+  if (!(e.ctrlKey || e.metaKey)) return;
+  if (e.key === '=' || e.key === '+'){ e.preventDefault(); map.easeTo({zoom:map.getZoom() + 0.5, duration:300}); }
+  else if (e.key === '-'){ e.preventDefault(); map.easeTo({zoom:map.getZoom() - 0.5, duration:300}); }
+  else if (e.key === '0'){ e.preventDefault(); map.easeTo({...CH[cur].cam, duration:900}); }
+}, {capture:true});
+let ty = null;
+addEventListener('touchstart', e => { ty = e.touches[0].clientY; }, {passive:true});
+addEventListener('touchend', e => { if (ty === null) return; const d = ty - e.changedTouches[0].clientY; if (Math.abs(d) > 60 && !e.target.closest('.w')) step(Math.sign(d)); ty = null; }, {passive:true});
+map.on('mousedown', () => lastInteract = performance.now());
+map.on('touchstart', () => lastInteract = performance.now());
+
+/* ============================ pins (globe chapters) ============================ */
+const OURS = [
+  {n:'Newcastle · calibrated, 12 modes', c:[151.78,-32.93], ours:true},
+  {n:'Mumbai region · 27 M people', c:[72.88,19.08], ours:true},
+  {n:'', c:[77.21,28.61]}, {n:'', c:[88.36,22.57]}, {n:'', c:[80.27,13.08]}, {n:'', c:[103.82,1.35]}, {n:'', c:[-0.12,51.5]}, {n:'', c:[55.27,25.2]},
+];
+const CLONES = [
+  {n:'Shanghai', c:[121.47,31.23], s:'3,750 km²', w:'A whole megacity in photoreal 3D', take:'City-scale streaming', u:'https://www.unrealengine.com/en-US/spotlights/51world-creates-digital-twin-of-the-entire-city-of-shanghai'},
+  {n:'Xiong\'an', c:[115.98,39.03], s:'Born digital', w:'Every asset gets a digital ID as it is built', take:'Twin before concrete', u:'https://en.people.cn/n3/2026/0325/c90000-20439733.html'},
+  {n:'Hangzhou', c:[120.16,30.27], s:'50% faster', w:'Ambulances, with green waves ahead', take:'Live signal control', u:'https://en.wikipedia.org/wiki/City_Brain'},
+  {n:'Singapore', c:[103.82,1.35], s:'S$73 M', w:'A nation modelled above and below ground', take:'Underground layers', u:'https://en.wikipedia.org/wiki/Virtual_Singapore'},
+  {n:'Dubai', c:[55.27,25.2], s:'195,000', w:'Buildings in 3D, with live operations', take:'One asset registry', u:'https://www.middleeastainews.com/p/dubai-launches-city-scale-digital'},
+  {n:'Rotterdam', c:[4.48,51.92], s:'42 km', w:'Of port under sensors: tides, wind and berths', take:'Port operations twin', u:'https://newsroom.ibm.com/Turning-Rotterdam-into-the-Worlds-Smartest-Port-with-IBM-Cloud-IoT'},
+  {n:'Helsinki', c:[24.94,60.17], s:'80,000', w:'Buildings with solar, noise and flood per roof', take:'Open, semantic 3D', u:'https://aec-business.com/helsinki-is-building-a-digital-twin-of-the-city/'},
+  {n:'Valencia', c:[-0.38,39.47], s:'4 M m³', w:'Of water saved a year with a SCADA-fed twin', take:'Leak prediction', u:'https://www.idrica.com/case-studies/digital-twin-valencia/'},
+];
+function addPins(kind){
+  const L = kind === 'ours' ? OURS : CLONES;
+  for (const p of L){
+    const el = document.createElement('div'); el.className = 'pin' + (p.ours ? ' ours' : ''); el.dataset.name = p.n;
+    if (!p.ours && kind === 'ours'){ el.style.background = 'rgba(217,180,106,.55)'; el.style.boxShadow = '0 0 0 5px rgba(217,180,106,.12)'; }
+    markers.push(new maplibregl.Marker({element:el}).setLngLat(p.c).addTo(map));
+  }
+}
+function buildClones(){
+  $('#clones').innerHTML = CLONES.map((c, i) => `<div class="cl" data-i="${i}"><b>${c.n}</b><div class="s">${c.s}</div><span>${c.w}</span><span style="color:var(--gold-2);margin-top:4px">We take: ${c.take}</span></div>`).join('');
+  $$('.cl').forEach(el => el.onclick = () => { const c = CLONES[+el.dataset.i]; map.flyTo({center:c.c, zoom:3.2, duration:2200}); $$('.cl').forEach(x => x.classList.toggle('on', x === el)); });
+}
+
+/* ============================ lenses ============================ */
+const LENSES = [
+  {k:'traffic', n:'Traffic', c:'#ff6b3d', L:['net-traffic','bld'], deck:'flow', leg:['Flow','linear-gradient(90deg,#2ecc71,#b8e05a,#ffc53d,#ff6b3d,#ff2f4e)','free','jammed']},
+  {k:'zoning', n:'Zoning', c:'#56c271', L:['lu','lu-edge','parks','bld'], leg:['Land use','linear-gradient(90deg,#56c271 0 25%,#3d8bff 25% 50%,#f5b83d 50% 75%,#b58cff 75%)','homes · shops · industry · civic','']},
+  {k:'water', n:'Water', c:'#37d0ff', L:['net-water','net-water-glow','bld'], deck:'dsites:water', leg:['Main size','linear-gradient(90deg,#37d0ff55,#8be8ff)','150 mm','900 mm']},
+  {k:'sewage', n:'Sewage', c:'#c08a4a', L:['net-sewer','net-sewer-flow','bld'], deck:'dsites:sewage', leg:['Gravity sewers','linear-gradient(90deg,#7a5530,#c08a4a,#ffd9a3)','','flow →']},
+  {k:'power', n:'Power', c:'#ffe066', L:['net-power','net-power-glow','bld'], deck:'dsites:power', leg:['Feeder load','linear-gradient(90deg,#ffe066,#ffb020,#ff4d4d)','30%','95%']},
+  {k:'heat', n:'Heat', c:'#ff4d4d', L:['hex','bld'], hex:'heat', leg:['Surface temperature','linear-gradient(90deg,#2b1b54,#8a2a74,#e0474c,#fca636,#fcfdbf)','31 °C','39 °C']},
+  {k:'air', n:'Air', c:'#b58cff', L:['hex','bld'], hex:'air', leg:['Air quality index','linear-gradient(90deg,#3ddc97,#ffe066,#ff8a3d,#c0392b,#7d3c98)','good','severe']},
+  {k:'noise', n:'Noise', c:'#ff8fab', L:['hex','bld'], hex:'noise', leg:['Noise','linear-gradient(90deg,#0b1d3a,#3b4ba8,#b44cc7,#ff8fab)','quiet','loud']},
+  {k:'value', n:'Land value', c:'#f3d9a0', L:['hex','bld'], hex:'value', leg:['Land value','linear-gradient(90deg,#123c2c,#2f7d4f,#9fcf6a,#f3d9a0,#fff4d6)','low','high']},
+];
+let LENS = null;
+function buildLenses(){
+  $('#lensbar').innerHTML = LENSES.map(l => `<button data-k="${l.k}"><i style="background:${l.c};box-shadow:0 0 10px ${l.c}"></i>${l.n}</button>`).join('');
+  $$('#lensbar button').forEach(b => b.onclick = () => setLens(b.dataset.k, true));
+}
+const HEXPAINT = {
+  heat:{c:['interpolate',['linear'],['get','h'],31,'#2b1b54',33,'#8a2a74',35,'#e0474c',37,'#fca636',38.5,'#fcfdbf'], h:['*',['-',['get','h'],30.5],38]},
+  air:{c:['interpolate',['linear'],['get','a'],0.25,'#3ddc97',0.45,'#ffe066',0.6,'#ff8a3d',0.75,'#c0392b',0.9,'#7d3c98'], h:['*',['get','a'],260]},
+  noise:{c:['interpolate',['linear'],['get','n'],0.2,'#0b1d3a',0.45,'#3b4ba8',0.7,'#b44cc7',0.9,'#ff8fab'], h:['*',['get','n'],220]},
+  value:{c:['interpolate',['linear'],['get','v'],0.1,'#123c2c',0.35,'#2f7d4f',0.6,'#9fcf6a',0.8,'#f3d9a0',1,'#fff4d6'], h:['*',['get','v'],320]},
+};
+function setHex(k){
+  const P = HEXPAINT[k]; if (!P) return;
+  const shape = k === 'heat' ? 'circle' : 'hex';
+  if (D.dyn && (D.hexShape !== shape || D.hexBuilt !== D.dyn.stamp)){ map.getSource('hex').setData(dynHexFC(shape)); D.hexShape = shape; D.hexBuilt = D.dyn.stamp; }
+  else if (!D.dyn && D.hexFC && D.hexShape !== shape){ map.getSource('hex').setData(shape === 'circle' ? D.circleFC : D.hexFC); D.hexShape = shape; }
+  D.hexK = k;
+  map.setPaintProperty('hex', 'fill-extrusion-color', P.c);
+  map.setPaintProperty('hex', 'fill-extrusion-height', D.dyn ? ['*', P.h, Math.max(1, D.dyn.size / 300)] : P.h);
+}
+function setLens(k, user){
+  const l = LENSES.find(x => x.k === k); LENS = l;
+  if (CH[cur].id === 'lenses'){
+    for (const id of TOGGLED) map.setLayoutProperty(id, 'visibility', l.L.includes(id) ? 'visible' : 'none');
+  }
+  if (l.hex) setHex(l.hex);
+  $$('#lensbar button').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+  $('#lensLegend').innerHTML = `<div class="t">${l.leg[0]}</div><div class="ramp" style="background:${l.leg[1]}"></div><div class="ramp-l"><span>${l.leg[2]}</span><span>${l.leg[3]}</span></div>`;
+  if (user) lensAuto = false;
+}
+let lensAuto = true;
+
+
+/* ============================ dynamic lenses ============================
+   Wherever the camera looks, the lens data is rebuilt from what the map tiles hold there:
+   buildings (Overture), roads, parks and water (OpenStreetMap). Heat, air, noise and land value
+   are binned on a hex grid around the camera's target; traffic flows run on the visible roads;
+   sensor sites sit on the visible network. Recomputed when the view moves or zooms. */
+const DYN_CH = new Set(['lenses', 'predict']);
+const RCLS = {motorway:5, trunk:5, primary:4, secondary:3, tertiary:2, minor:1, service:0.5};
+const FLOWC = {5:[255,59,78], 4:[255,122,61], 3:[255,197,61], 2:[184,224,90], 1:[46,204,113], 0.5:[46,204,113]};
+let dynLast = null, dynAt = 0;
+const lines = g => g.type === 'LineString' ? [g.coordinates] : g.type === 'MultiLineString' ? g.coordinates : [];
+const firstPt = g => g.type === 'Polygon' ? g.coordinates[0][0] : g.type === 'MultiPolygon' ? g.coordinates[0][0][0] : null;
+function rebuildDynamic(){
+  if (!ready || !DYN_CH.has(CH[cur].id)) return;
+  const c = map.getCenter(), z = map.getZoom(), lat0 = c.lat, lng0 = c.lng;
+  const kx = 111320 * Math.cos(lat0 * Math.PI / 180), ky = 110574;
+  // the lens grows with the view, so it fills the screen at any zoom; about 5,000 cells either way
+  const R = clamp(12000 * Math.pow(2, 13.3 - z), 2500, 90000);
+  const size = R / 42, S3 = Math.sqrt(3);
+  const toXY = (lng, lat) => [(lng - lng0) * kx, (lat - lat0) * ky];
+  const axial = (x, y) => {                       // pointy hexes, cube rounding
+    let q = (S3 / 3 * x - y / 3) / size, r = (2 / 3 * y) / size, s_ = -q - r;
+    let rq = Math.round(q), rr = Math.round(r), rs = Math.round(s_);
+    const dq = Math.abs(rq - q), dr = Math.abs(rr - r), ds = Math.abs(rs - s_);
+    if (dq > dr && dq > ds) rq = -rr - rs; else if (dr > ds) rr = -rq - rs;
+    return rq + ',' + rr;
+  };
+  // every cell inside the circle, so the lens reaches the edge of the view
+  const cells = [], index = new Map(), n = Math.ceil(R / (size * 1.5)) + 1;
+  for (let q = -n * 2; q <= n * 2; q++) for (let r = -n; r <= n; r++){
+    const x = size * S3 * (q + r / 2), y = size * 1.5 * r, d = Math.hypot(x, y);
+    if (d > R) continue;
+    const cell = {x, y, d, b:0, rd:0, hv:0, res:0, com:0, ind:0, green:0, water:0};
+    cells.push(cell); index.set(q + ',' + r, cell);
+  }
+  const at = (x, y) => index.get(axial(x, y));
+
+  // 1. roads, at every zoom: length per cell, weighted by class
+  const seen = new Set(), flow = [], wantSites = {water:[], sewage:[], power:[]};
+  const siteGrid = {water:size * 7, sewage:size * 5, power:size * 9}, siteSeen = {water:new Set(), sewage:new Set(), power:new Set()};
+  for (const f of map.querySourceFeatures('omt', {sourceLayer:'transportation'})){
+    const w = RCLS[f.properties.class]; if (!w) continue;
+    for (const ln of lines(f.geometry)){
+      if (ln.length < 2) continue;
+      const key = ln[0][0].toFixed(5) + ln[0][1].toFixed(5) + ln[ln.length - 1][0].toFixed(5) + ln.length;
+      if (seen.has(key)) continue; seen.add(key);
+      let inside = false, L = 0; const ts = [0];
+      for (let j = 1; j < ln.length; j++){
+        const [x0, y0] = toXY(ln[j-1][0], ln[j-1][1]), [x1, y1] = toXY(ln[j][0], ln[j][1]);
+        const seg = Math.hypot(x1 - x0, y1 - y0); L += seg; ts.push(L);
+        const cell = at((x0 + x1) / 2, (y0 + y1) / 2); if (!cell) continue;
+        inside = true; cell.rd += seg * w; if (w >= 4) cell.hv += seg;
+        for (const kind of ['water', 'sewage', 'power']){
+          if ((kind === 'power' && w < 3) || (kind === 'water' && w < 2) || (kind === 'sewage' && (w < 1 || w > 3))) continue;
+          const g = siteGrid[kind], gk = Math.floor(x1 / g) + ':' + Math.floor(y1 / g);
+          if (!siteSeen[kind].has(gk)){ siteSeen[kind].add(gk); wantSites[kind].push({p:ln[j], k:kind === 'water' ? (hh(gk) < 0.2 ? 'pump' : 'esr') : kind === 'sewage' ? 'lift' : 'sub'}); }
+        }
+      }
+      // moving traffic on the visible roads: busier classes get more vehicles
+      if (inside && L > 60 && flow.length < 3200){
+        const nveh = Math.max(1, Math.round(w * w / 3 * Math.min(3, L / 400)));
+        const spd = ([0, 6, 7, 9, 11, 13][Math.round(Math.min(5, w))] || 6) * Math.max(1, size / 300);
+        for (let v = 0; v < nveh; v++){
+          const rev = hh(key + 'r' + v) < 0.5, t0 = hh(key + 't' + v) * 900;
+          const path = rev ? ln.slice().reverse() : ln;
+          const dts = rev ? ts.map(d => L - d).reverse() : ts;
+          flow.push({path, ts:dts.map(d => t0 + d / spd), c:FLOWC[w] || FLOWC[1]});
+        }
+      }
+    }
+  }
+  // 2. land use, parks, woods and water, at every zoom: which cells each polygon covers
+  const cover = (geom, apply) => {
+    const polys = geom.type === 'Polygon' ? [geom.coordinates] : geom.type === 'MultiPolygon' ? geom.coordinates : [];
+    for (const pg of polys){
+      const ring = pg[0].map(q => toXY(q[0], q[1]));
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const [x, y] of ring){ if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+      if (x1 < -R || x0 > R || y1 < -R || y0 > R) continue;
+      let hit = false;
+      for (const cell of cells){
+        if (cell.x < x0 || cell.x > x1 || cell.y < y0 || cell.y > y1) continue;
+        let inside = false;
+        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++){
+          const [xi, yi] = ring[i], [xj, yj] = ring[j];
+          if ((yi > cell.y) !== (yj > cell.y) && cell.x < (xj - xi) * (cell.y - yi) / (yj - yi) + xi) inside = !inside;
+        }
+        if (inside){ apply(cell); hit = true; }
+      }
+      if (!hit){ const cell = at((x0 + x1) / 2, (y0 + y1) / 2); if (cell) apply(cell); }   // polygons smaller than a cell
+    }
+  };
+  const LU = {residential:'res', commercial:'com', retail:'com', industrial:'ind', railway:'ind', quarry:'ind'};
+  for (const f of map.querySourceFeatures('omt', {sourceLayer:'landuse'})){ const k = LU[f.properties.class]; if (k) cover(f.geometry, cell => cell[k] = 1); }
+  for (const f of map.querySourceFeatures('omt', {sourceLayer:'park'})) cover(f.geometry, cell => cell.green = 1);
+  for (const f of map.querySourceFeatures('omt', {sourceLayer:'landcover'})){ if (/wood|forest|grass|wetland/.test(f.properties.class || '')) cover(f.geometry, cell => cell.green = Math.max(cell.green, 0.8)); }
+  for (const f of map.querySourceFeatures('omt', {sourceLayer:'water'})) cover(f.geometry, cell => cell.water = 1);
+  // 3. buildings, when the view is close enough for them to load: counted once each
+  let nb = 0; const bseen = new Set();
+  for (const f of map.querySourceFeatures('bld', {sourceLayer:'building'})){
+    // the same building sits in tiles of several zoom levels, and these tiles carry no id: key it by position
+    const q = firstPt(f.geometry); if (!q) continue;
+    const bk = q[0].toFixed(5) + ',' + q[1].toFixed(5); if (bseen.has(bk)) continue; bseen.add(bk);
+    const [x, y] = toXY(q[0], q[1]); const cell = at(x, y); if (cell){ cell.b += 1; nb++; }
+  }
+  const p95 = k => { const v = cells.map(c_ => c_[k]).filter(v => v > 0).sort((x, y) => x - y); return v.length ? v[Math.floor(v.length * 0.95)] : 1; };
+  const B95 = p95('b'), R95 = p95('rd'), H95 = p95('hv'), useB = nb > 800;
+  for (const cell of cells){
+    const bn = useB ? Math.min(1, cell.b / B95) : 0, rn = Math.min(1, cell.rd / R95), hn = Math.min(1, cell.hv / H95);
+    const built = Math.max(bn, 0.75 * Math.max(cell.res, cell.com, cell.ind), 0.6 * rn);
+    const cool = Math.max(cell.green, cell.water), noise_ = hh(Math.round(cell.x) + '/' + Math.round(cell.y));
+    cell.h = +(31 + 5.4 * built + 1.4 * rn + 0.9 * hn + 0.6 * cell.ind - 3 * cool * (1 - 0.5 * built) + (noise_ - 0.5) * 0.7).toFixed(1);
+    cell.a = +clamp(0.18 + 0.45 * hn + 0.2 * rn + 0.18 * cell.ind + 0.1 * built - 0.15 * cool + (noise_ - 0.5) * 0.08, 0, 1).toFixed(2);
+    cell.n = +clamp(0.12 + 0.6 * hn + 0.25 * rn + 0.1 * cell.ind - 0.1 * cool, 0, 1).toFixed(2);
+    cell.v = +clamp(0.1 + 0.3 * built + 0.25 * rn + 0.2 * cell.com + 0.25 * (1 - cell.d / R) - 0.2 * cell.water - 0.1 * cell.ind, 0.05, 1).toFixed(2);
+  }
+  D.dyn = {cells, size, lng0, lat0, kx, ky, stamp:performance.now(), nb};
+  D.flow = flow; D.dynSites = wantSites;
+  dynLast = {lng:lng0, lat:lat0, z}; dynAt = performance.now();
+  setHex(D.hexK || 'heat');
+}
+function dynHexFC(shape){
+  const {cells, size, lng0, lat0, kx, ky} = D.dyn, feats = [];
+  cells.forEach((c, i) => {
+    const ring = [];
+    if (shape === 'circle'){ const Rr = size * 1.02; for (let a = 0; a <= 28; a++){ const t = a / 28 * 2 * Math.PI; ring.push([lng0 + (c.x + Rr * Math.cos(t)) / kx, lat0 + (c.y + Rr * Math.sin(t)) / ky]); } }
+    else for (let a = 0; a <= 6; a++){ const t = (60 * a + 30) * Math.PI / 180; ring.push([lng0 + (c.x + size * 0.97 * Math.cos(t)) / kx, lat0 + (c.y + size * 0.97 * Math.sin(t)) / ky]); }
+    feats.push(poly(ring, {h:c.h, a:c.a, n:c.n, v:c.v}, i));
+  });
+  return fc(feats);
+}
+map.on('sourcedata', e => { if (e.isSourceLoaded && (e.sourceId === 'bld' || e.sourceId === 'omt') && e.tile) D.dynDirty = performance.now(); });
+function dynCheck(now){
+  if (!DYN_CH.has(CH[cur].id) || now - dynAt < 700) return;
+  const c = map.getCenter(), z = map.getZoom();
+  const moved = !dynLast || Math.hypot((c.lng - dynLast.lng) * 105000, (c.lat - dynLast.lat) * 110600) > 250 * Math.pow(2, 13.3 - z) || Math.abs(z - dynLast.z) > 0.25;
+  // also refill once the tiles for a new view have arrived
+  // rebuild when the view has moved, or when new building / road tiles have landed since the last build
+  const fresh = D.dynDirty && D.dynDirty > dynAt && now - D.dynDirty > 600;
+  if ((moved || fresh) && !map.isMoving() || (moved && now - dynAt > 1800)) rebuildDynamic();
+  else dynAt = now - 400;
+}
+
+/* ============================ prediction grid ============================ */
+const ICON = (d, c) => `<svg viewBox="0 0 32 32" fill="none" stroke="${c}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const PRED = [
+  ['Flood depth', '72 hours ahead, street by street', '#37d0ff', '<path d="M4 20c3 0 3-2 6-2s3 2 6 2 3-2 6-2 3 2 6 2M4 26c3 0 3-2 6-2s3 2 6 2 3-2 6-2 3 2 6 2"/><path d="M16 4l5 8a5 5 0 1 1-10 0z"/>', 'heat'],
+  ['Heat islands', 'Hot blocks, and what trees fix', '#ff6b3d', '<circle cx="16" cy="16" r="5"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M7 7l3 3M22 22l3 3M7 25l3-3M22 10l3-3"/>', 'heat'],
+  ['Water demand', 'Hour by hour, zone by zone', '#8be8ff', '<path d="M16 4c5 7 8 11 8 15a8 8 0 0 1-16 0c0-4 3-8 8-15z"/>', 'value'],
+  ['Pipe bursts', 'Which main fails next', '#ff4d4d', '<path d="M3 13h9l2 3 2-3h13M3 19h26"/><path d="M14 7l1 3M18 6l-1 4M21 8l-2 3"/>', 'value'],
+  ['Power peaks', 'Feeder overloads before they trip', '#ffe066', '<path d="M18 3L7 18h8l-2 11 12-16h-8z"/>', 'noise'],
+  ['Air quality', 'Tomorrow\'s smog, by street', '#b58cff', '<path d="M4 12h15a4 4 0 1 0-4-4M4 18h20a4 4 0 1 1-4 4M4 24h9"/>', 'air'],
+  ['Road wear', 'Resurface before potholes', '#f3d9a0', '<path d="M11 29l3-26M21 29l-3-26M16 7v3M16 15v3M16 23v3"/>', 'noise'],
+  ['Land value', 'What a new road is worth', '#9fcf6a', '<path d="M4 26h24M7 26V14l6-5 6 5v12M19 26V10l6-4v20"/>', 'value'],
+  ['Waste routes', 'Bins emptied when full', '#3ddc97', '<path d="M8 9h16l-2 19H10zM6 9h20M13 9V5h6v4"/>', 'air'],
+  ['Ambulance reach', 'Eight-minute coverage, live', '#ff8fab', '<path d="M4 20V11h14l4 5h6v4z"/><circle cx="9" cy="22" r="2.5"/><circle cx="23" cy="22" r="2.5"/><path d="M11 13v4M9 15h4"/>', 'heat'],
+  ['Disease hotspots', 'Dengue risk, block by block', '#c77dff', '<circle cx="16" cy="16" r="6"/><path d="M16 4v6M16 22v6M4 16h6M22 16h6M8 8l4 4M20 20l4 4M8 24l4-4M20 12l4-4"/>', 'air'],
+  ['Rooftop solar', 'Every roof, a yield', '#ffc857', '<path d="M4 22l6-12h18l-6 12z"/><path d="M10 16h16M16 10l-3 12M22 10l-3 12"/>', 'heat'],
+];
+function buildPredGrid(){
+  $('#predGrid').innerHTML = PRED.map((p, i) => `<div class="pc" data-i="${i}">${ICON(p[3], p[2])}<b>${p[0]}</b><span>${p[1]}</span></div>`).join('');
+  $$('.pc').forEach(el => el.onmouseenter = () => setHex(PRED[+el.dataset.i][4]));
+}
+let predK = 0, predT = 0;
+function predictEnter(){ setHex('heat'); predT = performance.now(); }
+
+/* ============================ SCADA ============================ */
+const TILES = [
+  {k:'PS-02 outlet pressure', u:'bar', v:4.2, n:0.05, alarm:true},
+  {k:'Reservoir ESR-03', u:'%', v:71, n:0.6},
+  {k:'Zone 7 flow', u:'L/s', v:386, n:6},
+  {k:'Feeder SS-02 load', u:'%', v:64, n:1.5},
+];
+const hist = TILES.map(t => Array.from({length:40}, () => t.v));
+function buildTiles(){
+  $('#tiles').innerHTML = TILES.map((t, i) => `<div class="tile" id="tile${i}"><div class="k">${t.k}</div><div class="v num"><span id="tv${i}">${t.v}</span> <small style="font-size:12px;color:var(--muted)">${t.u}</small></div><svg width="100%" height="26" viewBox="0 0 120 26" preserveAspectRatio="none"><polyline id="tp${i}" fill="none" stroke="#d9b46a" stroke-width="1.5"/></svg></div>`).join('');
+}
+let scadaT0 = 0;
+function scadaFrame(now){
+  const T = 14000, t = ((now - scadaT0) % T) / T;           // one incident cycle
+  const phase = t < 0.16 ? 0 : t < 0.3 ? 1 : t < 0.68 ? 2 : 3;
+  $$('#steps div').forEach((d, i) => d.classList.toggle('on', i === phase));
+  TILES.forEach((tl, i) => {
+    let v = tl.v + (Math.random() - 0.5) * tl.n * 2;
+    if (tl.alarm && t > 0.06 && t < 0.86) v = tl.v - 2.6 * Math.min(1, (t - 0.06) / 0.08) * (t > 0.7 ? Math.max(0, 1 - (t - 0.7) / 0.16) : 1);
+    if (i === 1 && t > 0.2 && t < 0.86) v = tl.v - 30 * Math.min(1, (t - 0.2) / 0.4) * (t > 0.7 ? Math.max(0, 1 - (t - 0.7) / 0.16) : 1);
+    hist[i].push(v); hist[i].shift();
+    if (Math.floor(now / 250) !== scadaFrame._k){
+      const el = $('#tv' + i); if (el) el.textContent = tl.u === 'bar' ? v.toFixed(2) : Math.round(v);
+      const lo = Math.min(...hist[i]), hi = Math.max(...hist[i]) + 1e-6;
+      const pl = $('#tp' + i); if (pl) pl.setAttribute('points', hist[i].map((x, j) => `${j * 3},${24 - (x - lo) / (hi - lo) * 22}`).join(' '));
+      $('#tile' + i).classList.toggle('alarm', (i === 0 && t > 0.06 && t < 0.8) || (i === 1 && t > 0.3 && t < 0.8));
+    }
+  });
+  if (Math.floor(now / 250) !== scadaFrame._k) scadaFrame._k = Math.floor(now / 250);
+  // spread of predicted pressure loss along the network
+  const reach = phase >= 2 ? (t < 0.68 ? (t - 0.3) / 0.38 * 2600 : Math.max(0, 2600 * (1 - (t - 0.72) / 0.14))) : (phase === 1 ? 120 : 0);
+  if (map.getLayer('incident')){
+    map.setPaintProperty('incident', 'line-opacity', ['case', ['<=', ['get', 'd'], reach], 0.95, 0]);
+    map.setPaintProperty('incident', 'line-color', t > 0.7 ? '#3ddc97' : '#ff4d4d');
+  }
+  const homes = Math.round(Math.min(1, reach / 2600) * 18600 / 100) * 100;
+  const act = $('#action');
+  act.classList.toggle('on', phase >= 2);
+  act.innerHTML = phase === 2 ? `<b style="color:#ffb3b3">Forecast:</b> low pressure reaches <b class="num">${homes.toLocaleString('en-IN')}</b> homes in 40 min unless we act.`
+                              : `<b style="color:#8ff0c4">Action sent:</b> start standby pump at PS-01, open valve V-112. Supply holds.`;
+  act.style.background = phase === 2 ? 'rgba(255,77,77,.1)' : 'rgba(61,220,151,.1)';
+  act.style.borderColor = phase === 2 ? 'rgba(255,77,77,.4)' : 'rgba(61,220,151,.35)';
+  return {t, phase};
+}
+
+/* ============================ flood ============================ */
+function floodRamp(h){
+  return ['interpolate', ['linear'], ['elevation'], -50, 'rgba(20,110,210,0.0)', 0, 'rgba(20,110,210,0.0)', 0.01, 'rgba(24,110,210,0.82)',
+          Math.max(0.02, h - 3), 'rgba(40,140,230,0.78)', Math.max(0.03, h - 0.02), 'rgba(90,190,255,0.62)', Math.max(0.04, h), 'rgba(0,0,0,0)', 9000, 'rgba(0,0,0,0)'];
+}
+let floodAuto = true, floodLevel = -1, floodSamples = null, floodPending = null, floodLastSet = 0, floodJob = 0;
+const PL_FLOOD = {};
+map.on('sourcedata', e => { if (e.sourceId === 'bld' && e.tile && CH[cur] && CH[cur].id === 'flood') PL_FLOOD.dirty = true; });
+function floodEnter(){ PL_FLOOD.n = 0; PL_FLOOD.dirty = true; floodAuto = true; floodLevel = -1; floodSamples = null; const job = ++floodJob; setTimeout(() => sampleFlood(job), 2500); }
+/* the elevation of every road and building in view, read a few thousand at a time so the page never stalls;
+   kept sorted, so each water level is counted by a binary search instead of a full pass */
+function sampleFlood(job){
+  if (!TW.roads || CH[cur].id !== 'flood' || job !== floodJob) return;
+  const roads = [], bld = [], feats = map.querySourceFeatures('bld', {sourceLayer:'building'}), seen = new Set();
+  let i = 0, j = 0;
+  const step = () => {
+    if (job !== floodJob || CH[cur].id !== 'flood') return;
+    const until = performance.now() + 6;
+    for (; i < TW.roads.length && performance.now() < until; i++){
+      const r = TW.roads[i], c = r.c[r.c.length >> 1], e = map.queryTerrainElevation(c);
+      if (e == null) continue;
+      let L = 0; for (let k = 1; k < r.c.length; k++) L += Math.hypot((r.c[k][0] - r.c[k-1][0]) * 105000, (r.c[k][1] - r.c[k-1][1]) * 110600);
+      roads.push([e / 1.15, L]);
+    }
+    for (; i >= TW.roads.length && j < feats.length && performance.now() < until; j++){
+      const f = feats[j], g = f.geometry.type === 'Polygon' ? f.geometry.coordinates[0][0] : f.geometry.coordinates[0][0][0];
+      const k = g[0].toFixed(5) + g[1].toFixed(5); if (seen.has(k)) continue; seen.add(k);
+      const e = map.queryTerrainElevation(g); if (e != null) bld.push(e / 1.15);
+    }
+    if (i < TW.roads.length || j < feats.length){ requestAnimationFrame(step); return; }
+    roads.sort((a, b) => a[0] - b[0]);
+    const cum = [0]; for (const [, L] of roads) cum.push(cum[cum.length - 1] + L);
+    bld.sort((a, b) => a - b);
+    floodSamples = {re:roads.map(r => r[0]), cum, bld};
+    const h = floodLevel; floodLevel = -1; if (h >= 0) setFlood(h);
+    PL_FLOOD.n = (PL_FLOOD.n || 0) + 1;
+    if (PL_FLOOD.n < 4 && PL_FLOOD.dirty) { PL_FLOOD.dirty = false; setTimeout(() => sampleFlood(job), 1500); }
+  };
+  requestAnimationFrame(step);
+}
+const below = (arr, h) => { let lo = 0, hi = arr.length; while (lo < hi){ const mid = (lo + hi) >> 1; if (arr[mid] < h) lo = mid + 1; else hi = mid; } return lo; };
+/* the water surface is a colour ramp on the terrain: changing it redraws every draped tile, so it changes
+   at most ten times a second, and only when the level moves by a visible step (10 cm) */
+function setFlood(h){
+  h = Math.round(h * 10) / 10;
+  if (h === floodLevel) return;
+  floodLevel = h;
+  map.setPaintProperty('flood', 'color-relief-color', floodRamp(h));
+  floodLastSet = performance.now();
+  $('#fLevel').textContent = h.toFixed(1);
+  const sl = $('#fSlider'); if (+sl.value !== h) sl.value = h; sl.style.setProperty('--p', (h / 12 * 100) + '%');
+  if (floodSamples){
+    $('#fRoads').textContent = Math.round(floodSamples.cum[below(floodSamples.re, h)] / 1000).toLocaleString('en-IN');
+    $('#fBld').textContent = below(floodSamples.bld, h).toLocaleString('en-IN');
+  }
+}
+function floodTick(now){
+  if (floodPending !== null && now - floodLastSet > 100){ setFlood(floodPending); floodPending = null; }
+  else if (floodAuto && now - floodLastSet > 100) setFlood(0.5 + ((now / 1000) % 14) / 14 * 6.5);
+}
+$('#fSlider').addEventListener('input', e => { floodAuto = false; floodPending = +e.target.value; $('#fLevel').textContent = (+e.target.value).toFixed(1); });
+
+/* ============================ crowd ============================ */
+let crowdS = 'a', crowdT0 = 0;
+function crowdEnter(){ crowdT0 = performance.now(); }
+$$('#crowdSeg button').forEach(b => b.onclick = () => { crowdS = b.dataset.s; crowdT0 = performance.now(); $$('#crowdSeg button').forEach(x => x.classList.toggle('on', x === b)); });
+const fruinColor = d => d < 2 ? [61,220,151] : d < 4 ? [255,176,32] : d < 5 ? [255,77,77] : [255,47,208];
+
+/* ============================ timeline ============================ */
+let tlOn = false, YEAR = 2026, tlAssets = {bld:true, road:true, pipe:true};
+const CENTRE = [73.0650, 19.2988];
+function resetBuildingTimeline(on){
+  tlOn = !!on;
+  if (on){ stampBuildings(); applyYear(YEAR); }
+  else {
+    map.setPaintProperty('bld', 'fill-extrusion-height', BH);
+    if (applyYear.lastY !== undefined && D.roadFC){ map.getSource('road').setData(D.roadFC); applyYear.lastY = undefined; }
+    map.setPaintProperty('road', 'line-color', ['interpolate',['linear'],['get','t'],0,'#2ecc71',0.55,'#b8e05a',0.75,'#ffc53d',0.9,'#ff6b3d',1,'#ff2f4e']);
+    map.setPaintProperty('water', 'line-color', '#8be8ff'); map.setPaintProperty('water', 'line-opacity', 0.95);
+  }
+}
+function stampBuildings(){
+  if (!tlOn) return;
+  for (const f of map.querySourceFeatures('bld', {sourceLayer:'building'})){
+    if (f.id == null) continue;
+    const g = f.geometry.type === 'Polygon' ? f.geometry.coordinates[0][0] : f.geometry.coordinates[0][0][0];
+    const d = Math.hypot((g[0] - CENTRE[0]) * 105, (g[1] - CENTRE[1]) * 110.6);
+    const y = Math.round(1958 + Math.min(d, 7) * 8.5 + hh(String(f.id)) * 22 - 6);
+    map.setFeatureState({source:'bld', sourceLayer:'building', id:f.id}, {y});
+  }
+}
+map.on('sourcedata', e => { if (tlOn && e.sourceId === 'bld' && e.isSourceLoaded) { clearTimeout(stampBuildings._t); stampBuildings._t = setTimeout(stampBuildings, 300); } });
+function applyYear(Y){
+  YEAR = Y;
+  $('#tlYear').textContent = Y;
+  const sl = $('#tlSlider'); sl.value = Y; sl.style.setProperty('--p', ((Y - 1970) / 90 * 100) + '%');
+  const age = ['-', Y, ['coalesce', ['feature-state', 'y'], 1990]];
+  map.setPaintProperty('bld', 'fill-extrusion-height', tlAssets.bld ? ['case', ['<=', ['coalesce', ['feature-state', 'y'], 1990], Y], BH, 0] : BH);
+  map.setPaintProperty('bld', 'fill-extrusion-color', tlAssets.bld ? ['interpolate', ['linear'], age, 0, '#f5f0e6', 15, '#9fcf6a', 35, '#f3c44d', 55, '#ff7a3d', 75, '#d8243c'] : '#8e96a6');
+  map.setPaintProperty('bld', 'fill-extrusion-opacity', tlAssets.bld ? 0.9 : 0.4);
+  // roads: condition index from the resurfacing cycle; none planned after today
+  if (TW.roads){
+    const last = r => { if (Y < r.b) return null; const lastDone = Math.min(Y, 2026); const k = Math.floor((lastDone - r.b) / r.cy); return r.b + k * r.cy; };
+    const pci = r => { const l = last(r); if (l === null) return -1; return clamp(100 - (Y - l) * 6.5, 0, 100); };
+    map.setPaintProperty('road', 'line-color', ['interpolate', ['linear'], ['get', 'pci'], -1, 'rgba(0,0,0,0)', 0, '#d8243c', 40, '#ff7a3d', 65, '#f3c44d', 85, '#9fcf6a', 100, '#e8fff0']);
+    if (!applyYear.roadsFC || applyYear.lastY !== Y){
+      const feats = D.roadsNear.map(r => line(r.c, {k:r.k, t:r.t, pci:Math.round(pci(r))}));
+      map.getSource('road').setData(fc(feats)); applyYear.lastY = Y;
+    }
+    map.setLayoutProperty('road', 'visibility', tlAssets.road ? 'visible' : 'none');
+  }
+  // pipes: life used by material
+  const life = ['match', ['get', 'm'], 'CI', 60, 'DI', 80, 100];
+  if (TW.utilities && !applyYear.pipesSet){ map.getSource('water').setData(fc(TW.utilities.water.map(w => line(w.c, {d:w.d, y:w.y, m:w.m, id:w.id})))); applyYear.pipesSet = true; }
+  map.setPaintProperty('water', 'line-color', ['interpolate', ['linear'], ['/', ['-', Y, ['get', 'y']], life], -0.01, 'rgba(0,0,0,0)', 0, '#8be8ff', 0.5, '#9fcf6a', 0.8, '#f3c44d', 1, '#ff4d4d', 1.3, '#ff2fd0']);
+  map.setLayoutProperty('water', 'visibility', tlAssets.pipe ? 'visible' : 'none');
+  attention(Y);
+}
+function attention(Y){
+  if (!TW.utilities || !TW.roads) return;
+  const LIFE = {CI:60, DI:80, HDPE:100};
+  const items = [];
+  let pipePast = 0, roadPast = 0, nP = 0, nR = 0;
+  const due = new Array(10).fill(0);
+  for (const w of TW.utilities.water){
+    if (w.y > Y) continue; nP++;
+    const end = w.y + LIFE[w.m]; if (end <= Y) pipePast++;
+    const yrs = end - Y; if (yrs >= 0 && yrs < 10) due[Math.floor(yrs)] += w.d / 150;
+    if (yrs > -3 && yrs < 3) items.push({s:yrs + (w.d >= 450 ? -2 : 0), t:'pipe', name:`Main ${w.id} · ${w.d} mm ${w.m}`, sub:`laid ${w.y} · ${Y - w.y} yrs old`, act:w.d >= 450 ? 'Replace' : 'Reline', c:'#37d0ff'});
+  }
+  for (const r of D.roadsNear){
+    if (Y < r.b || r.k < 2) continue; nR++;
+    const lastDone = Math.min(Y, 2026); const l = r.b + Math.floor((lastDone - r.b) / r.cy) * r.cy;
+    const p = 100 - (Y - l) * 6.5; if (p < 40) roadPast++;
+    const yrs = (100 - 40) / 6.5 - (Y - l); if (yrs >= 0 && yrs < 10) due[Math.floor(yrs)] += r.k;
+    if (p < 45 && r.k >= 3) items.push({s:(p - 40) / 6.5 - r.k, t:'road', name:`${['','Lane','Street','Arterial','Highway','Expressway'][r.k]} R-${String(Math.round(r.c[0][0] * 1e5) % 100000).padStart(5, '0')}`, sub:`PCI ${Math.max(0, Math.round(p))} · last surfaced ${l}`, act:p < 20 ? 'Rebuild' : 'Resurface', c:'#f3c44d'});
+  }
+  items.sort((a, b) => a.s - b.s);
+  const pick = []; const seen = new Set();
+  for (const it of items){ if (pick.length >= 6) break; const k = it.t + it.act; if (seen.has(k) && pick.length < 4) continue; seen.add(k); pick.push(it); }
+  $('#attList').innerHTML = pick.map(it => `<li><i style="background:${it.c};box-shadow:0 0 8px ${it.c}"></i><div>${it.name}<small>${it.sub}</small></div><em>${it.act}</em></li>`).join('') || '<li><i style="background:var(--ok)"></i><div>Nothing due<small>network within design life</small></div><em></em></li>';
+  $('#kPipe').textContent = Math.round(100 * pipePast / Math.max(1, nP)) + '%';
+  $('#kRoad').textContent = Math.round(100 * roadPast / Math.max(1, nR)) + '%';
+  $('#kBld').textContent = (Y < 2000 ? Math.round((2000 - 1958) * 40 * (Y - 1958) / 42) : Math.round(3200 + (Y - 2000) * 180)).toLocaleString('en-IN');
+  const mx = Math.max(...due, 1);
+  $('#capex').innerHTML = due.map(v => `<div style="height:${Math.max(3, v / mx * 54)}px"></div>`).join('');
+}
+$('#tlSlider').addEventListener('input', e => applyYear(+e.target.value));
+$('.timeline').addEventListener('wheel', e => { e.preventDefault(); applyYear(clamp(YEAR + Math.sign(e.deltaY), 1970, 2060)); }, {passive:false});
+$$('#tlChips .chip').forEach(ch => ch.onclick = () => { tlAssets[ch.dataset.a] = !tlAssets[ch.dataset.a]; ch.classList.toggle('on', tlAssets[ch.dataset.a]); applyYear(YEAR); });
+
+/* ============================ district sketch ============================
+   A real district: a city block enclosed by arterial roads (from our Mumbai network). The pen traces its
+   perimeter, the district goes dark, and then it is built again from nothing, radiating out from its heart:
+   first the streets (the map's own roads), then water mains, sewers and power cables along them, and last
+   every real building standing there today (Overture footprints and heights), each rising in its own place. */
+const PL = {job:0, idx:0};
+const NETS = [
+  {k:'road', c:[255, 241, 207], lag:0, glow:true, w:{motorway:2.6, trunk:2.6, primary:2.2, secondary:1.6, tertiary:1.1, minor:0.7, service:0.45}},
+  {k:'water', c:[55, 208, 255], lag:0.9, off:2.2, w:{primary:0.9, secondary:0.9, tertiary:0.8, minor:0.5}},
+  {k:'sewer', c:[214, 150, 80], lag:1.8, off:-2.2, w:{secondary:0.9, tertiary:0.8, minor:0.45}},
+  {k:'power', c:[255, 224, 102], lag:2.7, off:3.6, w:{motorway:1.1, trunk:1.1, primary:1.1, secondary:1, tertiary:0.8}},
+];
+function plMetric(lng0, lat0){ const kx = 111320 * Math.cos(lat0 * Math.PI / 180), ky = 110574;
+  return {to:(q) => [(q[0] - lng0) * kx, (q[1] - lat0) * ky], from:(x, y) => [lng0 + x / kx, lat0 + y / ky]}; }
+const pip = (x, y, ring) => { let o = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++){ const [xi, yi] = ring[i], [xj, yj] = ring[j];
+  if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) o = !o; } return o; };
+const bldColour = ['case', ['==', ['feature-state', 'r'], 1], '#ff5a4a', ['interpolate', ['linear'], ['coalesce', ['feature-state', 'p'], 1], 0, '#15181f', 0.07, '#ffcf7a', 0.85, '#ffe7b8', 1, ROOF]];
+function clearPlan(){
+  PL.job++; PL.state = 'idle'; PL.pen = null; PL.nets = null;
+  for (const id of ['plan-site', 'plan-outline', 'plan']) if (map.getSource(id)) map.getSource(id).setData(G);
+  PL.rep = null;
+  if (PL.sched){ for (const b of PL.sched) map.removeFeatureState({source:'bld', sourceLayer:'building', id:b.id}); PL.sched = null; }
+  if (map.setSourceTileLodParams) map.setSourceTileLodParams(5, 15, 'bld');
+  if (!tlOn) map.setPaintProperty('bld', 'fill-extrusion-height', BH);
+}
+function planEnter(){
+  clearPlan();
+  const job = PL.job; PL.state = 'wait';
+  $('#planStage').textContent = 'Finding the district…';
+  const waitStill = () => { if (job !== PL.job) return; if (map.isMoving() || !TW.districts) setTimeout(waitStill, 150); else setTimeout(() => job === PL.job && flyToDistrict(job), 250); };
+  setTimeout(waitStill, 300);
+}
+$('#planAgain').onclick = () => { PL.idx++; planEnter(); };
+
+function flyToDistrict(job){
+  const list = TW.districts || [], D_ = list[PL.idx % list.length]; if (!D_) return;
+  const ring = D_.r;
+  let w = Infinity, s_ = Infinity, e = -Infinity, n = -Infinity;
+  for (const [x, y] of ring){ w = Math.min(w, x); e = Math.max(e, x); s_ = Math.min(s_, y); n = Math.max(n, y); }
+  PL.site = {ring, name:D_.n, A:D_.a};
+  $('#planName').textContent = D_.n + ' · ' + D_.a.toFixed(2) + ' km²';
+  $('#planStage').textContent = 'Flying to the district…';
+  // every building tile at full detail while this chapter plays, so every building can be picked up and raised
+  if (map.setSourceTileLodParams) map.setSourceTileLodParams(1, 1, 'bld');
+  const pad = innerWidth > 900 ? {top:90, bottom:110, left:Math.round(innerWidth * 0.28), right:Math.round(innerWidth * 0.26)} : 30;
+  const cam = map.cameraForBounds([[w, s_], [e, n]], {padding:pad, bearing:-20, pitch:50});
+  map.flyTo({...cam, zoom:Math.max(14.05, Math.min(15.6, cam.zoom)), pitch:50, bearing:-20, duration:2200, essential:true});
+  map.once('moveend', () => {
+    if (job !== PL.job) return;
+    let went = false; const go_ = () => { if (!went && job === PL.job){ went = true; beginTrace(job); } };
+    map.once('idle', go_); setTimeout(go_, 4000);          // wait for the district's buildings, but never forever
+  });
+}
+
+function beginTrace(job){
+  const {ring} = PL.site;
+  let cx = 0, cy = 0; for (const q of ring.slice(0, -1)){ cx += q[0]; cy += q[1]; } cx /= ring.length - 1; cy /= ring.length - 1;
+  const M = plMetric(cx, cy), R = ring.map(M.to);
+  const cum = [0]; for (let i = 1; i < R.length; i++) cum.push(cum[i - 1] + Math.hypot(R[i][0] - R[i-1][0], R[i][1] - R[i-1][1]));
+  const maxD = Math.max(...R.map(([x, y]) => Math.hypot(x, y)));
+  PL.plan = {ring, R, M, cum, maxD, seen:new Set()};
+  PL.sched = []; PL.nets = null;
+  PL.state = 'draw'; PL.t0 = performance.now();
+  map.getSource('plan-site').setData(fc([poly(ring)]));
+  map.setPaintProperty('bld', 'fill-extrusion-height', ['*', BH, ['coalesce', ['feature-state', 'p'], 1]]);
+  map.setPaintProperty('bld', 'fill-extrusion-color', bldColour);
+  collectBuildings(); buildNetworks();
+  $('#planStage').textContent = 'Tracing the district, road to road…';
+}
+const TRACE = 2.2, DARK = TRACE + 0.8, GROW = 4.8, BLD_LAG = 2;
+const reach = d => DARK + d / PL.plan.maxD * GROW;          // when the growth front reaches a point d metres from the heart
+/* every building inside the perimeter, scheduled to rise when the front passes it; called again as tiles land */
+function collectBuildings(){
+  const P = PL.plan; if (!P) return;
+  for (const f of map.querySourceFeatures('bld', {sourceLayer:'building'})){
+    if (f.id == null || P.seen.has(f.id)) continue;
+    const g = f.geometry.type === 'Polygon' ? f.geometry.coordinates[0] : f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates[0][0] : null; if (!g) continue;
+    const pts = g.map(P.M.to); const [x, y] = pts[0];
+    if (!pip(x, y, P.R)) continue;
+    P.seen.add(f.id);
+    let A = 0; for (let i = 1; i < pts.length; i++) A += pts[i-1][0] * pts[i][1] - pts[i][0] * pts[i-1][1]; A = Math.abs(A) / 2;
+    const pr = f.properties, h = pr.height || (pr.num_floors ? pr.num_floors * 3.3 : 5);
+    const d = Math.hypot(x, y) + hh(String(f.id)) * 60;
+    const b = {id:f.id, g, A, d0:Math.hypot(x, y), hide:TRACE + 0.2 + (1 - Math.hypot(x, y) / P.maxD) * 0.9, s:reach(d) + BLD_LAG, dur:0.8 + Math.min(1.2, h / 90), floor:A * h / 3.3, step:-1};
+    PL.sched.push(b);
+    // already past its moment (a late tile): put it straight at the right height
+    const t = (performance.now() - PL.t0) / 1000;
+    if (t > b.hide) setBuilding(b, t);
+  }
+}
+const STEPS = [0, 0.08, 0.2, 0.36, 0.54, 0.72, 0.88, 1];
+function setBuilding(b, t){
+  let k;
+  if (t < b.hide) k = -1;                                  // still standing: the old city
+  else if (t < b.s) k = 0;                                 // cleared, waiting for its turn
+  else { const q = clamp((t - b.s) / b.dur, 0, 1), e = 1 - Math.pow(1 - q, 3); k = STEPS.findIndex(v => v >= e - 1e-6); }
+  if (k === b.step) return;
+  b.step = k;
+  if (k < 0) map.removeFeatureState({source:'bld', sourceLayer:'building', id:b.id});
+  else map.setFeatureState({source:'bld', sourceLayer:'building', id:b.id}, {p:STEPS[k]});
+}
+/* the streets inside the district, from the map's own road tiles, each revealed as the front passes along it */
+function buildNetworks(){
+  const P = PL.plan, out = {road:[], water:[], sewer:[], power:[]}, seen = new Set(), total = {road:0, water:0, sewer:0, power:0}, times = {road:[], water:[], sewer:[], power:[]};
+  const subs = [], subSeen = new Set();
+  for (const f of map.querySourceFeatures('omt', {sourceLayer:'transportation'})){
+    const cls = f.properties.class;
+    const geoms = f.geometry.type === 'LineString' ? [f.geometry.coordinates] : f.geometry.type === 'MultiLineString' ? f.geometry.coordinates : [];
+    for (const ln of geoms){
+      const key = cls + ln[0][0].toFixed(5) + ln[0][1].toFixed(5) + ln.length; if (seen.has(key)) continue; seen.add(key);
+      let run = [];
+      const flush = () => {
+        if (run.length >= 2){
+          // grow from the end nearer the heart
+          if (run[0].d > run[run.length - 1].d) run.reverse();
+          const path = run.map(r => r.q), ts = []; let t = reach(run[0].d), L = 0;
+          for (let i = 0; i < run.length; i++){ if (i){ const l = Math.hypot(run[i].x - run[i-1].x, run[i].y - run[i-1].y); L += l; t = Math.max(t + l / (P.maxD / GROW), reach(run[i].d)); } ts.push(t); }
+          for (const N of NETS){
+            const w = N.w[cls]; if (!w) continue;
+            out[N.k].push({path, ts:ts.map(v => v + N.lag), w});
+            total[N.k] += L; times[N.k].push([ts[ts.length - 1] + N.lag, L]);
+            if (N.k === 'power' || N.k === 'water'){
+              const q = run[run.length - 1], g = Math.floor(q.x / 1100) + ':' + Math.floor(q.y / 1100) + N.k;
+              if (!subSeen.has(g)){ subSeen.add(g); subs.push({p:q.q, t:ts[ts.length - 1] + N.lag, k:N.k}); }
+            }
+          }
+        }
+        run = [];
+      };
+      for (const q of ln){
+        const [x, y] = P.M.to(q);
+        if (pip(x, y, P.R)) run.push({q, x, y, d:Math.hypot(x, y)}); else flush();
+      }
+      flush();
+    }
+  }
+  for (const k in times) times[k].sort((a, b) => a[0] - b[0]);
+  PL.nets = {out, total, times, subs};
+}
+
+/* after the real district stands: the plan. The largest old buildings go red, come down, and new ones rise on the same
+   plots: multi-storey logistics hubs, with towers near the district's heart. Their heights are the plan's, not today's. */
+const REP_AT = DARK + GROW + BLD_LAG + 2.4;
+function startReplacement(){
+  const P = PL.plan, cands = PL.sched.filter(b => b.A > 220).sort((a, b) => b.A - a.A);
+  const pick = cands.filter(b => hh('rep' + b.id) < 0.6).slice(0, 320);
+  pick.sort((a, b) => a.d0 - b.d0);
+  PL.rep = pick.map((b, i) => {
+    const core = b.d0 < P.maxD * 0.16 && hh('c' + b.id) < 0.5, r = hh('h' + b.id), h = core ? 45 + r * 45 : 18 + r * 14;
+    return {b, at:REP_AT + i / Math.max(1, pick.length) * 2.8, step:-2, h, t:core ? 'glass' : 'hub', floorOld:b.floor, floorNew:b.A * h / 3.6};
+  });
+}
+function replacementFrame(t){
+  if (!PL.rep) return {n:0, gain:0};
+  const feats = []; let n = 0, gain = 0;
+  for (const R of PL.rep){
+    const u = t - R.at;
+    let step;                                     // -2 waiting, -1 red, 0..3 coming down, 4 gone
+    if (u < 0) step = -2; else if (u < 0.5) step = -1; else if (u < 1.3) step = Math.min(3, Math.floor((u - 0.5) / 0.2)); else step = 4;
+    if (step !== R.step){
+      R.step = step;
+      const down = [0.75, 0.45, 0.2, 0.05];
+      if (step === -1) map.setFeatureState({source:'bld', sourceLayer:'building', id:R.b.id}, {r:1, p:1});
+      else if (step >= 0 && step <= 3) map.setFeatureState({source:'bld', sourceLayer:'building', id:R.b.id}, {r:1, p:down[step]});
+      else if (step === 4) map.setFeatureState({source:'bld', sourceLayer:'building', id:R.b.id}, {r:0, p:0});
+    }
+    if (u > 1.3){
+      const q = clamp((u - 1.3) / (1 + R.h / 80), 0, 1), e = 1 - Math.pow(1 - q, 3);
+      feats.push({type:'Feature', properties:{t:R.t, hh:R.h * e, bb:0}, geometry:{type:'Polygon', coordinates:[R.b.g]}});
+      if (q > 0){ n++; gain += (R.floorNew - R.floorOld) * e; }
+    }
+  }
+  map.getSource('plan').setData(fc(feats));
+  return {n, gain};
+}
+const doneBy = (arr, t) => { let s = 0; for (const [tt, L] of arr){ if (tt > t) break; s += L; } return s; };
+const PK = [['Buildings', 'n'], ['Built floor', 'fa'], ['Roads', 'road'], ['Water mains', 'water'], ['Power cables', 'power'], ['Rebuilt by plan', 'rep']];
+function planFrame(now){
+  // the perimeter breathes for as long as the district is on screen
+  if (PL.plan && (PL.state === 'draw' || PL.state === 'done')){
+    const b = (Math.sin(now / 520) + 1) / 2;
+    map.setPaintProperty('plan-outline-glow', 'line-width', 8 + 14 * b);
+    map.setPaintProperty('plan-outline-glow', 'line-opacity', 0.25 + 0.45 * b);
+    map.setPaintProperty('plan-outline', 'line-width', 1.8 + 1.2 * b);
+  }
+  if (PL.state !== 'draw' || !PL.plan) return;
+  const P = PL.plan, t = (now - PL.t0) / 1000;
+  // 1. the pen traces the real boundary
+  const total = P.cum[P.cum.length - 1], goal = clamp(t / TRACE, 0, 1) * total;
+  let k = 1; while (k < P.cum.length - 1 && P.cum[k] < goal) k++;
+  const u = (goal - P.cum[k - 1]) / Math.max(1e-6, P.cum[k] - P.cum[k - 1]);
+  const penAt = [P.ring[k - 1][0] + (P.ring[k][0] - P.ring[k - 1][0]) * u, P.ring[k - 1][1] + (P.ring[k][1] - P.ring[k - 1][1]) * u];
+  if (t <= TRACE + 0.1){ map.getSource('plan-outline').setData(fc([line([...P.ring.slice(0, k), penAt])])); PL.pen = t < TRACE ? penAt : null; }
+  // 2. the district goes dark as its buildings go down, then lightens as it is rebuilt
+  map.setPaintProperty('plan-site', 'fill-opacity', 0.62 * clamp((t - TRACE) / 1, 0, 1) * (1 - clamp((t - DARK - GROW - BLD_LAG) / 3, 0, 1)));
+  // 3. every building: down with the old city, up with the new one
+  if (Math.floor(t * 2) !== PL.rescan){ PL.rescan = Math.floor(t * 2); if (t < DARK + GROW + BLD_LAG) collectBuildings(); }
+  let n = 0, fa = 0, rising = false;
+  for (const b of PL.sched){
+    setBuilding(b, t);
+    if (t >= b.s){ const q = clamp((t - b.s) / b.dur, 0, 1); n++; fa += b.floor * q; if (q < 1) rising = true; }
+  }
+  if (t > REP_AT - 0.2 && !PL.rep) startReplacement();
+  const RP = replacementFrame(t); fa += RP.gain;
+  const N = PL.nets, km = x => (x / 1000).toFixed(x < 10000 ? 1 : 0) + ' km';
+  const vals = {rep:RP.n.toLocaleString('en-IN'), n:n.toLocaleString('en-IN'), fa:(fa / 1e6).toFixed(2) + ' km²',
+    road:N ? km(doneBy(N.times.road, t)) : '–', water:N ? km(doneBy(N.times.water, t)) : '–', sewer:N ? km(doneBy(N.times.sewer, t)) : '–', power:N ? km(doneBy(N.times.power, t)) : '–'};
+  $('#planKpis').innerHTML = PK.map(([l, key]) => `<div class="tile"><div class="k">${l}</div><div class="v num">${vals[key]}</div></div>`).join('');
+  $('#planStage').textContent = t < TRACE ? 'Tracing the district, road to road…' : t < DARK ? 'Taking it back to bare ground…'
+    : t < DARK + GROW + 2.7 ? 'Streets, water, sewers and power coming up…' : t < REP_AT ? 'Every real building rising in its place…'
+    : t < REP_AT + 5.5 ? 'The plan: old godowns out, new logistics hubs in…' : 'Built and replanned · drag to look around';
+  if (t > REP_AT + 6.5){ PL.state = 'done'; }
+}
+function planLayers(now){
+  const L = [];
+  if (PL.pen){
+    const pulse = (Math.sin(now / 125) + 1) / 2;
+    L.push(new deck.ScatterplotLayer({id:'pen-halo', data:[PL.pen], getPosition:d => d, getRadius:18 + pulse * 10, radiusUnits:'pixels', getFillColor:[255, 207, 122, 70], parameters:{depthTest:false}, updateTriggers:{getRadius:pulse}}));
+    L.push(new deck.ScatterplotLayer({id:'pen', data:[PL.pen], getPosition:d => d, getRadius:6, radiusUnits:'pixels', getFillColor:[255, 247, 225], stroked:true, getLineColor:[255, 190, 90], lineWidthMinPixels:2, parameters:{depthTest:false}}));
+  }
+  if (PL.nets && (PL.state === 'draw' || PL.state === 'done')){
+    const t = (now - PL.t0) / 1000, fadeOut = PL.state === 'done' ? 0.3 : 1 - 0.7 * clamp((t - DARK - GROW - BLD_LAG - 2) / 3, 0, 1);
+    for (const N of NETS){
+      const ext = N.off && deck.PathStyleExtension ? {extensions:[new deck.PathStyleExtension({offset:true})], getOffset:N.off} : {};
+      if (N.glow) L.push(new deck.TripsLayer({id:'net-glow-' + N.k, data:PL.nets.out[N.k].filter(d => d.w >= 1.6), getPath:d => d.path, getTimestamps:d => d.ts, getColor:[...N.c, Math.round(55 * fadeOut)], getWidth:d => d.w * 3,
+        widthUnits:'pixels', currentTime:t, trailLength:1e6, fadeTrail:false, capRounded:true, jointRounded:true, parameters:{depthTest:false}, updateTriggers:{getColor:fadeOut}}));
+      L.push(new deck.TripsLayer({id:'net-' + N.k, data:PL.nets.out[N.k], getPath:d => d.path, getTimestamps:d => d.ts, getColor:[...N.c, Math.round(235 * fadeOut)], getWidth:d => d.w,
+        widthUnits:'pixels', currentTime:t, trailLength:1e6, fadeTrail:false, capRounded:true, jointRounded:true, parameters:{depthTest:false}, ...ext, updateTriggers:{getColor:fadeOut}}));
+    }
+    // pumping stations and substations switch on as their lines arrive
+    const on = PL.nets.subs.filter(s => s.t <= t);
+    const pulse = (Math.sin(now / 200) + 1) / 2;
+    L.push(new deck.ScatterplotLayer({id:'net-nodes-halo', data:on, getPosition:d => d.p, getRadius:d => 10 + 14 * clamp(1 - (t - d.t) / 1.2, 0, 1) + pulse * 3, radiusUnits:'pixels',
+      getFillColor:d => d.k === 'power' ? [255, 224, 102, 70] : [55, 208, 255, 70], parameters:{depthTest:false}, updateTriggers:{getRadius:[t, pulse]}}));
+    L.push(new deck.ScatterplotLayer({id:'net-nodes', data:on, getPosition:d => d.p, getRadius:4, radiusUnits:'pixels', getFillColor:d => d.k === 'power' ? [255, 234, 140] : [140, 232, 255],
+      stroked:true, getLineColor:[255, 255, 255], lineWidthMinPixels:1, parameters:{depthTest:false}}));
+  }
+  return L;
+}
+
+/* ============================ ask the city ============================ */
+let askT = 0;
+function askEnter(){
+  askT = performance.now();
+  map.setLayoutProperty('flood', 'visibility', 'none');
+  $('#chat').innerHTML = `<div class="t">Ask the twin</div><div class="bub q" id="askQ"></div><div class="bub a" id="askA" style="display:none"></div>`;
+}
+const Q = 'Heavy rain at 6 pm on Friday. What happens to the port trucks, and what should we do?';
+function askFrame(now){
+  const t = (now - askT) / 1000, q = $('#askQ'), a = $('#askA'); if (!q) return;
+  const n = Math.floor(clamp(t / 3.2, 0, 1) * Q.length);
+  q.innerHTML = Q.slice(0, n) + (n < Q.length ? '<span class="caret"></span>' : '');
+  if (t > 3.6 && a.style.display === 'none'){
+    a.style.display = 'block';
+    a.innerHTML = `Running the storm, the traffic and the port together…<div class="run"><div>Rainfall + drains<i><b></b></i></div><div>Truck movements<i><b></b></i></div><div>Diversions tested<i><b></b></i></div></div><div id="askR"></div>`;
+    setTimeout(() => $$('.run b').forEach((b, i) => setTimeout(() => b.style.width = '100%', i * 500)), 50);
+  }
+  if (t > 6.2 && $('#askR') && !$('#askR').innerHTML){
+    $('#askR').innerHTML = `<ol style="margin-top:10px"><li>Two low underpasses on the port road flood first; the highlighted corridor slows to a crawl.</li><li>Hold outbound trucks at the port gate from 5:30 pm; release them in waves.</li><li>Open the eastern bypass to heavy vehicles until the water drops.</li></ol><div style="font-size:11px;color:var(--muted);margin-top:8px">Shown on the map · <span style="color:var(--gold-2)">Open the full scenario →</span></div>`;
+    map.setLayoutProperty('flood', 'visibility', 'visible'); setFlood(3.5);
+  }
+}
+
+/* ============================ sources ============================ */
+const SRC = [
+  ['JNPA container throughput 2025–26 (8.17 M TEU)', 'https://indianinfrastructure.com/'],
+  ['51World: digital twin of the whole of Shanghai', 'https://www.unrealengine.com/en-US/spotlights/51world-creates-digital-twin-of-the-entire-city-of-shanghai'],
+  ['Xiong\'an: planned and built with its digital twin', 'https://en.people.cn/n3/2026/0325/c90000-20439733.html'],
+  ['Hangzhou City Brain', 'https://en.wikipedia.org/wiki/City_Brain'],
+  ['Virtual Singapore', 'https://en.wikipedia.org/wiki/Virtual_Singapore'],
+  ['Dubai city-scale digital twin', 'https://www.middleeastainews.com/p/dubai-launches-city-scale-digital'],
+  ['Port of Rotterdam with IBM', 'https://newsroom.ibm.com/Turning-Rotterdam-into-the-Worlds-Smartest-Port-with-IBM-Cloud-IoT'],
+  ['Helsinki 3D+', 'https://aec-business.com/helsinki-is-building-a-digital-twin-of-the-city/'],
+  ['Valencia water twin (Global Omnium)', 'https://www.idrica.com/case-studies/digital-twin-valencia/'],
+  ['Singapore PUB anomaly detection twin', 'https://yii.bentley.com/project/high-fidelity-digital-twin-enabled-anomaly-detection-and-localization-in-singapore/'],
+  ['SCADA into a unified namespace (MQTT Sparkplug)', 'https://www.hivemq.com/blog/integrating-scada-system-into-unified-namespace-iiot/'],
+  ['iFLOWS-Mumbai flood warning', 'https://www.pib.gov.in/PressReleasePage.aspx?PRID=1631096'],
+  ['Cooling Singapore: urban heat twin', 'https://sec.ethz.ch/research/cs.html'],
+  ['Breathe London air quality network', 'https://www.c40.org/press_releases/mayor-launches-world-s-largest-air-quality-monitoring-network-in-london'],
+  ['Fruin crowd levels of service (G. K. Still)', 'https://www.gkstill.com/Support/crowd-flow/fruin/Fruin1.html'],
+  ['Hajj Jamarat crowd simulation', 'https://www.jasss.org/22/2/9.html'],
+  ['Maha Kumbh 2025 AI crowd management', 'https://www.businesstoday.in/india/story/blending-technology-and-devotion-ai-cameras-to-set-new-global-standard-crowd-management-at-maha-kumbh-mela-2025-457365-2024-12-15'],
+  ['Paris 2024 Olympics digital twins (OnePlan)', 'https://www.oneplan.io/case-studies/paris-2024-olympics-digital-twins/'],
+  ['Cities: Skylines II info views', 'https://cs2.paradoxwikis.com/Info_views'],
+  ['Pipe remaining useful life (Fracta)', 'https://www.fracta.ai/remaining-useful-life'],
+  ['Urban digital twins in China (Geoawesome)', 'https://geoawesome.com/urban-digital-twins-in-china-a-smart-gadget-or-a-decision-support-tool/'],
+  ['Our digital twins blog', 'https://praneetdhoolia.github.io/digital-twins/'],
+  ['MATSim', 'https://www.matsim.org/'], ['SUMO', 'https://eclipse.dev/sumo/'],
+  ['Map data: OpenStreetMap, Overture Maps, Esri World Imagery, Mapzen terrain', 'https://www.openstreetmap.org/copyright'],
+];
+function buildSources(){
+  $('#sources').innerHTML = '<div class="t">Sources and links</div>' + SRC.map(([t, u]) => `<a href="${u}" target="_blank" rel="noopener">${t}<br><small>${u.replace(/^https?:\/\//, '').slice(0, 64)}</small></a>`).join('') +
+    '<div style="font-size:11px;color:var(--dim);margin-top:12px;line-height:1.5">Moving people in Newcastle come from our calibrated 25 % run. Bhiwandi districts, roads and buildings are real; utility networks, sensors, crowds, freight volumes and the replacement plan are illustrative layers, laid on real roads.</div>';
+}
+
+/* ============================ frame loop ============================ */
+let t0 = performance.now();
+function layersFor(c, now){
+  const L = [], sec = (now - t0) / 1000;
+  const want = c.id === 'lenses' ? (LENS && LENS.deck) : c.deck;
+  if (want === 'nc' && D.nc){
+    const T = 7200, tt = (sec * 50) % T;
+    L.push(new deck.TripsLayer({id:'nc', data:D.nc, getPath:d => d.path, getTimestamps:d => d.ts, getColor:d => d.c, getWidth:d => d.w,
+      widthUnits:'pixels', widthMinPixels:1.5, trailLength:c.id === 'engine' ? 420 : 320, currentTime:tt, fadeTrail:true, capRounded:true, jointRounded:true, opacity:0.95,
+      parameters:{depthTest:false}, updateTriggers:{}}));
+    const el = $('#ncClock'); if (el) el.textContent = fmtT(TW.newcastle.t0 + tt);
+  }
+  if (want === 'people' && D.people){
+    const tt = (sec * 60) % 3600;
+    L.push(new deck.TripsLayer({id:'mum', data:D.people, getPath:d => d.path, getTimestamps:d => d.ts, getColor:d => d.c, widthMinPixels:2.2, trailLength:240, currentTime:tt, fadeTrail:true, capRounded:true, jointRounded:true, parameters:{depthTest:false}}));
+  }
+  if (want === 'flow' && D.flow){
+    const tt = (sec * 45) % 900;
+    L.push(new deck.TripsLayer({id:'flow', data:D.flow, getPath:d => d.path, getTimestamps:d => d.ts, getColor:d => d.c, widthMinPixels:2.4, trailLength:60, currentTime:tt, fadeTrail:true, capRounded:true, jointRounded:true, parameters:{depthTest:false}}));
+    L.push(new deck.TripsLayer({id:'flow2', data:D.flow, getPath:d => d.path, getTimestamps:d => d.ts.map(t => t + 900), getColor:d => d.c, widthMinPixels:2.4, trailLength:60, currentTime:tt + 900, fadeTrail:true, capRounded:true, jointRounded:true, parameters:{depthTest:false}}));
+  }
+  if (want && want.startsWith && want.startsWith('dsites:') && D.dynSites){
+    const s = D.dynSites[want.slice(7)] || [];
+    const pulse = (Math.sin(sec * 3) + 1) / 2;
+    L.push(new deck.ScatterplotLayer({id:'dsites-halo', data:s, getPosition:d => d.p, getRadius:d => (70 + pulse * 80) * Math.pow(2, 13.3 - map.getZoom()), radiusUnits:'meters', getFillColor:d => [...hex(SITE[d.k]), 60], updateTriggers:{getRadius:[pulse, Math.round(map.getZoom() * 4)]}, parameters:{depthTest:false}}));
+    L.push(new deck.ScatterplotLayer({id:'dsites', data:s, getPosition:d => d.p, getRadius:5, radiusUnits:'pixels', getFillColor:d => hex(SITE[d.k]), stroked:true, getLineColor:[255,255,255], lineWidthMinPixels:1.5, parameters:{depthTest:false}}));
+  }
+  if (want === 'freight' && D.freight){
+    const tt = (sec * 120) % D.freightT;
+    L.push(new deck.TripsLayer({id:'fr', data:D.freight, getPath:d => d.path, getTimestamps:d => d.ts, getColor:[255, 244, 220], widthMinPixels:3, trailLength:600, currentTime:tt, fadeTrail:true, capRounded:true, parameters:{depthTest:false}}));
+  }
+  if (want && want.startsWith && want.startsWith('sites:') && D.scada){
+    const kinds = want.slice(6).split(',');
+    const s = D.scada.filter(x => kinds.includes(x.k));
+    const pulse = (Math.sin(sec * 3) + 1) / 2;
+    L.push(new deck.ScatterplotLayer({id:'sites-halo', data:s, getPosition:d => d.p, getRadius:60 + pulse * 70, radiusUnits:'meters', getFillColor:d => [...hex(SITE[d.k]), 60], updateTriggers:{getRadius:pulse}, parameters:{depthTest:false}}));
+    L.push(new deck.ScatterplotLayer({id:'sites', data:s, getPosition:d => d.p, getRadius:5, radiusUnits:'pixels', getFillColor:d => hex(SITE[d.k]), stroked:true, getLineColor:[255,255,255], lineWidthMinPixels:1.5, parameters:{depthTest:false}}));
+  }
+  if (c.id === 'scada' && D.scada){
+    const st = scadaFrame(now);
+    const pulse = (Math.sin(sec * 4) + 1) / 2;
+    const s = D.scada;
+    L.push(new deck.ScatterplotLayer({id:'sc-halo', data:s, getPosition:d => d.p, getRadius:d => (d.n.startsWith('PS-02') && st.phase < 3 ? 160 : 55) + pulse * 60, radiusUnits:'meters',
+      getFillColor:d => d.n.startsWith('PS-02') && st.t > 0.06 && st.t < 0.72 ? [255, 77, 77, 110] : [...hex(SITE[d.k] || '#fff'), 50], updateTriggers:{getRadius:[pulse, st.phase], getFillColor:st.t}, parameters:{depthTest:false}}));
+    L.push(new deck.ScatterplotLayer({id:'sc', data:s, getPosition:d => d.p, getRadius:5, radiusUnits:'pixels', getFillColor:d => hex(SITE[d.k] || '#fff'), stroked:true, getLineColor:[255,255,255], lineWidthMinPixels:1.2, parameters:{depthTest:false}}));
+  }
+  if (c.id === 'plan') L.push(...planLayers(now));
+  if (c.id === 'crowd' && D.crowd){
+    const span = 4 * 3600, tt = ((now - crowdT0) / 1000 * 150) % span;
+    const tr = D.crowd[crowdS];
+    L.push(new deck.TripsLayer({id:'cr', data:tr, getPath:d => d.path, getTimestamps:d => d.ts, getColor:[255, 236, 200], widthMinPixels:1.6, trailLength:220, currentTime:tt, fadeTrail:true, opacity:0.8, parameters:{depthTest:false}}));
+    const frames = crowdS === 'a' ? D.crowd.da : D.crowd.db;
+    let f = frames[0]; for (const fr of frames){ if (fr[0] <= tt) f = fr; else break; }
+    L.push(new deck.ColumnLayer({id:'dens', data:f ? f[1] : [], diskResolution:6, radius:15, extruded:true, getPosition:d => [d[0], d[1]], getElevation:d => d[2] * 26,
+      getFillColor:d => [...fruinColor(d[2]), 215], parameters:{depthTest:true}, material:{ambient:0.6, diffuse:0.5}}));
+    const now_ = f ? Math.max(0, ...f[1].map(d => d[2])) : 0;
+    $('#cClock').textContent = fmtT(TW.crowd.t0 + tt);
+    $('#cNow').textContent = now_.toFixed(1);
+    const pk = TW.crowd.peak[crowdS === 'a' ? 0 : 1];
+    $('#cPeak').textContent = pk.toFixed(1); $('#cPeak').style.color = `rgb(${fruinColor(pk)})`;
+    $('#cPlan').innerHTML = crowdS === 'a' ? 'All processions leave within 30 minutes and converge on one ghat.' : 'Releases staggered over three hours; the northern mandals are routed to a second ghat on the river.';
+  }
+  return L;
+}
+const SITE = {esr:'#37d0ff', pump:'#8be8ff', wtp:'#ffffff', stp:'#c08a4a', lift:'#ffd9a3', sub:'#ffe066', sig:'#ff8fab', gauge:'#3ddc97'};
+const ARCS = [[77.21,28.61],[72.57,23.02],[79.09,21.15],[78.49,17.39],[77.59,12.97],[88.36,22.57],[75.86,22.72],[80.27,13.08],[73.86,18.52]].map(c => ({c}));
+
+const hazeEl = $('#haze');
+function haze(c){
+  // only in a city view: over the globe, or zoomed far out mid-flight, the horizon maths has no meaning
+  const on = !c.globe && map.getProjection().type !== 'globe' && map.getZoom() > 9 && map.getPitch() > 55;
+  hazeEl.classList.toggle('on', on);
+  if (!on) return;
+  const ctr = map.getCenter(), b = map.getBearing() * Math.PI / 180, d = 6.5 * Math.pow(2, 14.6 - map.getZoom());
+  const lat = clamp(ctr.lat + Math.cos(b) * d / 111, -85, 85), lng = ctr.lng + Math.sin(b) * d / (111 * Math.cos(ctr.lat * Math.PI / 180));
+  let y = map.project([lng, lat]).y; if (!isFinite(y)) y = 0; y = clamp(y, 40, innerHeight * 0.6);
+  hazeEl.style.background = `linear-gradient(to bottom, rgba(${HAZE_C},0) ${y - 170}px, rgba(${HAZE_C},.72) ${y - 70}px, rgba(${HAZE_C},.9) ${y - 20}px, rgba(${HAZE_C},.45) ${y + 40}px, rgba(${HAZE_C},0) ${y + 120}px)`;
+}
+function frame(now){
+  requestAnimationFrame(frame);
+  if (!ready || cur < 0) return;
+  const c = CH[cur];
+  haze(c);
+  if (drift && !map.isMoving() && now - lastInteract > 4000) map.setBearing(map.getBearing() + drift);
+  // the moving layers wait until a city chapter has landed on the flat projection
+  overlay.setProps({layers: c.globe || map.getProjection().type === 'globe' ? [] : layersFor(c, now)});
+  if (c.id === 'flood') floodTick(now);
+  if (c.id === 'plan') planFrame(now);
+  if (c.id === 'ask') askFrame(now);
+  if (c.id === 'lenses' && lensAuto){ const i = Math.floor(((now - t0) / 4200)) % LENSES.length; if (LENSES[i] !== LENS) setLens(LENSES[i].k); }
+  dynCheck(now);
+  if (c.id === 'predict'){ const i = Math.floor((now - predT) / 3000) % 4; const k = ['heat','air','noise','value'][i]; if (k !== predK){ predK = k; setHex(k); } }
+  if (c.globe && !map.isMoving() && now - lastInteract > 3000) map.setCenter([map.getCenter().lng + 0.03, map.getCenter().lat]);
+}
+requestAnimationFrame(frame);
+/* the how-to line: touch wording on touch screens; it quietens while the map is being moved */
+/* Command + drag turns and tilts too, the way Ctrl + drag does (MapLibre only listens for Ctrl and the right button) */
+(() => {
+  const el = map.getCanvasContainer(); let d = null;
+  el.addEventListener('mousedown', e => { if (!e.metaKey || e.button !== 0) return; e.preventDefault(); e.stopPropagation();
+    d = {x:e.clientX, y:e.clientY, b:map.getBearing(), p:map.getPitch()}; lastInteract = performance.now(); }, true);
+  addEventListener('mousemove', e => { if (!d) return; lastInteract = performance.now();
+    map.jumpTo({bearing:d.b + (e.clientX - d.x) * 0.4, pitch:clamp(d.p - (e.clientY - d.y) * 0.4, 0, 85)}); });
+  addEventListener('mouseup', () => { d = null; });
+})();
+const howto = document.getElementById('howto');
+if (matchMedia('(pointer: coarse)').matches) howto.innerHTML = '<span><b>Drag</b> move</span><i></i><span><b>Two fingers</b> turn, tilt &amp; zoom</span><i></i><span><b>Swipe</b> slides</span>';
+map.on('movestart', e => { if (e.originalEvent) howto.classList.add('dim'); });
+map.on('moveend', () => setTimeout(() => howto.classList.remove('dim'), 1500));
+window.goTo = (i) => go(i, true);
+window.twinMap = map; window.twinCur = () => CH[cur].id;
+</script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two cities, one framework: Mumbai, and the agents that built it - Praneet Dhoolia</title>
+<meta name="description" content="The twin's second city is Mumbai: 27 million synthetic residents, its suburban trains from the printed timetables, its metro, buses and ferries, on the same framework as Newcastle and stood up in days. And what made that possible: fifty days of building with AI coding agents that kept the project in the repository, not in anyone's head.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/digital-twins/part-7-two-cities-one-framework.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="home" href="/">Praneet Dhoolia</a>
+    <nav>
+      <a href="/">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="post-header">
+    <p class="eyebrow ruled"><span><a href="/digital-twins/">City digital twin</a> &middot; Part 7 &middot; Two cities</span></p>
+    <h1>Two cities, one framework: <em>Mumbai, and the agents that built it</em></h1>
+    <p class="standfirst">Newcastle was the first city. The second is Mumbai: 27 million synthetic residents, its suburban trains taken from the printed timetables, its metro, buses and ferries, all running on the same framework, stood up in days. This post shows it, and what made it possible: fifty days of building with AI coding agents that kept the whole project in the repository rather than in anyone's head.</p>
+    <p class="date"><time datetime="2026-10">October 2026</time> &middot; ~10 min read &middot; Part 7 of a series &middot; with Pranav Dhoolia</p>
+  </div>
+
+  <article class="post-body">
+
+<section>
+  <h2>A second city</h2>
+  <p><a class="t" data-ref="Part 5 &middot; The synthetic city"
+     data-tip="A working twin of Greater Newcastle: six hundred thousand synthetic residents travelling by twelve modes on the real roads and timetables, checked against the real city."
+     href="/digital-twins/part-5-a-synthetic-city-held-to-reality.html">Previously</a> I showed a working twin of Greater Newcastle, six hundred thousand people. Mumbai is more than forty times larger and different in almost every way that matters to a travel model: the suburban railway carries millions a day, auto-rickshaws are a mode of their own, and much of the data lives in printed timetables and government portals rather than open feeds.</p>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt7-viewer-3d.dark.jpg" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt7-viewer-3d.light.jpg" alt="The twin's 3D viewer over central Mumbai, from Mahim Bay across Dadar, Matunga and Wadala towards Kurla and the Bandra-Kurla Complex. The suburban railway lines run in purple through the middle of the city, the Rajiv Gandhi Sea Link crosses the bay, and the streets are coloured by simulated delay, heavily red." width="1440" height="900">
+    </picture>
+    <figcaption><b>FIG 1</b> - Central Mumbai in the same viewer as Newcastle: the Western and Central Railway lines in purple through Dadar and Matunga, the Sea Link across Mahim Bay, and every street coloured by simulated delay. Why it is mostly red is explained below.</figcaption>
+  </figure>
+
+  <p>The Mumbai twin covers the core of the Mumbai Metropolitan Region. Its 27,057,132 synthetic residents live in 6.1 million households, generated from the 2011 census and carried forward to 2026 with vehicle registrations and population projections. It runs on the same code as Newcastle: the same simulator, the same viewer, the same checks, the same scoreboard.</p>
+</section>
+
+<section>
+  <h2>Mumbai, rebuilt from its own data</h2>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt7-network.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt7-network.light.png" alt="Map of the Mumbai twin's network: about 820,000 road links in grey and about 73,000 footpath and cycle links in green, covering the island city, the western and eastern suburbs, Thane, Navi Mumbai and the districts beyond." width="1400" height="1000">
+    </picture>
+    <figcaption><b>FIG 2</b> - Mumbai's network: 824,536 road links and 72,809 footpath and cycle links from OpenStreetMap, with gradients from a global elevation model.</figcaption>
+  </figure>
+
+  <p>The suburban railway carries most of the city's longer trips, and it has no open timetable feed. So the twin reads the Western and Central Railways' own printed timetables: 3,289 trains, against the 3,234 services the operators publish, each stopping where the sheet says it stops. The metro lines run at their published headways, the buses from a community-built feed and the regional operators' data, and seven commuter ferry crossings from the Maritime Board's directory. Trains, metro cars and boats carry the capacities their operators publish.</p>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt7-transit.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt7-transit.light.png" alt="Map of every timetabled service in the Mumbai twin: suburban and regional train lines in blue running north along the western coast and north-east through Thane and Kalyan, metro lines in orange, bus routes in green and ferry crossings across the harbour." width="1400" height="1000">
+    </picture>
+    <figcaption><b>FIG 3</b> - Every timetabled service: 1,964 train patterns from the printed timetables and regional services, 1,802 bus route patterns, the metro lines and the ferry crossings.</figcaption>
+  </figure>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt7-people.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt7-people.light.png" alt="Hexagon density map of where the Mumbai twin's synthetic residents live, densest in the island city and the western and central suburbs, then Thane and Navi Mumbai, thinning towards the outer districts." width="1400" height="1000">
+    </picture>
+    <figcaption><b>FIG 4</b> - Where the synthetic residents live, from a 1% sample of them: the island city and the suburbs along the railway lines, then Thane and Navi Mumbai.</figcaption>
+  </figure>
+
+  <p>Many Indian government websites refuse connections from an Australian address, so sources came through Internet Archive copies, a VPN endpoint in India, and - for data behind a login and a captcha - downloads from a browser, imported by script with a record of where each came from. Of 600 catalogued sources, 572 were acquired, each with a stated use in the model.</p>
+</section>
+
+<section>
+  <h2>Where Mumbai stands</h2>
+  <p>Mumbai has not produced a ridership reading yet, for the reason this run shows.</p>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt7-viewer-day.dark.jpg" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt7-viewer-day.light.jpg" alt="The viewer showing a finished 1 percent Mumbai run: the whole region's 379,019 loaded links coloured almost entirely red, and on the left the run's card warning that at 1 percent MATSim floors link storage at one vehicle, so the run produces spurious spillback, above the table of modes against their targets." width="1440" height="900">
+    </picture>
+    <figcaption><b>FIG 5</b> - A finished 1% run of Mumbai: the whole region red. The viewer's own card says why - at a 1% sample every road holds so little that the city jams whatever the model does.</figcaption>
+  </figure>
+
+  <p>A simulation that runs a fraction of the population also scales every road down by that fraction. At 1%, a typical Mumbai street can pass one vehicle every few minutes, and on a network whose median link is 65 metres long the city gridlocks no matter how much memory the machine has. The smallest sample that behaves is about 10%: 2.7 million agents and roughly 247 GB of working memory, several times what the workstation that built it has. The framework carried Mumbai all the way to a running simulation. It needs a larger machine to go further.</p>
+</section>
+
+<section>
+  <h2>One framework, any city</h2>
+  <p>Mumbai took days because the framework was made city-agnostic from the start. In its first week, 338 file paths across 46 scripts assumed Newcastle was the only city; they were moved behind one module that knows where a city lives, and the rule became that the code may not name a place. A city is a folder that supplies a described contract, and a throwaway test city with a different projection, seed and set of modes proves on every change that the framework reads the same for a city it has never seen.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 720 250" role="img" aria-label="On the left, the framework: the simulation code, the schema, the tests and the run command, which may not name any place. On the right, two city folders, Newcastle and Mumbai, each supplying a descriptor with a derived boundary, a registry of declared values, a hashed manifest, its own adapters and builders, and its own documents. A contract check between them refuses a city that is missing anything.">
+      <rect x="0" y="0" width="720" height="250" fill="url(#g1)"/>
+      <text class="sv-band" x="16" y="24">FRAMEWORK</text>
+      <text class="sv-band" x="440" y="24" style="fill:var(--flag)">CITIES</text>
+
+      <rect x="16" y="40" width="250" height="176" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="30" y="64">simulation code &middot; schema</text>
+      <text class="sv-lab-b" x="30" y="82">tests &middot; the run command</text>
+      <text class="sv-sub" x="30" y="108">names no place, no coordinate,</text>
+      <text class="sv-sub" x="30" y="122">no extent</text>
+      <text class="sv-sub" x="30" y="148">a throwaway test city with a</text>
+      <text class="sv-sub" x="30" y="162">different projection, seed and</text>
+      <text class="sv-sub" x="30" y="176">modes must run it unchanged</text>
+      <text class="sv-sub" x="30" y="202">checked in CI on every change</text>
+
+      <rect x="290" y="96" width="126" height="64" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
+      <text class="sv-lab-b" x="302" y="120">the contract</text>
+      <text class="sv-sub" x="302" y="138">refuses a city</text>
+      <text class="sv-sub" x="302" y="151">missing anything</text>
+
+      <rect x="440" y="40" width="264" height="80" rx="5" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="454" y="62">cities/newcastle</text>
+      <text class="sv-sub" x="454" y="80">derived boundary &middot; 600 values</text>
+      <text class="sv-sub" x="454" y="94">968 hashed files &middot; adapters</text>
+      <text class="sv-sub" x="454" y="108">its own documents</text>
+
+      <rect x="440" y="136" width="264" height="80" rx="5" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="454" y="158">cities/mumbai</text>
+      <text class="sv-sub" x="454" y="176">derived boundary &middot; 428 values</text>
+      <text class="sv-sub" x="454" y="190">1,459 hashed files &middot; adapters</text>
+      <text class="sv-sub" x="454" y="204">its own documents</text>
+
+      <line x1="266" y1="128" x2="290" y2="128" stroke="var(--ink-soft)" stroke-width="1.3"/>
+      <line x1="416" y1="120" x2="440" y2="84" stroke="var(--ink-soft)" stroke-width="1.3"/>
+      <line x1="416" y1="136" x2="440" y2="176" stroke="var(--ink-soft)" stroke-width="1.3"/>
+
+      <text class="sv-flag" x="16" y="242">differences between cities are declared switches, never a branch on a city's name</text>
+    </svg>
+    </div>
+    <figcaption><b>FIG 6</b> - What "a city" is to the framework. Newcastle and Mumbai are two folders; the code between them does not know either name.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Built with agents</h2>
+  <p>Both cities were built between 10 August and 30 September in 64 working sessions with <span class="t" data-k="agent">AI coding agents</span> - 709 commits, reviewed and steered by us, written mostly by them. The main difficulty was continuity: each session starts with no memory of the one before.</p>
+  <p><a class="t" data-ref="Agent design &middot; Software engineering agent"
+     data-tip="An agent that onboards a repository the way a new engineer does - summarising every file, then every package - and uses that hierarchy like a table of contents."
+     href="/software-engineering-agent-langgraph.html">Previously</a> I wrote an agent that onboards a repository the way a new engineer would, building itself a table of contents. This project turns that around: the repository is kept as the table of contents, so any session can read its way to the current state in about 600 lines.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 720 280" role="img" aria-label="A funnel of five layers read in order by a new session. The goal, one page. The board, one page, mostly generated. The brief, expiring facts with the command that re-derives each. One position page, at most 130 lines. One section of the record, found through its index, from a record over 18,000 lines that is never read whole.">
+      <defs>
+        <pattern id="g1" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="720" height="280" fill="url(#g1)"/>
+      <text class="sv-band" x="16" y="24">WHAT A SESSION WITH NO MEMORY READS, IN ORDER</text>
+
+      <rect x="60" y="40" width="600" height="38" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="76" y="64">1 &middot; THE GOAL</text>
+      <text class="sv-sub" x="644" y="64" text-anchor="end">one page &middot; what the twin is for</text>
+
+      <rect x="100" y="86" width="520" height="38" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="116" y="110">2 &middot; THE BOARD</text>
+      <text class="sv-sub" x="604" y="110" text-anchor="end">one page &middot; generated from run records</text>
+
+      <rect x="140" y="132" width="440" height="38" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="156" y="156">3 &middot; THE BRIEF</text>
+      <text class="sv-sub" x="564" y="156" text-anchor="end">expiring facts + the command for each</text>
+
+      <rect x="180" y="178" width="360" height="38" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
+      <text class="sv-lab-b" x="196" y="202">4 &middot; ONE POSITION PAGE</text>
+      <text class="sv-sub" x="524" y="202" text-anchor="end">&le; 130 lines</text>
+
+      <rect x="220" y="224" width="280" height="38" rx="5" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="236" y="248" style="fill:var(--flag)">5 &middot; ONE RECORD SECTION</text>
+      <text class="sv-sub" x="484" y="248" text-anchor="end">via its index</text>
+
+      <text class="sv-sub" x="704" y="274" text-anchor="end">about 600 lines in total; the 18,000-line record is never read whole</text>
+    </svg>
+    </div>
+    <figcaption><b>FIG 7</b> - What a session with no memory reads, in order. The goal, the status board, a short brief, one page on the topic at hand, and one section of the full record.</figcaption>
+  </figure>
+
+  <p>Three habits kept fifty days of agent work honest. Every fact has one home, and the pages that repeat it are generated from it or checked against it. Every mistake that happens twice becomes a check that refuses it - "a rule a session can skip is a wish", as one of the project's hooks puts it - so a typed-in map rectangle, a script that silently corrupted files, a forced Windows restart that killed a 28-hour run, each now has something that stops it. And the decisions and the spending stay with us: open questions arrive once, as clickable choices with a recommendation, and no day-long run starts without an approved, measured cost.</p>
+</section>
+
+<section>
+  <h2>What came next</h2>
+  <p>A twin that could stand up a city of 27 million people on one contract caught the attention of a state government in India, planning a new city on Mumbai's edge. The proposal we prepared for it is the next post.</p>
+</section>
+
+<div class="sources">
+  <h2>Sources &amp; anchors</h2>
+  <ol>
+    <li>Figures 1 and 5: the twin's run viewer on the Mumbai run <code>20260922T005949_4it_1pct</code> &middot; figures 2 to 4: drawn from Mumbai's assembled network, weekday timetables and that run's persons &middot; map data &copy; OpenStreetMap contributors (ODbL), buildings from Overture Maps</li>
+    <li>Mumbai in the twin - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/cities/mumbai/docs/README.md">cities/mumbai/docs/README.md</a> &middot; the suburban timetable builder - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/cities/mumbai/build/build_suburban_timetable_feed.py">build_suburban_timetable_feed.py</a></li>
+    <li>The city contract - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/src/city.py">src/city.py</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/config/schema/city.schema.json">city.schema.json</a> &middot; the throwaway-city test - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/tests/check_city_agnostic.py">check_city_agnostic.py</a></li>
+    <li>How the sessions work - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/HANDOVER_CONTRACT.md">HANDOVER_CONTRACT.md</a> &middot; the onboard and handoff skills - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/.claude/skills/onboard/SKILL.md">onboard</a>, <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/.claude/skills/handoff/SKILL.md">handoff</a> &middot; the hook quoted - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/.claude/hooks/block-stdin-trap.sh">block-stdin-trap.sh</a></li>
+    <li>Claude Code - <a href="https://github.com/anthropics/claude-code">github.com/anthropics/claude-code</a></li>
+  </ol>
+</div>
+
+  </article>
+
+  <p class="colophon"><span>City digital twin &middot; Part 7 of the series &middot;</span>
+    <span>Back to <a class="t" data-ref="Part 6 &middot; How it works"
+    data-tip="Every stage of the Newcastle twin, from open data to a scored run: network, timetables, signals, population, their days, the simulation, the checks and the runs."
+    href="/digital-twins/part-6-inside-the-newcastle-twin.html">inside the Newcastle twin</a></span>
+    <span>Next: <a class="t" data-ref="Part 8 &middot; The City, Twice"
+    data-tip="The proposal prepared for a state government in India: what it shows, and how and why each part of it came to be."
+    href="/digital-twins/part-8-the-city-twice.html">the City, Twice</a></span></p>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+<div id="tip" role="tooltip"></div>
+
+<script>
+window.GLOSS = {
+  agent:{t:"AI coding agent",d:"A language model working inside a code repository through tools - reading files, running commands, editing and committing - rather than answering in a chat window."}
+};
+</script>
+<script src="/assets/tip.js" defer></script>
+</body>
+</html>

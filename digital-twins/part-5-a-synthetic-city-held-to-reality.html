@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A synthetic Newcastle: a city that moves, checked against the real one - Praneet Dhoolia</title>
+<meta name="description" content="A working digital twin of Greater Newcastle: six hundred thousand synthetic residents with homes, jobs and households, travelling by twelve modes on the region's real roads and timetables, watched in a 3D viewer and checked against how the real city travels.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/digital-twins/part-5-a-synthetic-city-held-to-reality.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="home" href="/">Praneet Dhoolia</a>
+    <nav>
+      <a href="/">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="post-header">
+    <p class="eyebrow ruled"><span><a href="/digital-twins/">City digital twin</a> &middot; Part 5 &middot; The synthetic city</span></p>
+    <h1>A synthetic Newcastle: <em>a city that moves, checked against the real one</em></h1>
+    <p class="standfirst">A weekend twin of one stadium precinct taught me what a small twin can do. Alongside it I was building a much bigger one: a working digital twin of Greater Newcastle, in which six hundred thousand synthetic residents live, travel by twelve modes on the region's real roads and timetables, and are checked against how the real city travels. This post shows what it looks like and what it can already say.</p>
+    <p class="date"><time datetime="2026-10">October 2026</time> &middot; ~9 min read &middot; Part 5 of a series &middot; with Pranav Dhoolia</p>
+  </div>
+
+  <article class="post-body">
+
+<section>
+  <h2>What I built</h2>
+  <p><a class="t" data-ref="Part 4 &middot; Hands on with SUMO"
+     data-tip="A scoped twin built by hand in SUMO: how long the Brisbane 2032 stadium precinct takes to clear after 63,000 people leave at once."
+     href="/digital-twins/part-4-brisbane-2032-egress-with-sumo.html">Previously</a> I built a twin by hand for one question: how long a stadium precinct takes to empty. It ended with a list of what it lacked: real demand instead of numbers I made up, real targets to check against, many runs instead of one, and a record of where every number came from. The Newcastle twin has each of these, for a whole city.</p>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt5-viewer-3d.dark.jpg" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-viewer-3d.light.jpg" alt="The twin's 3D viewer over central Newcastle at a steep tilt. Every street is coloured by how delayed its traffic was over a simulated weekday, mostly green for flowing with red on the busiest stretches; rail lines run in purple into Newcastle Interchange, the Stockton ferry crosses the harbour in cyan, and buildings stand in 3D." width="1440" height="900">
+    </picture>
+    <figcaption><b>FIG 1</b> - Central Newcastle in the twin's own viewer, after a full simulated weekday. Each street is coloured by how much slower its traffic ran than when empty; the rail lines, the light rail and the Stockton ferry run on their real timetables.</figcaption>
+  </figure>
+
+  <p>The city is Newcastle, in New South Wales, across its five council areas. It was chosen for a question: the city opened a 2.7 km light rail in 2019 whose business case, the state's Auditor-General found, was written after the decision to build it, and nobody has measured what it changed since. Answering that needs a model of how the whole city travels that can be trusted first, so the twin became the goal and the light rail its first question.</p>
+  <p>In one sentence: every resident of the study area has a synthetic counterpart with a home, a household, an age, a job or a school, a driver's licence or not, and a car or not; each of them has a day to get through; and each chooses how to travel it - drive, get a lift, walk, cycle, ride a motorbike, take a taxi, a bus, a train, the light rail or the ferry - on the real network, while trucks and freight trains take their real share of the roads and level crossings.</p>
+
+  <table>
+    <thead><tr><th>The hand-built precinct twin</th><th>The Newcastle twin</th></tr></thead>
+    <tbody>
+      <tr><td>Demand I wrote down: attendance &times; car share &divide; 2.5</td><td>A population generated from the census, which chooses its own way to travel</td></tr>
+      <tr><td>One precinct's roads</td><td>The whole region: every road, footpath and cycle path, and every public transport timetable</td></tr>
+      <tr><td>Cars only</td><td>Twelve modes, each moving through the network</td></tr>
+      <tr><td>Nothing to check against</td><td>Twelve real ridership figures, checked every run</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>The city, rebuilt from open data</h2>
+  <p>Everything under the people is public data, rebuilt by scripts so that it can be rebuilt again. The roads, footpaths and cycle paths come from OpenStreetMap across four thousand square kilometres; the timetables from the transport department's open feeds for buses, trains, the light rail and the ferry.</p>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt5-network.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-network.light.png" alt="Map of the twin's network across Greater Newcastle: about 200,000 road links in grey and about 170,000 footpath and cycle path links in green, dense in the city centre and the suburbs around Lake Macquarie and Maitland." width="1400" height="1000">
+    </picture>
+    <figcaption><b>FIG 2</b> - The network the people move on: 200,935 road links and 169,509 footpath and cycle path links, so a walk to the bus stop is a walk on a real footpath, not a straight line.</figcaption>
+  </figure>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt5-transit.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-transit.light.png" alt="Map of every timetabled public transport service in the twin: bus routes in green covering the city and suburbs, train lines in blue running north-west to Maitland and south towards Lake Macquarie, the light rail in purple in the city centre and the ferry across the harbour." width="1400" height="1000">
+    </picture>
+    <figcaption><b>FIG 3</b> - Every timetabled service, drawn on the streets and tracks it was mapped to: 996 bus route patterns, 270 train patterns, the light rail and the Stockton ferry.</figcaption>
+  </figure>
+
+  <p>The people are generated from the 2021 census, one census area (<span class="t" data-k="sa1">SA1</span>) at a time, so that added up they match what was published there: household sizes, cars per household, age and sex, work and study, income. Driver licences come from the transport department's published counts, and each person's day is shaped by the state's <span class="t" data-k="hts">travel survey</span>: about three and a half trips, to real buildings. What nobody is given is a mode. They choose it in the simulation.</p>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt5-people.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-people.light.png" alt="Hexagon density map of where the twin's synthetic residents live, densest in central Newcastle and its inner suburbs, with clusters at Maitland, Cessnock, Raymond Terrace, Port Stephens and around Lake Macquarie." width="1400" height="1000">
+    </picture>
+    <figcaption><b>FIG 4</b> - Where the synthetic residents live, from one run's quarter-sample of them. The pattern follows the region's real settlement.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>A day in the twin</h2>
+  <p>The engine is <a class="t" data-k="matsim" href="https://www.matsim.org/">MATSim</a>. Every synthetic person carries a plan for the day and tries it on the network, where the plans meet in queues. Each plan is scored - time at work or at home is good, time stuck in traffic or waiting at a stop is bad, fares and parking cost money - and between rounds some people try something else: another route, another time, another mode. After a couple of hundred rounds the choices stop changing much, and the mode shares are read from that state.</p>
+
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt5-day.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-day.light.png" alt="Stacked area chart of trips starting in each fifteen minutes of a simulated weekday by mode, with a morning peak around 08:30 and a larger afternoon peak around 16:00, dominated by car drivers, then car passengers, walking, trucks, cycling, taxis and public transport." width="1400" height="620">
+    </picture>
+    <figcaption><b>FIG 5</b> - A simulated weekday in Greater Newcastle: every trip by every simulated traveller, residents, visitors, through traffic and trucks, by the time it starts, scaled up from the quarter sample the run simulates.</figcaption>
+  </figure>
+
+  <p>The twin has its own viewer. It opens any run, finished or still going, and draws the whole region: each street by how delayed it was, each rail, light rail and ferry line from the run's own timetable, and beside the map the twelve modes against their real targets.</p>
+
+  <figure>
+    <img src="/media/dt5-viewer-orbit.gif" alt="Animated view in the twin's 3D viewer, turning slowly over central Newcastle, the harbour and Stockton, with streets coloured by simulated delay and rail lines in purple." width="640" height="360">
+    <figcaption><b>FIG 6</b> - Turning over the city in the viewer. Everything drawn comes from the run: the delays, the lines, the ferry.</figcaption>
+  </figure>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt5-viewer-day.dark.jpg" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt5-viewer-day.light.jpg" alt="The viewer's full view of a finished run: the whole region's network coloured by delay on the right, and on the left the run's card - settled, accounting closes, 250 of 250 iterations in 27 hours 51 minutes - and the table of the twelve modes against their targets." width="1440" height="900">
+    </picture>
+    <figcaption><b>FIG 7</b> - The same run from above, with its card: 158,161 people simulated, 250 rounds in just under 28 hours on one workstation, and every mode read against its target.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>How close to the real city</h2>
+  <p>A twin is only worth what it can be checked against, so each of the twelve modes is scored on the basis its real figure is published on: the travel survey's shares of residents' trips, the Opal card's boardings at train stations, on the light rail and at the ferry wharves, and road counts for trucks. There is no single "public transport" row that could hide trains overshooting while trams undershoot.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 720 370" role="img" aria-label="Deviation of ten scored modes from their real targets. Car plus 8.5 percent and motorbike minus 4.1 percent are inside the plus or minus 10 percent band. Ride minus 25, walk minus 24.7, bus minus 30.7, light rail minus 74, ferry plus 95.4, heavy rail plus 119, bike plus 149 and taxi plus 161 percent are past the 20 percent stop bar.">
+      <rect x="0" y="0" width="720" height="370" fill="url(#g2)"/>
+      <text class="sv-band" x="16" y="24">DEVIATION FROM THE REAL FIGURE</text>
+      <text class="sv-sub" x="16" y="40">one completed run, 25% sample, iteration 250, 30 Sep 2026</text>
+      <rect x="459.0" y="52" width="22.0" height="258" fill="var(--accent-wash)"/>
+      <line x1="448.0" y1="52" x2="448.0" y2="310" stroke="var(--flag)" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="492.0" y1="52" x2="492.0" y2="310" stroke="var(--flag)" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="470" y1="52" x2="470" y2="310" stroke="var(--ink)" stroke-width="1"/>
+      <g class="sv-sub" text-anchor="middle"><text x="250" y="326">-200%</text><text x="360" y="326">-100%</text><text x="470" y="326">0</text><text x="580" y="326">+100%</text><text x="690" y="326">+200%</text></g>
+      <text class="sv-lab" x="16" y="72">car</text>
+      <rect x="470" y="61" width="9.4" height="14" fill="var(--accent)"/><text class="sv-sub" x="485.4" y="72" style="fill:var(--ink)">+8.5%</text>
+      <text class="sv-lab" x="16" y="98">motorbike</text>
+      <rect x="465.5" y="87" width="4.5" height="14" fill="var(--accent)"/><text class="sv-sub" x="459.5" y="98" text-anchor="end" style="fill:var(--ink)">-4.1%</text>
+      <text class="sv-lab" x="16" y="124">walk</text>
+      <rect x="442.8" y="113" width="27.2" height="14" fill="var(--flag)"/><text class="sv-sub" x="436.8" y="124" text-anchor="end" style="fill:var(--ink)">-24.7%</text>
+      <text class="sv-lab" x="16" y="150">ride (passenger)</text>
+      <rect x="442.5" y="139" width="27.5" height="14" fill="var(--flag)"/><text class="sv-sub" x="436.5" y="150" text-anchor="end" style="fill:var(--ink)">-25.0%</text>
+      <text class="sv-lab" x="16" y="176">bus</text>
+      <rect x="436.2" y="165" width="33.8" height="14" fill="var(--flag)"/><text class="sv-sub" x="430.2" y="176" text-anchor="end" style="fill:var(--ink)">-30.7%</text>
+      <text class="sv-lab" x="16" y="202">light rail</text>
+      <rect x="388.6" y="191" width="81.4" height="14" fill="var(--flag)"/><text class="sv-sub" x="382.6" y="202" text-anchor="end" style="fill:var(--ink)">-74.0%</text>
+      <text class="sv-lab" x="16" y="228">ferry</text>
+      <rect x="470" y="217" width="104.9" height="14" fill="var(--flag)"/><text class="sv-sub" x="580.9" y="228" style="fill:var(--ink)">+95.4%</text>
+      <text class="sv-lab" x="16" y="254">heavy rail</text>
+      <rect x="470" y="243" width="131.2" height="14" fill="var(--flag)"/><text class="sv-sub" x="607.2" y="254" style="fill:var(--ink)">+119.3%</text>
+      <text class="sv-lab" x="16" y="280">bike</text>
+      <rect x="470" y="269" width="164.0" height="14" fill="var(--flag)"/><text class="sv-sub" x="640.0" y="280" style="fill:var(--ink)">+149.1%</text>
+      <text class="sv-lab" x="16" y="306">taxi</text>
+      <rect x="470" y="295" width="177.2" height="14" fill="var(--flag)"/><text class="sv-sub" x="653.2" y="306" style="fill:var(--ink)">+161.1%</text>
+      <text class="sv-sub" x="16" y="348">shaded: inside 10% (the goal) &middot; dashed: the 20% stop bar</text>
+      <text class="sv-flag" x="16" y="364">truck and freight train are checked as levels and representation, not as a deviation</text>
+    </svg>
+    </div>
+    <figcaption><b>FIG 8</b> - The honest scoreboard: 2 of 12 modes inside 10% of the real figure. Data: the run's own twelve-mode reading, published on the twin's <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/STATUS.md">status board</a>.</figcaption>
+  </figure>
+
+  <p>Two of twelve modes are within 10% so far. Each mode has a constant that could be adjusted until it matches its target, but that would hide the missing behaviour rather than fix it, so the constants are left alone. The misses point at things the city does that the twin does not yet: people drive most trips under a kilometre, because the walk to a parked car costs them nothing yet; almost half of the attempts to plan a public transport journey find no route; and people without a car, with no lift and no bus, fall back on cycling and taxis far more than real people do. The light rail, the question the project started from, is still the furthest off.</p>
+</section>
+
+<section>
+  <h2>What comes next</h2>
+  <p>The next steps are the missing behaviours the scoreboard points to, then the question the twin was built for: Newcastle with its light rail, and without it. The next post opens the twin up stage by stage: the network, the timetables, the population and their days, the simulation, how each run is checked, and what it takes to run one.</p>
+</section>
+
+<div class="sources">
+  <h2>Sources &amp; anchors</h2>
+  <ol>
+    <li>The twin's repository, public - <a href="https://github.com/praneetdhoolia/city-digital-twin">github.com/praneetdhoolia/city-digital-twin</a> &middot; its goal - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/GOAL.md">docs/GOAL.md</a> &middot; its status board - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/STATUS.md">docs/STATUS.md</a> &middot; its project reports - <a href="https://praneetdhoolia.github.io/city-digital-twin/">praneetdhoolia.github.io/city-digital-twin</a></li>
+    <li>Figures 1, 7 and 8: the twin's run viewer on run <code>20260929T072135_250it_25pct</code> &middot; figures 2 to 4 and 6: drawn from the same run's network, timetables, persons and trips &middot; map data &copy; OpenStreetMap contributors (ODbL), buildings from Overture Maps</li>
+    <li>MATSim - <a href="https://www.matsim.org/">matsim.org</a> &middot; Horni, Nagel &amp; Axhausen (eds.), <em>The Multi-Agent Transport Simulation MATSim</em>, Ubiquity Press (2016) - <a href="https://doi.org/10.5334/baw">doi.org/10.5334/baw</a> &middot; pt2matsim - <a href="https://github.com/matsim-org/pt2matsim">github.com/matsim-org/pt2matsim</a></li>
+    <li>The origin question, the Newcastle light rail - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/cities/newcastle/docs/archived/design/newcastle-lr-proposal.md">newcastle-lr-proposal.md</a> &middot; the population and demand - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/population-and-demand.md">population-and-demand.md</a> &middot; ABS Census DataPacks - <a href="https://www.abs.gov.au/census/find-census-data/datapacks">abs.gov.au</a></li>
+    <li>The network, timetables and signals - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/network-and-inputs.md">network-and-inputs.md</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/signals-and-crossings.md">signals-and-crossings.md</a> &middot; the targets and the scoreboard - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/public-transport-and-yardsticks.md">public-transport-and-yardsticks.md</a></li>
+  </ol>
+</div>
+
+  </article>
+
+  <p class="colophon"><span>City digital twin &middot; Part 5 of the series &middot;</span>
+    <span>Back to <a class="t" data-ref="Part 4 &middot; Hands on with SUMO"
+    data-tip="A scoped twin built by hand in SUMO, and the upgrade path it named: real targets, real counts, many seeds, and provenance attached."
+    href="/digital-twins/part-4-brisbane-2032-egress-with-sumo.html">the hand-built SUMO twin</a></span>
+    <span>Next: <a class="t" data-ref="Part 6 &middot; How it works"
+    data-tip="Every stage of the Newcastle twin, from open data to a scored run: network, timetables, signals, population, their days, the simulation, the checks and the runs."
+    href="/digital-twins/part-6-inside-the-newcastle-twin.html">inside the Newcastle twin</a></span></p>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+<div id="tip" role="tooltip"></div>
+
+<script>
+window.GLOSS = {
+  sa1:{t:"SA1",d:"Statistical Area Level 1 - the smallest area the Australian Bureau of Statistics publishes most census results for, typically 200 to 800 people."},
+  hts:{t:"Household Travel Survey",d:"Transport for NSW's continuous survey of how households travel on an average day: trips per person, purposes, distances and modes. The twin uses it to shape each day and as a target, never to impose shares."},
+  matsim:{t:"MATSim",d:"Multi-Agent Transport Simulation - an open-source Java framework in which every synthetic person executes, scores and revises a daily plan over many rounds. Click to visit."}
+};
+</script>
+<script src="/assets/tip.js" defer></script>
+</body>
+</html>

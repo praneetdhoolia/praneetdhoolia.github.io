@@ -9,6 +9,8 @@ _site/
 .sass-cache/
 .bundle/
 vendor/
+# ...but the hosted proposal's vendor/ is its served third-party code and fonts (Part 7), not a bundle
+!digital-twins/the-city-twice/vendor/
 
 # Node (only if a build step is added later)
 node_modules/
