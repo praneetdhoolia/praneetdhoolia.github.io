@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Two cities, one framework: Mumbai, and the agents that built it - Praneet Dhoolia</title>
 <meta name="description" content="The twin's second city is Mumbai: 27 million synthetic residents, its suburban trains from the printed timetables, its metro, buses and ferries, on the same framework as Newcastle and stood up in days. And what made that possible: fifty days of building with AI coding agents that kept the project in the repository, not in anyone's head.">
-<link rel="canonical" href="https://praneetdhoolia.github.io/digital-twins/part-6-two-cities-one-framework.html">
+<link rel="canonical" href="https://praneetdhoolia.github.io/digital-twins/part-7-two-cities-one-framework.html">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/site.css">
 </head>
@@ -24,10 +24,10 @@
 <main class="wrap">
 
   <div class="post-header">
-    <p class="eyebrow ruled"><span><a href="/digital-twins/">City digital twin</a> &middot; Part 6 &middot; Two cities</span></p>
+    <p class="eyebrow ruled"><span><a href="/digital-twins/">City digital twin</a> &middot; Part 7 &middot; Two cities</span></p>
     <h1>Two cities, one framework: <em>Mumbai, and the agents that built it</em></h1>
     <p class="standfirst">Newcastle was the first city. The second is Mumbai: 27 million synthetic residents, its suburban trains taken from the printed timetables, its metro, buses and ferries, all running on the same framework, stood up in days. This post shows it, and what made it possible: fifty days of building with AI coding agents that kept the whole project in the repository rather than in anyone's head.</p>
-    <p class="date"><time datetime="2026-10">October 2026</time> &middot; ~10 min read &middot; Part 6 of a series &middot; with Pranav Dhoolia</p>
+    <p class="date"><time datetime="2026-10">October 2026</time> &middot; ~10 min read &middot; Part 7 of a series &middot; with Pranav Dhoolia</p>
   </div>
 
   <article class="post-body">
@@ -35,13 +35,13 @@
 <section>
   <h2>A second city</h2>
   <p><a class="t" data-ref="Part 5 &middot; The synthetic city"
-     data-tip="A working twin of Greater Newcastle: half a million synthetic residents travelling by twelve modes on the real roads and timetables, checked against the real city."
-     href="/digital-twins/part-5-a-synthetic-city-held-to-reality.html">Previously</a> I showed a working twin of Greater Newcastle, half a million people. Mumbai is fifty times larger and different in almost every way that matters to a travel model: the suburban railway carries millions a day, auto-rickshaws are a mode of their own, and much of the data lives in printed timetables and government portals rather than open feeds.</p>
+     data-tip="A working twin of Greater Newcastle: six hundred thousand synthetic residents travelling by twelve modes on the real roads and timetables, checked against the real city."
+     href="/digital-twins/part-5-a-synthetic-city-held-to-reality.html">Previously</a> I showed a working twin of Greater Newcastle, six hundred thousand people. Mumbai is more than forty times larger and different in almost every way that matters to a travel model: the suburban railway carries millions a day, auto-rickshaws are a mode of their own, and much of the data lives in printed timetables and government portals rather than open feeds.</p>
 
   <figure>
     <picture>
-      <source srcset="/media/dt6-viewer-3d.dark.jpg" media="(prefers-color-scheme: dark)">
-      <img src="/media/dt6-viewer-3d.light.jpg" alt="The twin's 3D viewer over central Mumbai, from Mahim Bay across Dadar, Matunga and Wadala towards Kurla and the Bandra-Kurla Complex. The suburban railway lines run in purple through the middle of the city, the Rajiv Gandhi Sea Link crosses the bay, and the streets are coloured by simulated delay, heavily red." width="1440" height="900">
+      <source srcset="/media/dt7-viewer-3d.dark.jpg" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt7-viewer-3d.light.jpg" alt="The twin's 3D viewer over central Mumbai, from Mahim Bay across Dadar, Matunga and Wadala towards Kurla and the Bandra-Kurla Complex. The suburban railway lines run in purple through the middle of the city, the Rajiv Gandhi Sea Link crosses the bay, and the streets are coloured by simulated delay, heavily red." width="1440" height="900">
     </picture>
     <figcaption><b>FIG 1</b> - Central Mumbai in the same viewer as Newcastle: the Western and Central Railway lines in purple through Dadar and Matunga, the Sea Link across Mahim Bay, and every street coloured by simulated delay. Why it is mostly red is explained below.</figcaption>
   </figure>
@@ -54,8 +54,8 @@
 
   <figure>
     <picture>
-      <source srcset="/media/dt6-network.dark.png" media="(prefers-color-scheme: dark)">
-      <img src="/media/dt6-network.light.png" alt="Map of the Mumbai twin's network: about 820,000 road links in grey and about 73,000 footpath and cycle links in green, covering the island city, the western and eastern suburbs, Thane, Navi Mumbai and the districts beyond." width="1400" height="1000">
+      <source srcset="/media/dt7-network.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt7-network.light.png" alt="Map of the Mumbai twin's network: about 820,000 road links in grey and about 73,000 footpath and cycle links in green, covering the island city, the western and eastern suburbs, Thane, Navi Mumbai and the districts beyond." width="1400" height="1000">
     </picture>
     <figcaption><b>FIG 2</b> - Mumbai's network: 824,536 road links and 72,809 footpath and cycle links from OpenStreetMap, with gradients from a global elevation model.</figcaption>
   </figure>
@@ -64,16 +64,16 @@
 
   <figure>
     <picture>
-      <source srcset="/media/dt6-transit.dark.png" media="(prefers-color-scheme: dark)">
-      <img src="/media/dt6-transit.light.png" alt="Map of every timetabled service in the Mumbai twin: suburban and regional train lines in blue running north along the western coast and north-east through Thane and Kalyan, metro lines in orange, bus routes in green and ferry crossings across the harbour." width="1400" height="1000">
+      <source srcset="/media/dt7-transit.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt7-transit.light.png" alt="Map of every timetabled service in the Mumbai twin: suburban and regional train lines in blue running north along the western coast and north-east through Thane and Kalyan, metro lines in orange, bus routes in green and ferry crossings across the harbour." width="1400" height="1000">
     </picture>
     <figcaption><b>FIG 3</b> - Every timetabled service: 1,964 train patterns from the printed timetables and regional services, 1,802 bus route patterns, the metro lines and the ferry crossings.</figcaption>
   </figure>
 
   <figure>
     <picture>
-      <source srcset="/media/dt6-people.dark.png" media="(prefers-color-scheme: dark)">
-      <img src="/media/dt6-people.light.png" alt="Hexagon density map of where the Mumbai twin's synthetic residents live, densest in the island city and the western and central suburbs, then Thane and Navi Mumbai, thinning towards the outer districts." width="1400" height="1000">
+      <source srcset="/media/dt7-people.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt7-people.light.png" alt="Hexagon density map of where the Mumbai twin's synthetic residents live, densest in the island city and the western and central suburbs, then Thane and Navi Mumbai, thinning towards the outer districts." width="1400" height="1000">
     </picture>
     <figcaption><b>FIG 4</b> - Where the synthetic residents live, from a 1% sample of them: the island city and the suburbs along the railway lines, then Thane and Navi Mumbai.</figcaption>
   </figure>
@@ -87,8 +87,8 @@
 
   <figure>
     <picture>
-      <source srcset="/media/dt6-viewer-day.dark.jpg" media="(prefers-color-scheme: dark)">
-      <img src="/media/dt6-viewer-day.light.jpg" alt="The viewer showing a finished 1 percent Mumbai run: the whole region's 379,019 loaded links coloured almost entirely red, and on the left the run's card warning that at 1 percent MATSim floors link storage at one vehicle, so the run produces spurious spillback, above the table of modes against their targets." width="1440" height="900">
+      <source srcset="/media/dt7-viewer-day.dark.jpg" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt7-viewer-day.light.jpg" alt="The viewer showing a finished 1 percent Mumbai run: the whole region's 379,019 loaded links coloured almost entirely red, and on the left the run's card warning that at 1 percent MATSim floors link storage at one vehicle, so the run produces spurious spillback, above the table of modes against their targets." width="1440" height="900">
     </picture>
     <figcaption><b>FIG 5</b> - A finished 1% run of Mumbai: the whole region red. The viewer's own card says why - at a 1% sample every road holds so little that the city jams whatever the model does.</figcaption>
   </figure>
@@ -210,13 +210,13 @@
 
   </article>
 
-  <p class="colophon"><span>City digital twin &middot; Part 6 of the series &middot;</span>
-    <span>Back to <a class="t" data-ref="Part 5 &middot; The synthetic city"
-    data-tip="A working twin of Greater Newcastle: half a million synthetic residents travelling by twelve modes on the real roads and timetables, checked against the real city."
-    href="/digital-twins/part-5-a-synthetic-city-held-to-reality.html">the synthetic Newcastle</a></span>
-    <span>Next: <a class="t" data-ref="Part 7 &middot; The City, Twice"
+  <p class="colophon"><span>City digital twin &middot; Part 7 of the series &middot;</span>
+    <span>Back to <a class="t" data-ref="Part 6 &middot; How it works"
+    data-tip="Every stage of the Newcastle twin, from open data to a scored run: network, timetables, signals, population, their days, the simulation, the checks and the runs."
+    href="/digital-twins/part-6-inside-the-newcastle-twin.html">inside the Newcastle twin</a></span>
+    <span>Next: <a class="t" data-ref="Part 8 &middot; The City, Twice"
     data-tip="The proposal prepared for a state government in India: what it shows, and how and why each part of it came to be."
-    href="/digital-twins/part-7-the-city-twice.html">the City, Twice</a></span></p>
+    href="/digital-twins/part-8-the-city-twice.html">the City, Twice</a></span></p>
 
 </main>
 

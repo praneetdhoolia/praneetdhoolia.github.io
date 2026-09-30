@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inside the Newcastle twin: how a synthetic city is built, run and checked - Praneet Dhoolia</title>
+<meta name="description" content="Every stage of the Newcastle twin, from open data to a scored run: the study area, the network, the timetables, the signals and level crossings, the synthetic population and their days, the simulation that lets them choose, how each run is checked, and what it takes to run one.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/digital-twins/part-6-inside-the-newcastle-twin.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="home" href="/">Praneet Dhoolia</a>
+    <nav>
+      <a href="/">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="post-header">
+    <p class="eyebrow ruled"><span><a href="/digital-twins/">City digital twin</a> &middot; Part 6 &middot; How it works</span></p>
+    <h1>Inside the Newcastle twin: <em>how a synthetic city is built, run and checked</em></h1>
+    <p class="standfirst">This post opens up the Newcastle twin stage by stage, from open data to a scored run: the study area, the road and path network, the timetables, the traffic signals and level crossings, the synthetic population and their days, the simulation that lets them choose how to travel, how each run is checked against the real city, and what it takes to run one.</p>
+    <p class="date"><time datetime="2026-10">October 2026</time> &middot; ~18 min read &middot; Part 6 of a series &middot; with Pranav Dhoolia</p>
+  </div>
+
+  <article class="post-body">
+
+<section>
+  <h2>The pipeline</h2>
+  <p><a class="t" data-ref="Part 5 &middot; The synthetic city"
+     data-tip="A working twin of Greater Newcastle: six hundred thousand synthetic residents travelling by twelve modes on the real roads and timetables, checked against the real city."
+     href="/digital-twins/part-5-a-synthetic-city-held-to-reality.html">Previously</a> I showed what the twin looks like and how close it gets to the real city. Underneath is a pipeline of scripts. Each stage reads what the stage before produced, and each can be rerun from the raw downloads. Nothing in the chain is edited by hand.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 720 330" role="img" aria-label="The twin's pipeline in five columns. Sources: OpenStreetMap, the transport timetables, the 2021 census, licence counts, the household travel survey, and observed ridership and counts. Built: the network, the mapped timetables, signals and crossings, the synthetic population, and their daily plans. Run: MATSim, 250 rounds on a 25 percent sample. Checked: twelve modes against their targets, with gates and a held-back set. Seen: the viewer and the scoreboard.">
+      <defs>
+        <pattern id="p6g1" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/></pattern>
+        <marker id="p6m1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"/></marker>
+      </defs>
+      <rect x="0" y="0" width="720" height="330" fill="url(#p6g1)"/>
+      <text class="sv-band" x="12" y="22">SOURCES</text>
+      <text class="sv-band" x="196" y="22" style="fill:var(--ink)">BUILT</text>
+      <text class="sv-band" x="384" y="22" style="fill:var(--ink)">RUN</text>
+      <text class="sv-band" x="500" y="22" style="fill:var(--ink)">CHECKED</text>
+      <text class="sv-band" x="622" y="22" style="fill:var(--ink)">SEEN</text>
+
+      <g>
+        <rect x="12" y="36" width="160" height="40" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.3"/>
+        <text class="sv-lab" x="22" y="53">OpenStreetMap</text><text class="sv-sub" x="22" y="68">roads, paths, places</text>
+        <rect x="12" y="82" width="160" height="40" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.3"/>
+        <text class="sv-lab" x="22" y="99">timetables (GTFS)</text><text class="sv-sub" x="22" y="114">bus, train, tram, ferry</text>
+        <rect x="12" y="128" width="160" height="40" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.3"/>
+        <text class="sv-lab" x="22" y="145">2021 census</text><text class="sv-sub" x="22" y="160">tables for 1,500 areas</text>
+        <rect x="12" y="174" width="160" height="40" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.3"/>
+        <text class="sv-lab" x="22" y="191">licence counts</text><text class="sv-sub" x="22" y="206">by council and age</text>
+        <rect x="12" y="220" width="160" height="40" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.3"/>
+        <text class="sv-lab" x="22" y="237">travel survey</text><text class="sv-sub" x="22" y="252">trips, purposes, lengths</text>
+        <rect x="12" y="266" width="160" height="40" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.3"/>
+        <text class="sv-lab" x="22" y="283">ridership, counts</text><text class="sv-sub" x="22" y="298">Opal, road counts</text>
+      </g>
+      <g>
+        <rect x="196" y="36" width="164" height="46" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
+        <text class="sv-lab-b" x="206" y="55">network</text><text class="sv-sub" x="206" y="72">368,230 links</text>
+        <rect x="196" y="90" width="164" height="46" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
+        <text class="sv-lab-b" x="206" y="109">timetables mapped</text><text class="sv-sub" x="206" y="126">1,270 routes, every stop placed</text>
+        <rect x="196" y="144" width="164" height="46" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
+        <text class="sv-lab-b" x="206" y="163">signals, crossings</text><text class="sv-sub" x="206" y="180">SCATS logic, 405 closures</text>
+        <rect x="196" y="198" width="164" height="46" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
+        <text class="sv-lab-b" x="206" y="217">population</text><text class="sv-sub" x="206" y="234">612,667 residents</text>
+        <rect x="196" y="252" width="164" height="54" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
+        <text class="sv-lab-b" x="206" y="271">daily plans</text><text class="sv-sub" x="206" y="288">tours to real places,</text><text class="sv-sub" x="206" y="300">no mode given</text>
+      </g>
+      <path d="M172 171 L190 171" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#p6m1)"/>
+      <rect x="384" y="118" width="100" height="98" rx="4" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="394" y="142" style="fill:var(--flag)">MATSim</text>
+      <text class="sv-sub" x="394" y="160">everyone plans,</text><text class="sv-sub" x="394" y="173">travels, scores,</text><text class="sv-sub" x="394" y="186">adjusts; 250</text><text class="sv-sub" x="394" y="199">rounds, 25% of</text><text class="sv-sub" x="394" y="212">the population</text>
+      <path d="M360 171 L378 171" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#p6m1)"/>
+      <rect x="500" y="118" width="106" height="98" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.3"/>
+      <text class="sv-lab-b" x="510" y="142">12 targets</text>
+      <text class="sv-sub" x="510" y="160">each on its own</text><text class="sv-sub" x="510" y="173">basis; a gate at</text><text class="sv-sub" x="510" y="186">20%; 143 targets</text><text class="sv-sub" x="510" y="199">held back</text>
+      <path d="M484 167 L494 167" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#p6m1)"/>
+      <rect x="622" y="118" width="88" height="98" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
+      <text class="sv-lab-b" x="632" y="142">viewer</text><text class="sv-sub" x="632" y="160">3D map,</text><text class="sv-sub" x="632" y="173">scoreboard,</text><text class="sv-sub" x="632" y="186">run records</text>
+      <path d="M606 167 L616 167" stroke="var(--ink-soft)" stroke-width="1.3" marker-end="url(#p6m1)"/>
+      <text class="sv-flag" x="384" y="252">every stage is a script;</text>
+      <text class="sv-flag" x="384" y="266">every file it writes is hashed</text>
+      <text class="sv-flag" x="384" y="280">and listed with its source and licence</text>
+    </svg>
+    </div>
+    <figcaption><b>FIG 1</b> - The pipeline, left to right. The sources are public; everything in the middle is built by scripts from them; the run is checked against observed figures the build never used as inputs.</figcaption>
+  </figure>
+
+  <p>Every file the pipeline writes, 968 of them, is listed in a manifest with its hash, row count, the script that produced it, its source, retrieval date and licence. Files built from OpenStreetMap carry its share-alike licence (ODbL); the rest are CC-BY. A check fails the build when a file changes without its manifest entry changing.</p>
+</section>
+
+<section>
+  <h2>The study area</h2>
+  <p>The twin covers five council areas: Newcastle, Lake Macquarie, Maitland, Cessnock and Port Stephens, 4,086 km&sup2; in all, made of 1,500 census areas (<span class="t" data-k="sa1">SA1s</span>). The map extent is derived from those council boundaries with a 5 km margin, never typed in. That rule came from a mistake: early on, a study area typed into a script as a rectangle left 87 of the 1,500 census areas outside the road network for three stages of the build before anyone noticed. Now no coordinate may appear in the code, and a check counts any that do.</p>
+</section>
+
+<section>
+  <h2>The network</h2>
+  <p>OpenStreetMap is downloaded in ten themed layers (roads, rail, footpaths, buildings, places and so on) over tiles covering the extent, merged, and converted into a MATSim network with <a href="https://github.com/matsim-org/pt2matsim">pt2matsim</a>, in the local map projection so every distance is in metres.</p>
+  <p>Walking and cycling have their own network. 40,203 footpaths, cycle paths, stairs and tracks are added as walk and bike links, and each path's own OpenStreetMap tags (foot=, bicycle=, access=) override the default for its class: 4,484 paths were rewritten and 2,252 dropped that way. The network grew from 181,892 to 368,230 links. Speed limits come from the transport department's speed-zone data, and every link carries a gradient from the Copernicus 30-metre elevation model, which slows walkers and cyclists going uphill.</p>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt6-street.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt6-street.light.png" alt="Close-up of the twin's network in central Newcastle: roads in dark lines, a dense web of footpaths, stairs and cycle paths in green alongside and between them, and the rail, light rail and ferry links in purple along the harbour." width="1400" height="1000">
+    </picture>
+    <figcaption><b>FIG 2</b> - Central Newcastle, street by street, from the network the run used. The green is footpaths, paths, stairs and cut-throughs, which let a walking route be shorter than the driving one.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The timetables</h2>
+  <p>Public transport runs from the transport department's open timetable feeds (<span class="t" data-k="gtfs">GTFS</span>). Fifteen feeds - the 2026 timetable, four earlier eras back to 2014 for the light rail question, and the scenario variants - are mapped onto the network in one pass, so every stop sits on a link and every route follows real streets and tracks, with no stop left unmapped.</p>
+  <p>Mapping runs once per network build, on purpose. The mapper is not reproducible: two mappings of the same inputs place nearly one route in five on different streets. Weekday, Saturday and Sunday timetables and the scenario variants are cut from the one mapped schedule instead of being mapped again, so any two runs being compared share the same routes. On a weekday that schedule has 1,448 bus trips, 332 train trips, 252 light rail trips and 107 ferry crossings, and each vehicle type carries its seated and standing capacity.</p>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt6-departures.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt6-departures.light.png" alt="Line chart of timetabled departures per hour on a weekday: buses peak near 170 an hour around 07:00 and 230 around 15:00, with the afternoon school peak; trains, light rail and ferries run a steady 5 to 20 an hour through the day." width="1400" height="620">
+    </picture>
+    <figcaption><b>FIG 3</b> - Every timetabled departure on a weekday, by hour. The 15:00 bus peak is school services, which carry the afternoon school run in the simulation too.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Signals and level crossings</h2>
+  <p>The fourteen signalised intersections on the light rail corridor are modelled as signal systems. New South Wales runs adaptive signals (<span class="t" data-k="scats">SCATS</span>), and the transport department would not release the operated phase plans or offsets. Rather than guess a fixed timing, the twin runs the adaptive logic SCATS publishes: after each cycle an intersection measures how saturated each approach was, moves its cycle length by 6 seconds towards a target saturation of 0.90, within 30 to 150 seconds, and re-splits the green time between approaches. The offsets that coordinate neighbouring intersections are not adapted, because they were not obtained, and that is recorded rather than filled in.</p>
+  <p>Freight trains are handled the same way: by what the road network actually experiences. Putting coal trains on the passenger model's tracks would invent interactions nobody observed, so the two level crossings on the network close their boom gates at the times trains pass. The closures come from the mapped passenger timetable plus the freight movements in a published survey of the coal chain: 405 closures on a weekday, written as 2,478 timed changes to the road links.</p>
+</section>
+
+<section>
+  <h2>The people</h2>
+  <p>Households and people are drawn for each census area so that, added up, they reproduce what the census published there: household size, dwelling type and cars per household; age and sex; work, study and income. The result is 612,667 synthetic residents against the 611,915 the 2021 census counted, with the household-size distribution within 0.6 percentage points of the census in every band.</p>
+  <p>Two things are measured rather than assumed. Driver licences come from the transport department's licence statistics divided by the resident population, for each council area and age band: 78% of 18 to 24 year olds hold one, 94% of 25 to 34 year olds, all of those aged 35 to 44, and 51% of those over 85. And households own the cars the census says they own, as named vehicles: 81,384 households, a third, have more licensed drivers than cars, so their drivers compete for them during the day. Each person's income, from the census band, sets how much a dollar matters to them when they choose.</p>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt6-population.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt6-population.light.png" alt="Two charts. Left: an age and sex pyramid of the 612,667 synthetic residents, widest between 20 and 64. Right: the share holding a driver licence by age, rising from about 64% at 17 to 19 to near 100% from 35 to 75, then falling to about 50% over 85." width="1400" height="660">
+    </picture>
+    <figcaption><b>FIG 4</b> - The synthetic population by age and sex, and licence holding by age as the transport department's counts set it.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Their days</h2>
+  <p>Each person gets a day built from home-based tours: out to work or study and back, a stop at the shops, taking a child to school, a work trip in the middle of the day. The number of trips is solved so that the population makes 3.473 trips per person per day, the travel survey's figure; it realises 3.470. Destinations are real buildings and places from OpenStreetMap, chosen with a distance model whose decay is solved so that trip lengths match the survey for each purpose and home council. People without a car choose nearer destinations: their decay per kilometre is 1.25 times faster, solved so that both groups together match the survey.</p>
+  <p>Some trips are tied to other people. A child's trip to school is bound to a parent with a licence and a car, and a lift is bound to a driver who owns one, so a passenger in the simulation can only ride with a real driver who is making that trip. What nobody is given is a mode.</p>
+
+  <figure>
+    <picture>
+      <source srcset="/media/dt6-purposes.dark.png" media="(prefers-color-scheme: dark)">
+      <img src="/media/dt6-purposes.light.png" alt="Horizontal bar chart of a weekday's 2,275,503 planned trips by purpose: home and other errands 706,252, home and work 413,430, dropping off or picking up someone 349,846, home and shopping 345,341, between two places away from home 286,477, home and school or study 126,161, work-based trips 47,996, each with its average straight-line distance." width="1400" height="600">
+    </picture>
+    <figcaption><b>FIG 5</b> - A weekday's planned trips for the study area's residents, by purpose, with their average straight-line distance. Commutes are the longest; school trips the shortest.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The simulation</h2>
+  <p>The engine is <a class="t" data-k="matsim" href="https://www.matsim.org/">MATSim</a>. Everyone's plans are executed together on the network, in a queue simulation where every mode takes up space: walkers and cyclists on paths and roads, cars, taxis and trucks in traffic, buses, trains, trams and the ferry on their timetables, stopping for signals and boom gates. Nothing teleports.</p>
+  <p>Each executed plan gets a score. Time spent at activities earns 6 utility points an hour; time spent travelling costs, with values of time from the literature by purpose ($18.60 an hour for a commute); waiting and walking to a stop cost more than riding, and each transfer costs the equivalent of 8 minutes, a value swept from 3 to 15. Money counts too: Opal fares from the published fare schedule, and parking priced by how many jobs are nearby, up to $3.20 an hour, at 7,710 parking facilities.</p>
+  <p>Between rounds, people revise their plans: 70% of revisions pick among remembered plans by score, 15% try a new route, 10% a new mode for a tour, 5% a new departure time. After 80% of the 250 rounds, only remembered plans are used, so the last rounds show where the population settled.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 720 260" role="img" aria-label="A loop of four boxes: plans, execute on the network, score, replan. Replanning changes route for 15 percent, mode for 10 percent, departure time for 5 percent, and 70 percent reselect among remembered plans. The loop repeats for 250 iterations.">
+      <defs>
+        <pattern id="g2" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/>
+        </pattern>
+        <marker id="m2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+        </marker>
+      </defs>
+      <rect x="0" y="0" width="720" height="260" fill="url(#g2)"/>
+
+      <rect x="40" y="96" width="150" height="62" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
+      <text class="sv-lab-b" x="56" y="120">PLANS</text>
+      <text class="sv-sub" x="56" y="138">up to 8 remembered</text>
+      <text class="sv-sub" x="56" y="151">per person</text>
+
+      <rect x="286" y="24" width="160" height="62" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.3"/>
+      <text class="sv-lab-b" x="302" y="48">EXECUTE</text>
+      <text class="sv-sub" x="302" y="66">every mode in one queue</text>
+      <text class="sv-sub" x="302" y="79">simulation, real timetables</text>
+
+      <rect x="530" y="96" width="160" height="62" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.3"/>
+      <text class="sv-lab-b" x="546" y="120">SCORE</text>
+      <text class="sv-sub" x="546" y="138">time at activities, minus</text>
+      <text class="sv-sub" x="546" y="151">travel, waits, fares, parking</text>
+
+      <rect x="286" y="172" width="160" height="72" rx="5" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="302" y="194" style="fill:var(--flag)">REPLAN</text>
+      <text class="sv-sub" x="302" y="211">70% pick a remembered plan</text>
+      <text class="sv-sub" x="302" y="224">15% route &middot; 10% mode</text>
+      <text class="sv-sub" x="302" y="237">5% departure time</text>
+
+      <path d="M190 112 C 230 80 250 62 284 56" fill="none" stroke="var(--accent)" stroke-width="1.3" marker-end="url(#m2)"/>
+      <path d="M446 56 C 490 62 512 80 544 96" fill="none" stroke="var(--accent)" stroke-width="1.3" marker-end="url(#m2)"/>
+      <path d="M580 158 C 540 190 500 204 448 208" fill="none" stroke="var(--accent)" stroke-width="1.3" marker-end="url(#m2)"/>
+      <path d="M286 208 C 230 204 200 188 150 160" fill="none" stroke="var(--accent)" stroke-width="1.3" marker-end="url(#m2)"/>
+
+      <text class="sv-sub" x="16" y="30">250 iterations</text>
+      <text class="sv-sub" x="16" y="44">innovation stops at 80%</text>
+      <text class="sv-flag" x="704" y="250" text-anchor="end">mode shares emerge; none is typed in</text>
+    </svg>
+    </div>
+    <figcaption><b>FIG 6</b> - The loop MATSim runs 250 times. The mode shares the scoreboard reads come out of it; none is an input.</figcaption>
+  </figure>
+
+  <p>Several behaviours needed code of their own, written as additions to MATSim in Java. A passenger getting a lift boards the driver's actual car, and the driver detours to pick them up. Taxis are a finite fleet - 800 at full scale - so a request can be refused and the traveller has to choose again. Household cars are shared, so a driver may find the car already out. Crowded buses and trains feel worse, cycling in heavy traffic feels worse, and hills slow walkers and cyclists. The constant each mode carries in the choice model is kept at its prior value, so that a mode which misses its target shows a missing behaviour instead of being tuned to fit.</p>
+  <p>A run simulates a quarter of the population, drawn by household so families travel together, with road capacity, seats and standing room scaled to match.</p>
+</section>
+
+<section>
+  <h2>Checking a run</h2>
+  <p>Each of the twelve modes has a target on the basis its real figure is published on: shares of residents' trips for car, lift, walk, bike, motorbike, taxi and bus, from the travel survey and, for taxis, industry trip counts; weekday Opal boardings at the train stations, on the light rail and at the ferry wharves; road counts for trucks; and the timetable and coal-chain survey for freight trains. Every 100 rounds the run reads all twelve, and a mode 20% or more off its target is the signal to stop and find its cause. Of 210 validation targets, 143 are held back and have never been read by the calibration code; they are opened once, at the end.</p>
+  <p>Runs are grouped into families: any change that can move the results starts a new family, and runs are never compared across one. Within a family, differences are read as bands. MATSim runs are not bit-reproducible - three runs of one build, same seed, diverge by the second round because parallel threads draw random numbers in a different order - though their mode shares came out the same.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 722 332" role="img" aria-label="Every completed result run from 9 to 30 September, one row each, against the ten scored modes. Cells inside 10 percent of the real figure are shaded blue, 10 to 20 percent grey, 20 percent or more pink. The count of modes inside 10 percent goes 0, 2, 2, 2, 2, 1, 2.">
+<defs><pattern id="p6hg" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/></pattern></defs>
+<rect x="0" y="0" width="722" height="332" fill="url(#p6hg)"/>
+<text class="sv-band" x="12" y="22">DEVIATION FROM THE REAL FIGURE, EVERY RESULT SO FAR</text>
+<text class="sv-sub" x="145" y="48" text-anchor="middle">car</text>
+<text class="sv-sub" x="199" y="48" text-anchor="middle">ride</text>
+<text class="sv-sub" x="253" y="48" text-anchor="middle">walk</text>
+<text class="sv-sub" x="307" y="48" text-anchor="middle">taxi</text>
+<text class="sv-sub" x="361" y="48" text-anchor="middle">bike</text>
+<text class="sv-sub" x="415" y="48" text-anchor="middle">m'bike</text>
+<text class="sv-sub" x="469" y="48" text-anchor="middle">bus</text>
+<text class="sv-sub" x="523" y="48" text-anchor="middle">train</text>
+<text class="sv-sub" x="577" y="48" text-anchor="middle">light rail</text>
+<text class="sv-sub" x="631" y="48" text-anchor="middle">ferry</text>
+<text class="sv-sub" x="690" y="48" text-anchor="middle">inside</text>
+<text class="sv-lab-b" x="12" y="77">9 Sep</text><text class="sv-sub" x="70" y="77">F32</text>
+<rect x="120" y="61" width="50" height="24" rx="3" fill="var(--surface)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="145" y="77" text-anchor="middle" style="fill:var(--ink-soft)">+11%</text>
+<rect x="174" y="61" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="199" y="77" text-anchor="middle" style="fill:var(--flag)">-41%</text>
+<rect x="228" y="61" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="253" y="77" text-anchor="middle" style="fill:var(--flag)">-26%</text>
+<rect x="282" y="61" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="307" y="77" text-anchor="middle" style="fill:var(--flag)">+202%</text>
+<rect x="336" y="61" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="361" y="77" text-anchor="middle" style="fill:var(--flag)">+113%</text>
+<rect x="390" y="61" width="50" height="24" rx="3" fill="var(--surface)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="415" y="77" text-anchor="middle" style="fill:var(--ink-soft)">+12%</text>
+<rect x="444" y="61" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="469" y="77" text-anchor="middle" style="fill:var(--flag)">+45%</text>
+<rect x="498" y="61" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="523" y="77" text-anchor="middle" style="fill:var(--flag)">+221%</text>
+<rect x="552" y="61" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="577" y="77" text-anchor="middle" style="fill:var(--flag)">-59%</text>
+<rect x="606" y="61" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="631" y="77" text-anchor="middle" style="fill:var(--flag)">+40%</text>
+<text class="sv-lab-b" x="690" y="77" text-anchor="middle">0 / 12</text>
+<text class="sv-lab-b" x="12" y="107">12 Sep</text><text class="sv-sub" x="70" y="107">F35</text>
+<rect x="120" y="91" width="50" height="24" rx="3" fill="var(--accent-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="145" y="107" text-anchor="middle" style="fill:var(--accent)">+10%</text>
+<rect x="174" y="91" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="199" y="107" text-anchor="middle" style="fill:var(--flag)">-42%</text>
+<rect x="228" y="91" width="50" height="24" rx="3" fill="var(--surface)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="253" y="107" text-anchor="middle" style="fill:var(--ink-soft)">-12%</text>
+<rect x="282" y="91" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="307" y="107" text-anchor="middle" style="fill:var(--flag)">+131%</text>
+<rect x="336" y="91" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="361" y="107" text-anchor="middle" style="fill:var(--flag)">+202%</text>
+<rect x="390" y="91" width="50" height="24" rx="3" fill="var(--accent-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="415" y="107" text-anchor="middle" style="fill:var(--accent)">-6%</text>
+<rect x="444" y="91" width="50" height="24" rx="3" fill="var(--surface)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="469" y="107" text-anchor="middle" style="fill:var(--ink-soft)">-16%</text>
+<rect x="498" y="91" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="523" y="107" text-anchor="middle" style="fill:var(--flag)">+55%</text>
+<rect x="552" y="91" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="577" y="107" text-anchor="middle" style="fill:var(--flag)">-74%</text>
+<rect x="606" y="91" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="631" y="107" text-anchor="middle" style="fill:var(--flag)">+66%</text>
+<text class="sv-lab-b" x="690" y="107" text-anchor="middle">2 / 12</text>
+<text class="sv-lab-b" x="12" y="137">15 Sep</text><text class="sv-sub" x="70" y="137">F35</text>
+<rect x="120" y="121" width="50" height="24" rx="3" fill="var(--accent-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="145" y="137" text-anchor="middle" style="fill:var(--accent)">+9%</text>
+<rect x="174" y="121" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="199" y="137" text-anchor="middle" style="fill:var(--flag)">-41%</text>
+<rect x="228" y="121" width="50" height="24" rx="3" fill="var(--surface)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="253" y="137" text-anchor="middle" style="fill:var(--ink-soft)">-12%</text>
+<rect x="282" y="121" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="307" y="137" text-anchor="middle" style="fill:var(--flag)">+143%</text>
+<rect x="336" y="121" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="361" y="137" text-anchor="middle" style="fill:var(--flag)">+198%</text>
+<rect x="390" y="121" width="50" height="24" rx="3" fill="var(--accent-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="415" y="137" text-anchor="middle" style="fill:var(--accent)">-6%</text>
+<rect x="444" y="121" width="50" height="24" rx="3" fill="var(--surface)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="469" y="137" text-anchor="middle" style="fill:var(--ink-soft)">-12%</text>
+<rect x="498" y="121" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="523" y="137" text-anchor="middle" style="fill:var(--flag)">+60%</text>
+<rect x="552" y="121" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="577" y="137" text-anchor="middle" style="fill:var(--flag)">-71%</text>
+<rect x="606" y="121" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="631" y="137" text-anchor="middle" style="fill:var(--flag)">+45%</text>
+<text class="sv-lab-b" x="690" y="137" text-anchor="middle">2 / 12</text>
+<text class="sv-lab-b" x="12" y="167">16 Sep</text><text class="sv-sub" x="70" y="167">F35</text>
+<rect x="120" y="151" width="50" height="24" rx="3" fill="var(--accent-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="145" y="167" text-anchor="middle" style="fill:var(--accent)">+10%</text>
+<rect x="174" y="151" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="199" y="167" text-anchor="middle" style="fill:var(--flag)">-40%</text>
+<rect x="228" y="151" width="50" height="24" rx="3" fill="var(--surface)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="253" y="167" text-anchor="middle" style="fill:var(--ink-soft)">-12%</text>
+<rect x="282" y="151" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="307" y="167" text-anchor="middle" style="fill:var(--flag)">+133%</text>
+<rect x="336" y="151" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="361" y="167" text-anchor="middle" style="fill:var(--flag)">+188%</text>
+<rect x="390" y="151" width="50" height="24" rx="3" fill="var(--accent-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="415" y="167" text-anchor="middle" style="fill:var(--accent)">-5%</text>
+<rect x="444" y="151" width="50" height="24" rx="3" fill="var(--surface)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="469" y="167" text-anchor="middle" style="fill:var(--ink-soft)">-18%</text>
+<rect x="498" y="151" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="523" y="167" text-anchor="middle" style="fill:var(--flag)">+55%</text>
+<rect x="552" y="151" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="577" y="167" text-anchor="middle" style="fill:var(--flag)">-69%</text>
+<rect x="606" y="151" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="631" y="167" text-anchor="middle" style="fill:var(--flag)">+56%</text>
+<text class="sv-lab-b" x="690" y="167" text-anchor="middle">2 / 12</text>
+<text class="sv-lab-b" x="12" y="197">26 Sep</text><text class="sv-sub" x="70" y="197">F37</text>
+<rect x="120" y="181" width="50" height="24" rx="3" fill="var(--accent-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="145" y="197" text-anchor="middle" style="fill:var(--accent)">+4%</text>
+<rect x="174" y="181" width="50" height="24" rx="3" fill="var(--surface)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="199" y="197" text-anchor="middle" style="fill:var(--ink-soft)">-14%</text>
+<rect x="228" y="181" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="253" y="197" text-anchor="middle" style="fill:var(--flag)">-21%</text>
+<rect x="282" y="181" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="307" y="197" text-anchor="middle" style="fill:var(--flag)">+130%</text>
+<rect x="336" y="181" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="361" y="197" text-anchor="middle" style="fill:var(--flag)">+131%</text>
+<rect x="390" y="181" width="50" height="24" rx="3" fill="var(--accent-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="415" y="197" text-anchor="middle" style="fill:var(--accent)">-7%</text>
+<rect x="444" y="181" width="50" height="24" rx="3" fill="var(--surface)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="469" y="197" text-anchor="middle" style="fill:var(--ink-soft)">-11%</text>
+<rect x="498" y="181" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="523" y="197" text-anchor="middle" style="fill:var(--flag)">+188%</text>
+<rect x="552" y="181" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="577" y="197" text-anchor="middle" style="fill:var(--flag)">-58%</text>
+<rect x="606" y="181" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="631" y="197" text-anchor="middle" style="fill:var(--flag)">+119%</text>
+<text class="sv-lab-b" x="690" y="197" text-anchor="middle">2 / 12</text>
+<text class="sv-lab-b" x="12" y="227">29 Sep</text><text class="sv-sub" x="70" y="227">F38</text>
+<rect x="120" y="211" width="50" height="24" rx="3" fill="var(--accent-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="145" y="227" text-anchor="middle" style="fill:var(--accent)">+6%</text>
+<rect x="174" y="211" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="199" y="227" text-anchor="middle" style="fill:var(--flag)">-25%</text>
+<rect x="228" y="211" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="253" y="227" text-anchor="middle" style="fill:var(--flag)">-27%</text>
+<rect x="282" y="211" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="307" y="227" text-anchor="middle" style="fill:var(--flag)">+169%</text>
+<rect x="336" y="211" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="361" y="227" text-anchor="middle" style="fill:var(--flag)">+144%</text>
+<rect x="390" y="211" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="415" y="227" text-anchor="middle" style="fill:var(--flag)">+466%</text>
+<rect x="444" y="211" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="469" y="227" text-anchor="middle" style="fill:var(--flag)">-30%</text>
+<rect x="498" y="211" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="523" y="227" text-anchor="middle" style="fill:var(--flag)">+118%</text>
+<rect x="552" y="211" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="577" y="227" text-anchor="middle" style="fill:var(--flag)">-72%</text>
+<rect x="606" y="211" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="631" y="227" text-anchor="middle" style="fill:var(--flag)">+116%</text>
+<text class="sv-lab-b" x="690" y="227" text-anchor="middle">1 / 12</text>
+<text class="sv-lab-b" x="12" y="257">29 Sep</text><text class="sv-sub" x="70" y="257">F39</text>
+<rect x="120" y="241" width="50" height="24" rx="3" fill="var(--accent-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="145" y="257" text-anchor="middle" style="fill:var(--accent)">+8%</text>
+<rect x="174" y="241" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="199" y="257" text-anchor="middle" style="fill:var(--flag)">-25%</text>
+<rect x="228" y="241" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="253" y="257" text-anchor="middle" style="fill:var(--flag)">-25%</text>
+<rect x="282" y="241" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="307" y="257" text-anchor="middle" style="fill:var(--flag)">+161%</text>
+<rect x="336" y="241" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="361" y="257" text-anchor="middle" style="fill:var(--flag)">+149%</text>
+<rect x="390" y="241" width="50" height="24" rx="3" fill="var(--accent-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="415" y="257" text-anchor="middle" style="fill:var(--accent)">-4%</text>
+<rect x="444" y="241" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="469" y="257" text-anchor="middle" style="fill:var(--flag)">-31%</text>
+<rect x="498" y="241" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="523" y="257" text-anchor="middle" style="fill:var(--flag)">+119%</text>
+<rect x="552" y="241" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="577" y="257" text-anchor="middle" style="fill:var(--flag)">-74%</text>
+<rect x="606" y="241" width="50" height="24" rx="3" fill="var(--flag-wash)" stroke="var(--grid)" stroke-width="1"/><text class="sv-sub" x="631" y="257" text-anchor="middle" style="fill:var(--flag)">+95%</text>
+<text class="sv-lab-b" x="690" y="257" text-anchor="middle">2 / 12</text>
+<rect x="12" y="284" width="14" height="12" rx="2" fill="var(--accent-wash)" stroke="var(--grid)"/><text class="sv-sub" x="32" y="294">inside 10% (the goal)</text><rect x="170" y="284" width="14" height="12" rx="2" fill="var(--surface)" stroke="var(--grid)"/><text class="sv-sub" x="190" y="294">10 to 20%</text><rect x="280" y="284" width="14" height="12" rx="2" fill="var(--flag-wash)" stroke="var(--grid)"/><text class="sv-sub" x="300" y="294">20% or more: the run stops, or the cause is fixed</text>
+<text class="sv-flag" x="12" y="316">each row is a different model version, re-read today against today's targets</text>
+</svg>
+    </div>
+    <figcaption><b>FIG 7</b> - Every run that has reached its last round since 9 September, re-read today by the twin's own reporter. Families differ from row to row, so this is a history of versions, not a comparison. The 29 September F38 row shows a change that made motorbike far worse; the next version fixed it.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Running it</h2>
+  <p>Everything runs on one Windows workstation with 64 GB of memory: 16 threads for the simulation, a 48 GB Java heap for a quarter-sample run, and about 28 hours for 250 rounds. Before a full run, a four-round probe of about 45 minutes measures what the change costs, and the full run starts only with an approved, measured cost.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 720 250" role="img" aria-label="The 250 run directories on disk by how each ended: 139 short probes, 50 failed, 36 aborted, 12 full runs that reached their last iteration, 12 full runs stopped at a gate or ceiling, and 1 left without a record.">
+<defs><pattern id="p6rg" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/></pattern></defs>
+<rect x="0" y="0" width="720" height="250" fill="url(#p6rg)"/>
+<text class="sv-band" x="16" y="24">250 RUNS, BY HOW EACH ENDED</text>
+<text class="sv-lab" x="16" y="57">short probes that price a change</text><rect x="330" y="44" width="360.0" height="18" fill="var(--ink-soft)"/><text class="sv-sub" x="698.0" y="57" style="fill:var(--ink)">139</text>
+<text class="sv-lab" x="16" y="89">failed before finishing</text><rect x="330" y="76" width="129.5" height="18" fill="var(--flag)"/><text class="sv-sub" x="467.5" y="89" style="fill:var(--ink)">50</text>
+<text class="sv-lab" x="16" y="121">aborted, stopped by hand</text><rect x="330" y="108" width="93.2" height="18" fill="var(--flag)"/><text class="sv-sub" x="431.2" y="121" style="fill:var(--ink)">36</text>
+<text class="sv-lab" x="16" y="153">full runs that reached their last iteration</text><rect x="330" y="140" width="31.1" height="18" fill="var(--accent)"/><text class="sv-sub" x="369.1" y="153" style="fill:var(--ink)">12</text>
+<text class="sv-lab" x="16" y="185">full runs stopped at a gate or a ceiling</text><rect x="330" y="172" width="31.1" height="18" fill="var(--ink-soft)"/><text class="sv-sub" x="369.1" y="185" style="fill:var(--ink)">12</text>
+<text class="sv-lab" x="16" y="217">left without a record</text><rect x="330" y="204" width="2.6" height="18" fill="var(--flag)"/><text class="sv-sub" x="340.6" y="217" style="fill:var(--ink)">1</text>
+<text class="sv-flag" x="16" y="240">41% of the machine-hours spent on runs went to runs that died</text>
+</svg>
+    </div>
+    <figcaption><b>FIG 8</b> - Every run directory on disk, by how it ended. Most are probes; twelve full runs reached their last round.</figcaption>
+  </figure>
+
+  <p>The workstation was the least reliable part. Runs were killed by a forced Windows Update restart at round 237 of 250, by a disk controller crash, and by a shutdown from the Start menu. Each became a rule in the run launcher: it now refuses to start unless updates are paused past the run's expected end, it launches runs detached from any session, and it can resume a dead run from its last checkpoint.</p>
+</section>
+
+<section>
+  <h2>The record</h2>
+  <p>Every value a run can be sensitive to - 600 of them - is declared in a registry, with its units and where it came from. Values that are assumed or taken from the literature carry a range to sweep them over, or a stated rule for holding them fixed. A check counts any number a script decides for itself, and it stands at zero. Every decision is written into a dated record that is never rewritten, only added to.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 720 262" role="img" aria-label="Bar chart of the 600 declared input values by source. Assumed 223, definition 152, literature 87, derived 56, measured 43, observed 39. Observed, measured and derived total 138. Every assumed value carries a sweep range or a held-fixed rule.">
+      <rect x="0" y="0" width="720" height="262" fill="url(#p6g1)"/>
+      <text class="sv-band" x="16" y="26">600 DECLARED INPUT VALUES, BY SOURCE</text>
+
+      <text class="sv-lab" x="16" y="58">observed</text>
+      <rect x="140" y="46" width="77" height="16" fill="var(--accent)"/>
+      <text class="sv-sub" x="224" y="58" style="fill:var(--ink)">39</text>
+      <text class="sv-lab" x="16" y="86">measured</text>
+      <rect x="140" y="74" width="85" height="16" fill="var(--accent)"/>
+      <text class="sv-sub" x="232" y="86" style="fill:var(--ink)">43</text>
+      <text class="sv-lab" x="16" y="114">derived</text>
+      <rect x="140" y="102" width="110" height="16" fill="var(--accent)"/>
+      <text class="sv-sub" x="257" y="114" style="fill:var(--ink)">56</text>
+      <text class="sv-lab" x="16" y="142">literature</text>
+      <rect x="140" y="130" width="171" height="16" fill="var(--ink-soft)"/>
+      <text class="sv-sub" x="318" y="142" style="fill:var(--ink)">87</text>
+      <text class="sv-lab" x="16" y="170">definition</text>
+      <rect x="140" y="158" width="299" height="16" fill="var(--ink-soft)" opacity=".55"/>
+      <text class="sv-sub" x="446" y="170" style="fill:var(--ink)">152</text>
+      <text class="sv-lab" x="16" y="198">assumed</text>
+      <rect x="140" y="186" width="438" height="16" fill="var(--flag)"/>
+      <text class="sv-sub" x="585" y="198" style="fill:var(--ink)">223</text>
+
+      <text class="sv-sub" x="16" y="232">blue: from this city's own data &middot; grey: from published studies, or a definition such as a unit or a switch</text>
+      <text class="sv-flag" x="16" y="250">pink: assumed, and therefore swept over a stated range or held fixed with a stated reason</text>
+    </svg>
+    </div>
+    <figcaption><b>FIG 9</b> - The 600 declared input values by source. More than a third are still assumptions, each with a range. The registry is published as a <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/cities/newcastle/docs/reference/CONFIG_REFERENCE.md">reference</a>.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>What is still missing</h2>
+  <ul>
+    <li><strong>The walk to a parked car.</strong> The model charges nothing for it, so people drive 59% of trips under a kilometre.</li>
+    <li><strong>Public transport routes for everyone.</strong> Almost half of the attempts to plan a public transport journey find no route.</li>
+    <li><strong>Choices for people without a car.</strong> On a trip no driver is bound to and no transit serves, they have walking, cycling or a taxi, and they cycle and take taxis far more than real people do.</li>
+    <li><strong>The run-to-run band.</strong> How far readings of the same model spread across seeds is declared but not yet measured.</li>
+    <li><strong>The signal offsets</strong> that coordinate intersections, which were not released.</li>
+  </ul>
+  <p>The next post adds a second city on the same framework, and describes how both were built with AI coding agents.</p>
+</section>
+
+<div class="sources">
+  <h2>Sources &amp; anchors</h2>
+  <ol>
+    <li>Figures 2 to 5: drawn from run <code>20260929T072135_250it_25pct</code>'s network, timetables and plans, and from the synthetic population and weekday trips files &middot; figure 7: <code>report_mode_ridership.py</code> on each completed run &middot; figure 8: the run index &middot; map data &copy; OpenStreetMap contributors (ODbL)</li>
+    <li>Network, timetables and the one-mapping rule - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/network-and-inputs.md">network-and-inputs.md</a> &middot; footpaths - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/walk-and-bike.md">walk-and-bike.md</a> &middot; signals and crossings - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/signals-and-crossings.md">signals-and-crossings.md</a></li>
+    <li>Population and daily plans - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/population-and-demand.md">population-and-demand.md</a> &middot; choices and replanning - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/seed-and-choice-set.md">seed-and-choice-set.md</a> &middot; lifts - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/ride-and-pairing.md">ride-and-pairing.md</a> &middot; taxis - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/taxi-and-rideshare.md">taxi-and-rideshare.md</a></li>
+    <li>Targets, gates and families - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/public-transport-and-yardsticks.md">public-transport-and-yardsticks.md</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/monitoring-and-gates.md">monitoring-and-gates.md</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/sampling-and-families.md">sampling-and-families.md</a> &middot; running costs - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/positions/runs-and-economics.md">runs-and-economics.md</a></li>
+    <li>MATSim - <a href="https://www.matsim.org/">matsim.org</a> &middot; Horni, Nagel &amp; Axhausen (eds.), <em>The Multi-Agent Transport Simulation MATSim</em>, Ubiquity Press (2016) - <a href="https://doi.org/10.5334/baw">doi.org/10.5334/baw</a> &middot; pt2matsim - <a href="https://github.com/matsim-org/pt2matsim">github.com/matsim-org/pt2matsim</a></li>
+  </ol>
+</div>
+
+  </article>
+
+  <p class="colophon"><span>City digital twin &middot; Part 6 of the series &middot;</span>
+    <span>Back to <a class="t" data-ref="Part 5 &middot; The synthetic city"
+    data-tip="A working twin of Greater Newcastle: six hundred thousand synthetic residents travelling by twelve modes on the real roads and timetables, checked against the real city."
+    href="/digital-twins/part-5-a-synthetic-city-held-to-reality.html">the synthetic Newcastle</a></span>
+    <span>Next: <a class="t" data-ref="Part 7 &middot; Two cities"
+    data-tip="Mumbai on the same framework - 27 million synthetic residents, its trains from the printed timetables - and how AI coding agents built both cities."
+    href="/digital-twins/part-7-two-cities-one-framework.html">a second city</a></span></p>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+<div id="tip" role="tooltip"></div>
+
+<script>
+window.GLOSS = {
+  sa1:{t:"SA1",d:"Statistical Area Level 1 - the smallest area the Australian Bureau of Statistics publishes most census results for, typically 200 to 800 people."},
+  gtfs:{t:"GTFS",d:"General Transit Feed Specification - the standard open format for public transport timetables: stops, routes, trips and their times."},
+  scats:{t:"SCATS",d:"Sydney Coordinated Adaptive Traffic System - the adaptive signal control used across NSW. It measures how saturated each approach is and adjusts cycle lengths and green splits in response."},
+  matsim:{t:"MATSim",d:"Multi-Agent Transport Simulation - an open-source Java framework in which every synthetic person executes, scores and revises a daily plan over many rounds. Click to visit."}
+};
+</script>
+<script src="/assets/tip.js" defer></script>
+</body>
+</html>

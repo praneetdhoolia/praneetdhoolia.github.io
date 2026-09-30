@@ -49,7 +49,7 @@ the markdown originals are gone from the working tree but remain in git history.
   that are part of the content - e.g. the YouTube `<iframe>` demo in
   `universal-assistant-langgraph-mcp.html`, which predates this rule and is the author's own
   material. A third, declared by the author in October 2026: the hosted proposal at
-  `digital-twins/the-city-twice/` (Part 7) is a live 3D map. Its code and fonts are copied into
+  `digital-twins/the-city-twice/` (Part 8) is a live 3D map. Its code and fonts are copied into
   its own `vendor/` folder, unchanged and with their licences (MapLibre GL 5.24.0, pmtiles 3.2.1,
   deck.gl 9.1.14, Instrument Serif and Inter); only its map tiles - Esri imagery, Mapzen terrain,
   the OpenFreeMap basemap and Overture buildings - stream from their providers. It is the
@@ -205,8 +205,8 @@ sources and colophon added. `python .github/scripts/check_posts.py` (also CI,
 | `index.html` | Landing page: reverse-chron list of all writing, one summary per entry. |
 | `about/index.html` | The `/about/` page. |
 | `retrieval-agent/` | Series: `index.html` landing page + `part-1…5-*.html`. |
-| `digital-twins/` | Series: `index.html` landing page + `part-<n>-*.html` (Parts 1&ndash;7). |
-| `digital-twins/the-city-twice/` | The proposal Part 7 is about, hosted as sent: `index.html`, its `data/*.js` (the Newcastle trails come from the twin run `20260929T012258_250it_25pct`), and `vendor/` (third-party code and fonts with their licences). Part 7's figures are redrawn from these data files, and its three slide GIFs (`media/dt7-slide-*.gif`) are recordings of the page playing. |
+| `digital-twins/` | Series: `index.html` landing page + `part-<n>-*.html` (Parts 1&ndash;8). |
+| `digital-twins/the-city-twice/` | The proposal Part 8 is about, hosted as sent: `index.html`, its `data/*.js` (the Newcastle trails come from the twin run `20260929T012258_250it_25pct`), and `vendor/` (third-party code and fonts with their licences). Part 8's figures are redrawn from these data files, and its three slide GIFs (`media/dt8-slide-*.gif`) are recordings of the page playing. |
 | `software-engineering-agent-langgraph.html`, `universal-assistant-langgraph-mcp.html` | Standalone posts. |
 | `assets/tip.js` | The shared glossary / source / cross-reference tooltip engine. |
 | `assets/site.css` | The single shared stylesheet (light + dark, system fonts, responsive). Includes the **essay-artifact layer** - `figure`/`figcaption`, `.fig-scroll`, the `.sv-*` SVG text classes, `.callout` (and `.callout.flag`), `.sources`, `.colophon`, `.eyebrow.ruled`, and the `.t` / `#tip` glossary tooltip - so a post that argues with diagrams needs no bespoke CSS. |
