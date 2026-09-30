@@ -82,10 +82,9 @@ def check_post(page: Path) -> list[str]:
     need(article is not None, "has no article.post-body")
     if article:
         a = article.group(1)
-        numbers = re.findall(r'<span class="no">(?:&sect;|§)(\d+)</span>', a)
-        need(len(numbers) > 0, "has no numbered sections")
-        need(numbers == [str(i) for i in range(1, len(numbers) + 1)],
-             f"section numbers run {numbers}, not 1..{len(numbers)}")
+        need(re.search(r"<section>\s*<h2>", a) is not None, "has no <section> opening with an <h2>")
+        need("&sect;" not in a and "§" not in a,
+             "uses a section sign; headings are plain words and prose names a section by what it holds")
         need('<div class="sources">' in a, "has no sources block")
 
         figs = re.findall(r"<figcaption><b>FIG (\d+)</b>", a)

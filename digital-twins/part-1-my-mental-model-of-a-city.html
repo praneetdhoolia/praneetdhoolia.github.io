@@ -33,7 +33,7 @@
   <article class="post-body">
 
 <section>
-  <h2><span class="no">§1</span>The model I started with</h2>
+  <h2>The model I started with</h2>
   <p>Here is the model, as I first wrote it down. A city is its people, its culture, its institutions, its businesses, its infrastructure, and its governance. All of these sit on a geographic structure. Every person, shop, hospital, and land parcel has a place.</p>
   <p>Between these entities run <strong>flows</strong>. The transport flow moves people from residences to workplaces, schools, hospitals, markets, and airports. It has weekday rhythms, weekend patterns, and event surges. The fiscal flow moves money. People earn and spend. Businesses and institutions earn and spend. Everyone pays taxes. Governments collect that money and plan projects that put it back into maintenance and improvement. Goods, water, energy, and information flow through the same structure.</p>
   <p>And the city watches itself. It puts out a wide variety of "sensors" - I use the word in a broad sense. Traffic cameras give a sense of road load. Tap-on and tap-off readers on public transport are payment devices, but they also count every journey by mode, exactly. Every income, expense, and tax return is lodged digitally. Every land purchase, sale, and plan is recorded. Governments publish budgets. Schools record attendance. Hospitals report aggregate patient counts. Roughly twice a decade, the census surveys everyone at once.</p>
@@ -77,13 +77,13 @@
 </section>
 
 <section>
-  <h2><span class="no">§2</span>The full twin I was aiming for</h2>
+  <h2>The full twin I was aiming for</h2>
   <p>Follow the model to its natural ambition. Put the entities, the flows, and the sensor streams into one system. Then every plan a council proposes - reactive, proactive, or strategic - could be tested before it is built. Simulate the flows under realistic loads. Add what we know about behaviour. Estimate the value of the plan in the model, not in the city.</p>
   <p>And follow the ambition to its limit. With enough instrumentation, the model's state tracks the city's state, closely and in near real time. Every person, car, bus, and dollar has a live counterpart. A forecast run on that model approximates what the real city will do. Call it the <strong>full city digital twin</strong>. That was the destination I had in mind when I started.</p>
 </section>
 
 <section>
-  <h2><span class="fix">CORRECTION 1</span><span class="no">§3</span>The city senses itself unevenly</h2>
+  <h2><span class="fix">CORRECTION 1</span>The city senses itself unevenly</h2>
   <p>The first crack in my assumptions appeared as soon as I catalogued real Australian data sources. The sensors do not report at the same speed - not even close. A transit vehicle-position feed updates <a href="https://translink.com.au/about-translink/open-data/gtfs-rt" data-src="TransLink open data - GTFS-realtime feeds">every 15 to 30 seconds</a>. The electricity market publishes <a href="https://www.aemo.com.au/energy-systems/electricity/national-electricity-market-nem/data-nem" data-src="AEMO - National Electricity Market data">demand every five minutes</a>. Land valuations arrive <a href="https://www.data.qld.gov.au/dataset/historical-trends-in-land-valuations" data-src="Queensland Government - historical land valuation trends">once a year</a>. Council budgets arrive <a href="https://www.brisbane.qld.gov.au/about-council/governance-and-strategy/annual-plan-and-budget/2025-26-brisbane-budget" data-src="Brisbane City Council - Annual Plan and Budget">once a year, as PDF documents</a>. National taxation statistics lag by <a href="https://www.ato.gov.au/about-ato/research-and-statistics/in-detail/taxation-statistics/taxation-statistics-2022-23" data-src="Australian Taxation Office - taxation statistics">about two years</a>. The census runs every five years, and its first results take <a href="https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis" data-src="Australian Bureau of Statistics - data services and release timing">ten months to appear</a>.</p>
 
   <figure>
@@ -145,27 +145,27 @@
 </section>
 
 <section>
-  <h2><span class="fix">CORRECTION 2</span><span class="no">§4</span>The sensors are not the city</h2>
+  <h2><span class="fix">CORRECTION 2</span>The sensors are not the city</h2>
   <p>My initial mental model equated observation with state. List enough sensors, and their union is the city. It is not. Tap-on and tap-off counts do not account for fare evasion. Tax data cannot account for the cash economy. Cameras may not cover all the corners. Every sensor was purpose-installed, and it only addresses that purpose.</p>
   <p>I realised that there was no sensor or flow for culture, trust, social networks, unpaid care work, or political mood. However, these are load-bearing for whether a policy succeeds.</p>
   <p>The discipline I adopted from this: the model holds the <span class="t" data-k="state">state</span>, and the sensors hold an <span class="t" data-k="obsfn">observed shadow</span> of it. The gap between the two must stay visible in every result. There is also a practical edge to this correction. "The city senses itself" does not mean <em>I</em> can sense the city. Individual tax, tap, and health records are observed by the state and rightly withheld from everyone else. A twin built outside government gets aggregates, and must synthesise the rest - openly.</p>
 </section>
 
 <section>
-  <h2><span class="fix">CORRECTION 3</span><span class="no">§5</span>People are not particles</h2>
+  <h2><span class="fix">CORRECTION 3</span>People are not particles</h2>
   <p>My initial mental model treated people the way physics treats particles. But people react to the policy being tested. Widen a road, and new trips appear to fill it. The effect is so consistent that economists call it the <a class="t" data-k="induced" href="https://doi.org/10.1257/aer.101.6.2616">fundamental law of road congestion</a>. Announce a rail line, and land prices move before the first train runs.</p>
   <p>Economics has a name for the general trap. The <a class="t" data-k="lucas" href="https://en.wikipedia.org/wiki/Lucas_critique">Lucas critique</a> says that behaviour estimated under the old rules does not survive a change in the rules, because people re-optimise. Its cousin, <a class="t" data-k="goodhart" href="https://en.wikipedia.org/wiki/Goodhart%27s_law">Goodhart's law</a>, warns that when a measure becomes a target, it stops being a good measure. Both apply to twins directly. A model calibrated on yesterday's trips cannot simply replay them under tomorrow's policy.</p>
   <p>The correction: a useful twin must model <strong>choice</strong>, not only flow. Give the simulated people options - mode, route, departure time - and let the policy change what those options cost. That is precisely what agent-based transport models do.</p>
 </section>
 
 <section>
-  <h2><span class="fix">CORRECTION 4</span><span class="no">§6</span>One run is not the answer</h2>
+  <h2><span class="fix">CORRECTION 4</span>One run is not the answer</h2>
   <p>I initially thought in deterministic terms: given a starting state, I can simulate, estimate, and prove a final state. Real simulations do not subscribe to that notion. The same city, under the same policy, produces a spread of outcomes.</p>
   <p>So one simulation run is not the answer. It is a single draw from a distribution. I must think in terms of ensembles: many runs across random <span class="t" data-k="seed">seeds</span>, swept across the parameters I could not measure. Report the spread. Where a conclusion depends on an unmeasured parameter, report the curve and not a single number. My refined mental model gives every quantity a distribution. It treats a lone precise number as a warning sign, not a comfort.</p>
 </section>
 
 <section>
-  <h2><span class="fix">CORRECTION 5</span><span class="no">§7</span>Governance is the controller, not just another entity</h2>
+  <h2><span class="fix">CORRECTION 5</span>Governance is the controller, not just another entity</h2>
   <p>I initially thought of governance as yet another entity among many, next to businesses and institutions. That was an error. Governance owns most of the sensor list - the tax ledger, the land registry, the census. And it acts on what it senses, through budgets, projects, and rules. In control-engineering terms, governance is the <span class="t" data-k="controller">feedback controller</span> of the system. The city is a closed loop: sense, decide, act, change, sense again.</p>
 
   <figure>
@@ -215,7 +215,7 @@
 </section>
 
 <section>
-  <h2><span class="fix">CORRECTION 6</span><span class="no">§8</span>Compare, not forecast</h2>
+  <h2><span class="fix">CORRECTION 6</span>Compare, not forecast</h2>
   <p>Even with enough sensors, a forecast cannot approximate reality for long. <a class="t" data-k="nwp" href="https://en.wikipedia.org/wiki/Numerical_weather_prediction">Numerical weather prediction</a> has near-perfect physics, planetary-scale sensing, and decades of relentless improvement. It can predict accurately for about ten useful days. Beyond that, <span class="t" data-k="chaos">sensitive dependence</span> takes over: tiny errors in the initial state grow until the forecast is unreliable.</p>
   <p>A city is a much harder case than weather. It has chaotic dynamics and agents who re-optimise and a controller inside the loop. More sensors may shrink the initial error. They do not control its growth. So the full twin fails as a forecast machine even in the limit.</p>
   <p>Here is what works. Run scenario A and scenario B on the same model, with identical assumptions, identical demand, and identical seeds. The shared errors largely cancel. The <em>difference</em> between A and B is far more trustworthy than the final state of either. A twin earns its keep on comparisons - this versus that - not on predictions.</p>
@@ -227,7 +227,7 @@
 </section>
 
 <section>
-  <h2><span class="no">§9</span>My mental model now</h2>
+  <h2>My mental model now</h2>
   <p>In my refined mental model, I keep the initial skeleton. It is still a state-space model: state, dynamics, observation. I now understand that the state is partly unobserved, and the unobserved part stays labelled. The observation function is a shadow at mixed cadences, not a mirror. The dynamics contain choosing agents, not particles. Every quantity carries a distribution. Governance sits outside the bands, as the controller of the loop. And the output that matters is a comparison, not a prophecy.</p>
 
   <figure>

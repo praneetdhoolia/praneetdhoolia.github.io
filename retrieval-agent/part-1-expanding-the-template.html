@@ -35,7 +35,7 @@
   <article class="post-body">
 
 <section>
-  <h2><span class="no">&sect;1</span>Motivation</h2>
+  <h2>Motivation</h2>
   <p>As a developer I want to get a feel of what it is like to create an AI solution using langgraph for a well known usecase of QA based on website content.
   I want to explore the following:</p>
   <ol>
@@ -57,7 +57,7 @@
 </section>
 
 <section>
-  <h2><span class="no">&sect;2</span>Create a new project using langGraph's retrieval agent template</h2>
+  <h2>Create a new project using langGraph's retrieval agent template</h2>
   <p>Install the LangGraph CLI</p>
   <pre><code class="language-bash">pip install langgraph-cli --upgrade
 </code></pre>
@@ -71,7 +71,7 @@
 </section>
 
 <section>
-  <h2><span class="no">&sect;3</span>Enhance the configurations</h2>
+  <h2>Enhance the configurations</h2>
   <p>Add <strong>starter_urls</strong>, and <strong>hops</strong> to <code>IndexConfiguration</code> in <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/src/retrieval_graph/configuration.py"><code>configuration.py</code></a>. Let's also add a method to get the list of urls from the comma-separated <code>starter_urls</code> string.</p>
   <pre><code class="language-python">    starter_urls: str = field(
         default=&quot;https://zohlar.com&quot;,
@@ -109,7 +109,7 @@
 </section>
 
 <section>
-  <h2><span class="no">&sect;4</span>Enhance to add Milvus (lite) retriever</h2>
+  <h2>Enhance to add Milvus (lite) retriever</h2>
   <h3>Dependencies</h3>
   <p>Let's begin by adding <code>langchain-milvus</code> as a dependency in <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/pyproject.toml"><code>pyproject.toml</code></a></p>
   <h3>Retriever</h3>
@@ -164,7 +164,7 @@ MILVUS_DB=milvus.db
 </section>
 
 <section>
-  <h2><span class="no">&sect;5</span>Enhance index_graph</h2>
+  <h2>Enhance index_graph</h2>
   <p>Out of the box implementation of <code>index_graph</code> (in <a href="https://github.com/praneetdhoolia/retrieval-agent-template/blob/main/src/retrieval_graph/index_graph.py">index_graph.py</a>) expects as input all the documents to be indexed. Since we are enhancing the graph to include an ingestion pipeline that crawls starting at the specified URL, we'll modify the <code>index_docs</code> node to kick start the crawl if docs list in the state is empty and <code>starter_urls</code> configuration has been provided.</p>
   <pre><code class="language-python">async def index_docs(
     state: IndexState, *, config: Optional[RunnableConfig] = None

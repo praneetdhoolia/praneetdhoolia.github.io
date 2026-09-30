@@ -35,7 +35,7 @@
   <article class="post-body">
 
 <section>
-  <h2><span class="no">&sect;1</span>Creating indexes from pre-crawled sites</h2>
+  <h2>Creating indexes from pre-crawled sites</h2>
   <p>Depending on the size of a site, crawling may be a long running process. In such cases our indexing process may timeout. We may want to run crawling actors independently (i.e., outside of our Index Graph)
   To accommodate such cases, I added a new indexing configuration <code>apify_dataset_id</code> which may be used to directly load a pre-crawled dataset. <span class="t" data-k="apify">Apify</span> stores the outcome of a crawl, and allows loading the dataset directly to a <code>langchain.core.Document</code> loader.</p>
   <p>Apify dataset storage</p>
@@ -100,7 +100,7 @@ async def index_docs(
 </section>
 
 <section>
-  <h2><span class="no">&sect;2</span>Splitting documents for fine-grained retrieval</h2>
+  <h2>Splitting documents for fine-grained retrieval</h2>
   <p>So far I directly embedded a crawled document. Crawled documents may be arbitrarily large.</p>
   <ol>
   <li>This puts an uncertainity on how many <span class="t" data-k="topk"><code>top_k</code></span> retrieval results I should consider for response generation. In fact, for one site the documents were so large that only 3 of them crossed the token limit allowed on the generation node.</li>
@@ -144,7 +144,7 @@ def make_milvus_retriever(
 </section>
 
 <section>
-  <h2><span class="no">&sect;3</span>Rate limit errors while embedding</h2>
+  <h2>Rate limit errors while embedding</h2>
   <p>Emebedding Models put limits on the number of token per unit time. Initially, I embedded the whole set of crawled (or split) documents in a single call. For large sites, this ran into <span class="t" data-k="ratelimit">rate limit</span> errors. With the following enhancement I added a batch size configuration, split documents into multiple batches, and added a time delay to avoid rate limits.</p>
   <pre><code class="language-python"># src/retrieval_graph/configuration.py
 # ...
@@ -193,7 +193,7 @@ async def index_docs(
 </section>
 
 <section>
-  <h2><span class="no">&sect;4</span>Pre-created indexes (for ease of demo)</h2>
+  <h2>Pre-created indexes (for ease of demo)</h2>
   <p>While demonstrating the solution to clients, I noticed the following:</p>
   <ol>
   <li>Live crawling can take quite a while.</li>

@@ -111,8 +111,11 @@ sources and colophon added. `python .github/scripts/check_posts.py` (also CI,
    - `<p class="date"><time datetime="...">...</time> &middot; ~N min read &middot; Part N of M</p>`
      (`Part N of a series` while a series is open-ended; nothing after the read time for a
      standalone).
-4. **`article.post-body`** - content in `<section>`s, each opening
-   `<h2><span class="no">&sect;N</span>Heading</h2>`, numbered from 1; `h3`/`h4` inside.
+4. **`article.post-body`** - content in `<section>`s, each opening with a plain-word `<h2>`;
+   `h3`/`h4` inside. **No section numbers and no section sign** (the author's call, October
+   2026: a reader should not need a numbering scheme to follow a post). Prose that points at
+   another part of the post names it by what it holds ("the stack, above", "the results
+   below"), never by a number.
    - Every image is a `<figure>` holding an `<img>` with `width` and `height`, then
      `<figcaption><b>FIG N</b> - caption</figcaption>`; figures are numbered from 1. Diagrams are
      inline SVG using the `.sv-*` text classes, wide ones inside `<div class="fig-scroll">`.
