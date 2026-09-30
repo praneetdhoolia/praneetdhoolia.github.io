@@ -147,6 +147,71 @@ def check_index() -> list[str]:
     return bad
 
 
+def check_navigation() -> list[str]:
+    """Cross-references name their target by its eyebrow; series colophons link the landing, the previous part and
+    the next part in that order; index and landing links carry the target's exact title; read times fit the words."""
+    bad = []
+    info = {}
+    for page in posts():
+        doc = strip_scripts(page.read_text(encoding="utf-8"))
+        h1 = re.search(r"<h1>(.*?)</h1>", doc, flags=re.S)
+        eb = re.search(r'<p class="eyebrow ruled"><span>(.*?)</span>', doc, flags=re.S)
+        art = re.search(r'<article class="post-body">(.*)</article>', doc, flags=re.S)
+        words = len(text(re.sub(r"<svg\b.*?</svg>", " ", art.group(1), flags=re.S)).split()) if art else 0
+        info[site_path(page)] = dict(h1=text(h1.group(1)) if h1 else "", eyebrow=text(eb.group(1)) if eb else "",
+                                     words=words, figures=len(re.findall(r"<figure\b", doc)), doc=doc)
+    for landing in sorted(ROOT.glob("*/index.html")):
+        folder = landing.parent
+        parts = sorted(folder.glob("part-*.html"), key=lambda p: int(re.search(r"part-(\d+)", p.name).group(1)))
+        if parts:
+            info[f"/{folder.name}/"] = dict(h1="", eyebrow=f"{info[site_path(parts[0])]['eyebrow'].split(' · ')[0]} · {len(parts)} parts",
+                                            words=0, figures=0, doc="", landing=True)
+    for src, p in info.items():
+        if p.get("landing"):
+            continue
+        for m in re.finditer(r'<a class="t" data-ref="([^"]*)"\s*data-tip="([^"]*)"\s*href="([^"]*)"', p["doc"], flags=re.S):
+            ref, href = html.unescape(m.group(1)), m.group(3)
+            tgt = info.get(href)
+            if tgt is None:
+                if href.startswith("/") and not href.startswith("/docs/"):
+                    bad.append(f"{src[1:]}: cross-reference to {href}, which is not a post")
+                continue
+            eb = tgt["eyebrow"]
+            if " · " in eb:  # a series part: its eyebrow, with or without the series name in front
+                ok = ref in {eb, " · ".join(eb.split(" · ")[1:])}
+            else:  # a standalone: its category, then a descriptor of the post
+                ok = ref.startswith(f"{eb} · ") and len(ref) > len(eb) + 3
+            if not ok:
+                bad.append(f"{src[1:]}: cross-reference label '{ref}' should name the target by its eyebrow '{eb}' ({href})")
+    for landing in sorted(ROOT.glob("*/index.html")):
+        folder = landing.parent
+        parts = sorted(folder.glob("part-*.html"), key=lambda p: int(re.search(r"part-(\d+)", p.name).group(1)))
+        for i, part in enumerate(parts):
+            col = re.search(r'<p class="colophon">(.*?)</p>', info[site_path(part)]["doc"], flags=re.S)
+            hrefs = re.findall(r'href="([^"]*)"', col.group(1)) if col else []
+            want = [f"/{folder.name}/"] + ([site_path(parts[i - 1])] if i else []) + ([site_path(parts[i + 1])] if i + 1 < len(parts) else [])
+            if hrefs != want:
+                bad.append(f"{part.relative_to(ROOT).as_posix()}: colophon links {hrefs}, expected the landing, the previous part and the next part: {want}")
+            for m in re.finditer(r'href="(/[^"]+\.html)">(.*?)</a>', col.group(1) if col else "", flags=re.S):
+                tgt = info.get(m.group(1))
+                if tgt and text(m.group(2)) != tgt["h1"].split(":")[0].strip():
+                    bad.append(f"{part.relative_to(ROOT).as_posix()}: colophon names {m.group(1)} '{text(m.group(2))}', its title starts '{tgt['h1'].split(':')[0].strip()}'")
+    for src in [ROOT / "index.html", *ROOT.glob("*/index.html")]:
+        doc = src.read_text(encoding="utf-8")
+        for m in re.finditer(r'<a(?: class="part")? href="(/[^"]+\.html)">\s*(?:<p class="part-kicker">.*?</p>\s*<h2>(.*?)</h2>|(.*?)</a>)', doc, flags=re.S):
+            tgt = info.get(m.group(1))
+            shown = text(m.group(2) or m.group(3) or "")
+            if tgt and shown != tgt["h1"]:
+                bad.append(f"{src.relative_to(ROOT).as_posix()}: links {m.group(1)} as '{shown}', its title is '{tgt['h1']}'")
+    for src, p in info.items():
+        m = re.search(r"~(\d+) min read", p["doc"])
+        if m:
+            est = p["words"] / 220 + 0.5 * p["figures"]
+            if abs(int(m.group(1)) - est) > max(2, 0.3 * est):
+                bad.append(f"{src[1:]}: says ~{m.group(1)} min read; {p['words']} words and {p['figures']} figures read in about {est:.0f}")
+    return bad
+
+
 def check_em_dashes() -> list[str]:
     """Every served page, stylesheet and script (the conventions file quotes the rule itself).
 
@@ -168,6 +233,7 @@ def main() -> int:
         for why in check_post(page):
             problems.append(f"{page.relative_to(ROOT).as_posix()}: {why}")
     problems += check_index()
+    problems += check_navigation()
     problems += check_em_dashes()
     if problems:
         print("\n".join(problems))
