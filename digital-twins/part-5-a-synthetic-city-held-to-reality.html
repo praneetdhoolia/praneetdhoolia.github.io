@@ -36,7 +36,7 @@
   <h2>What I built</h2>
   <p><a class="t" data-ref="Part 4 &middot; Hands on with SUMO"
      data-tip="A scoped twin built by hand in SUMO: how long the Brisbane 2032 stadium precinct takes to clear after 63,000 people leave at once."
-     href="/digital-twins/part-4-brisbane-2032-egress-with-sumo.html">Previously</a> I built a twin by hand for one question: how long a stadium precinct takes to empty. It ended with a wish list - real demand instead of numbers I made up, real targets to check against, many runs instead of one, and a record of where every number came from. This is that wish list, built for a whole city.</p>
+     href="/digital-twins/part-4-brisbane-2032-egress-with-sumo.html">Previously</a> I built a twin by hand for one question: how long a stadium precinct takes to empty. It ended with a list of what it lacked: real demand instead of numbers I made up, real targets to check against, many runs instead of one, and a record of where every number came from. The Newcastle twin has each of these, for a whole city.</p>
 
   <figure>
     <picture>
@@ -80,20 +80,20 @@
     <figcaption><b>FIG 3</b> - Every timetabled service, drawn on the streets and tracks it was mapped to: 996 bus route patterns, 270 train patterns, the light rail and the Stockton ferry.</figcaption>
   </figure>
 
-  <p>The people are generated from the 2021 census, one census area (<span class="t" data-k="sa1">SA1</span>) at a time, so that added up they match what was published there: household sizes, cars per household, age and sex, work and study, income. Driver licences come from the transport department's published counts, and each person's day is shaped by the state's <span class="t" data-k="hts">travel survey</span>: about three and a half trips, to real buildings. What nobody is given is a mode. That is the one thing they choose.</p>
+  <p>The people are generated from the 2021 census, one census area (<span class="t" data-k="sa1">SA1</span>) at a time, so that added up they match what was published there: household sizes, cars per household, age and sex, work and study, income. Driver licences come from the transport department's published counts, and each person's day is shaped by the state's <span class="t" data-k="hts">travel survey</span>: about three and a half trips, to real buildings. What nobody is given is a mode. They choose it in the simulation.</p>
 
   <figure>
     <picture>
       <source srcset="/media/dt5-people.dark.png" media="(prefers-color-scheme: dark)">
       <img src="/media/dt5-people.light.png" alt="Hexagon density map of where the twin's synthetic residents live, densest in central Newcastle and its inner suburbs, with clusters at Maitland, Cessnock, Raymond Terrace, Port Stephens and around Lake Macquarie." width="1400" height="1000">
     </picture>
-    <figcaption><b>FIG 4</b> - Where the synthetic residents live, from one run's quarter-sample of them. It is the region's real settlement pattern, drawn by people who do not exist.</figcaption>
+    <figcaption><b>FIG 4</b> - Where the synthetic residents live, from one run's quarter-sample of them. The pattern follows the region's real settlement.</figcaption>
   </figure>
 </section>
 
 <section>
   <h2>A day in the twin</h2>
-  <p>The engine is <a class="t" data-k="matsim" href="https://www.matsim.org/">MATSim</a>. Every synthetic person carries a plan for the day and tries it on the network, where the plans meet in queues. Each plan is scored - time at work or at home is good, time stuck in traffic or waiting at a stop is bad, fares and parking cost money - and between rounds some people try something else: another route, another time, another mode. After a couple of hundred rounds the city settles, and how many people drive, walk or ride the train is simply where it settled.</p>
+  <p>The engine is <a class="t" data-k="matsim" href="https://www.matsim.org/">MATSim</a>. Every synthetic person carries a plan for the day and tries it on the network, where the plans meet in queues. Each plan is scored - time at work or at home is good, time stuck in traffic or waiting at a stop is bad, fares and parking cost money - and between rounds some people try something else: another route, another time, another mode. After a couple of hundred rounds the choices stop changing much, and the mode shares are read from that state.</p>
 
   <figure>
     <div class="fig-scroll">
@@ -150,7 +150,7 @@
     <figcaption><b>FIG 6</b> - A simulated weekday in Greater Newcastle: every trip by every simulated traveller, residents, visitors, through traffic and trucks, by the time it starts, scaled up from the quarter sample the run simulates.</figcaption>
   </figure>
 
-  <p>The twin's viewer is where it comes alive. It opens any run, finished or still going, and draws the whole region: each street by how delayed it was, each rail, light rail and ferry line from the run's own timetable, and beside the map the twelve modes against their real targets.</p>
+  <p>The twin has its own viewer. It opens any run, finished or still going, and draws the whole region: each street by how delayed it was, each rail, light rail and ferry line from the run's own timetable, and beside the map the twelve modes against their real targets.</p>
 
   <figure>
     <img src="/media/dt5-viewer-orbit.gif" alt="Animated view in the twin's 3D viewer, turning slowly over central Newcastle, the harbour and Stockton, with streets coloured by simulated delay and rail lines in purple." width="640" height="360">
@@ -208,17 +208,17 @@
     <figcaption><b>FIG 9</b> - The honest scoreboard: 2 of 12 modes inside 10% of the real figure. Data: the run's own twelve-mode reading, published on the twin's <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/STATUS.md">status board</a>.</figcaption>
   </figure>
 
-  <p>Two of twelve is not a finished twin, and I would rather show that than tune it into looking like one. Every mode has a knob that could be turned until it matches; turning them would make the chart green and teach the model nothing. The misses point at things the city does that the twin does not yet: people drive most trips under a kilometre, because the walk to a parked car costs them nothing yet; almost half of the attempts to plan a public transport journey find no route; and people without a car, with no lift and no bus, fall back on cycling and taxis far more than real people do. The light rail, the question the project started from, is still the furthest off.</p>
+  <p>Two of twelve modes are within 10% so far. Each mode has a constant that could be adjusted until it matches its target, but that would hide the missing behaviour rather than fix it, so the constants are left alone. The misses point at things the city does that the twin does not yet: people drive most trips under a kilometre, because the walk to a parked car costs them nothing yet; almost half of the attempts to plan a public transport journey find no route; and people without a car, with no lift and no bus, fall back on cycling and taxis far more than real people do. The light rail, the question the project started from, is still the furthest off.</p>
 </section>
 
 <section>
   <h2>What it rests on</h2>
-  <p>Every number the twin uses - six hundred of them, from walking speed to the price of parking - is written down with where it came from, and each one that is assumed carries a range to test it over. Every one of its 968 data files is listed with its source, its licence and the script that made it. When data was refused, it was derived instead: the transport department would not release its traffic signal plans, so the signals run the adaptive algorithm the signal system publishes. It is the record a precinct-sized twin can do without and a city-sized one cannot.</p>
+  <p>Every number the twin uses - six hundred of them, from walking speed to the price of parking - is written down with where it came from, and each one that is assumed carries a range to test it over. Every one of its 968 data files is listed with its source, its licence and the script that made it. When data was refused, it was derived instead: the transport department would not release its traffic signal plans, so the signals run the adaptive algorithm the signal system publishes.</p>
 </section>
 
 <section>
   <h2>What comes next</h2>
-  <p>The next steps are the missing behaviours the scoreboard points to, then the question the twin was built for: Newcastle with its light rail, and without it. Building all this took fifty days, and I did not write most of it by hand; how it was built, and why a second city took days rather than months, is the next post.</p>
+  <p>The next steps are the missing behaviours the scoreboard points to, then the question the twin was built for: Newcastle with its light rail, and without it. The next post covers the second city, Mumbai, and how both were built with AI coding agents.</p>
 </section>
 
 <div class="sources">

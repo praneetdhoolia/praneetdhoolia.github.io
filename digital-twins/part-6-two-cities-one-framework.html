@@ -43,7 +43,7 @@
       <source srcset="/media/dt6-viewer-3d.dark.jpg" media="(prefers-color-scheme: dark)">
       <img src="/media/dt6-viewer-3d.light.jpg" alt="The twin's 3D viewer over central Mumbai, from Mahim Bay across Dadar, Matunga and Wadala towards Kurla and the Bandra-Kurla Complex. The suburban railway lines run in purple through the middle of the city, the Rajiv Gandhi Sea Link crosses the bay, and the streets are coloured by simulated delay, heavily red." width="1440" height="900">
     </picture>
-    <figcaption><b>FIG 1</b> - Central Mumbai in the same viewer as Newcastle: the Western and Central Railway lines in purple through Dadar and Matunga, the Sea Link across Mahim Bay, and every street coloured by simulated delay. The red is real, and it is explained below.</figcaption>
+    <figcaption><b>FIG 1</b> - Central Mumbai in the same viewer as Newcastle: the Western and Central Railway lines in purple through Dadar and Matunga, the Sea Link across Mahim Bay, and every street coloured by simulated delay. Why it is mostly red is explained below.</figcaption>
   </figure>
 
   <p>The Mumbai twin covers the core of the Mumbai Metropolitan Region. Its 27,057,132 synthetic residents live in 6.1 million households, generated from the 2011 census and carried forward to 2026 with vehicle registrations and population projections. It runs on the same code as Newcastle: the same simulator, the same viewer, the same checks, the same scoreboard.</p>
@@ -60,7 +60,7 @@
     <figcaption><b>FIG 2</b> - Mumbai's network: 824,536 road links and 72,809 footpath and cycle links from OpenStreetMap, with gradients from a global elevation model.</figcaption>
   </figure>
 
-  <p>The railway is the heart of the city, and there was no open timetable feed for it. So the twin reads the Western and Central Railways' own printed timetables: 3,289 trains, against the 3,234 services the operators publish, each stopping where the sheet says it stops. The metro lines run at their published headways, the buses from a community-built feed and the regional operators' data, and seven commuter ferry crossings from the Maritime Board's directory. Trains, metro cars and boats carry the capacities their operators publish.</p>
+  <p>The suburban railway carries most of the city's longer trips, and it has no open timetable feed. So the twin reads the Western and Central Railways' own printed timetables: 3,289 trains, against the 3,234 services the operators publish, each stopping where the sheet says it stops. The metro lines run at their published headways, the buses from a community-built feed and the regional operators' data, and seven commuter ferry crossings from the Maritime Board's directory. Trains, metro cars and boats carry the capacities their operators publish.</p>
 
   <figure>
     <picture>
@@ -78,12 +78,12 @@
     <figcaption><b>FIG 4</b> - Where the synthetic residents live, from a 1% sample of them: the island city and the suburbs along the railway lines, then Thane and Navi Mumbai.</figcaption>
   </figure>
 
-  <p>Getting the data was its own project. Many Indian government websites refuse connections from an Australian address, so sources came through Internet Archive copies, a VPN endpoint in India, and - for data behind a login and a captcha - downloads from a browser, imported by script with a record of where each came from. Of 600 catalogued sources, 572 were acquired, each with a stated use in the model.</p>
+  <p>Many Indian government websites refuse connections from an Australian address, so sources came through Internet Archive copies, a VPN endpoint in India, and - for data behind a login and a captcha - downloads from a browser, imported by script with a record of where each came from. Of 600 catalogued sources, 572 were acquired, each with a stated use in the model.</p>
 </section>
 
 <section>
   <h2>Where Mumbai stands</h2>
-  <p>Mumbai has not produced a ridership reading yet, and the reason is visible.</p>
+  <p>Mumbai has not produced a ridership reading yet, for the reason this run shows.</p>
 
   <figure>
     <picture>
@@ -93,7 +93,7 @@
     <figcaption><b>FIG 5</b> - A finished 1% run of Mumbai: the whole region red. The viewer's own card says why - at a 1% sample every road holds so little that the city jams whatever the model does.</figcaption>
   </figure>
 
-  <p>A simulation that runs a fraction of the population also scales every road down by that fraction. At 1%, a typical Mumbai street can pass one vehicle every few minutes, and on a network whose median link is 65 metres long the city gridlocks no matter how much memory the machine has. The smallest sample that behaves is about 10%: 2.7 million agents and roughly 247 GB of working memory, several times what the workstation that built it has. The framework carried Mumbai all the way to a running simulation. The next step is a bigger machine.</p>
+  <p>A simulation that runs a fraction of the population also scales every road down by that fraction. At 1%, a typical Mumbai street can pass one vehicle every few minutes, and on a network whose median link is 65 metres long the city gridlocks no matter how much memory the machine has. The smallest sample that behaves is about 10%: 2.7 million agents and roughly 247 GB of working memory, several times what the workstation that built it has. The framework carried Mumbai all the way to a running simulation. It needs a larger machine to go further.</p>
 </section>
 
 <section>
@@ -147,7 +147,7 @@
 
 <section>
   <h2>Built with agents</h2>
-  <p>Both cities were built between 10 August and 30 September in 64 working sessions with <span class="t" data-k="agent">AI coding agents</span> - 709 commits, reviewed and steered by us, written mostly by them. The hard part of that is not the code. It is memory: every session starts knowing nothing about the one before.</p>
+  <p>Both cities were built between 10 August and 30 September in 64 working sessions with <span class="t" data-k="agent">AI coding agents</span> - 709 commits, reviewed and steered by us, written mostly by them. The main difficulty was continuity: each session starts with no memory of the one before.</p>
   <p><a class="t" data-ref="Agent design &middot; Software engineering agent"
      data-tip="An agent that onboards a repository the way a new engineer does - summarising every file, then every package - and uses that hierarchy like a table of contents."
      href="/software-engineering-agent-langgraph.html">Previously</a> I wrote an agent that onboards a repository the way a new engineer would, building itself a table of contents. This project turns that around: the repository is kept as the table of contents, so any session can read its way to the current state in about 600 lines.</p>
