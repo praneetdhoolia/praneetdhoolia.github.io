@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A twin built by agents: and why a second city took days - Praneet Dhoolia</title>
+<meta name="description" content="The Newcastle twin was built in 64 sessions with AI coding agents that remembered nothing between sessions. The repository became their memory, read like a table of contents, and every mistake climbed a ladder until a check refused it. The proof it transfers: Mumbai, on the same framework, in days.">
+<link rel="canonical" href="https://praneetdhoolia.github.io/digital-twins/part-6-a-twin-built-by-agents.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="home" href="/">Praneet Dhoolia</a>
+    <nav>
+      <a href="/">Writing</a>
+      <a href="/about/">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="post-header">
+    <p class="eyebrow ruled"><span><a href="/digital-twins/">City digital twin</a> &middot; Part 6 &middot; Built by agents</span></p>
+    <h1>A twin built by agents: <em>and why a second city took days</em></h1>
+    <p class="standfirst">The Newcastle twin was built in 64 working sessions with AI coding agents, and no session remembered the one before it. This post is the technology that made that work - the repository kept as the agents' memory and read like a table of contents, and a ladder that turns every mistake into a check - and the proof that it transfers: a second city, Mumbai, stood up on the same framework in days.</p>
+    <p class="date"><time datetime="2026-10">October 2026</time> &middot; ~13 min read &middot; Part 6 of a series</p>
+  </div>
+
+  <article class="post-body">
+
+<section>
+  <h2>Sixty-four new engineers</h2>
+  <p>Between 10 August and 30 September the twin took 709 commits, 94 pull requests and 64 sessions with <span class="t" data-k="agent">AI coding agents</span> - Claude Code, with the same skills later ported to OpenAI's Codex. What <a class="t" data-ref="Part 5 &middot; The synthetic city"
+     data-tip="A census-drawn population choosing its own trips on one MATSim engine, every input on a ledger, held to twelve real ridership figures."
+     href="/digital-twins/part-5-a-synthetic-city-held-to-reality.html">Part 5</a> described - a population, a network, a ledger, a scoreboard - was written by agents, reviewed and steered by me. The simulation is not the hard part of that arrangement. Memory is. Every session starts with none: whatever the last one understood, decided or half-finished is gone unless it was written down somewhere the next one will look.</p>
+  <p>I had met this problem from the other side. The <a class="t" data-ref="Agent design &middot; Software engineering agent"
+     data-tip="An agent that onboards a repository the way a new engineer does - summarising every file, then every package - and uses that hierarchy like a table of contents to resolve issues."
+     href="/software-engineering-agent-langgraph.html">software engineering agent</a> I wrote about last year onboarded a repository the way a new engineer would: summarise every file, then every package, and use the hierarchy like a table of contents. This project inverts that. Instead of the agent building a table of contents from a repository, the repository is kept as one, so that any agent with no memory can read its way to the current state in a fixed budget.</p>
+  <p>The first lesson arrived on day four. The context for picking the project up had been living in a prompt pasted into each new chat. On 14 August it moved into the repository, and the commit says why: "Previous sessions kept this in a prompt, which is how it drifted from the repo it describes."</p>
+</section>
+
+<section>
+  <h2>The repository is the memory</h2>
+  <p>A new session reads, in order, about 600 lines and no more:</p>
+  <ul>
+    <li><strong>The goal</strong> - one page saying what the twin is for and the ten hard requirements it answers to.</li>
+    <li><strong>The board</strong> - one page: the twelve-mode scoreboard, what runs, what is next. Most of it is generated from the run records, not written.</li>
+    <li><strong>The brief</strong> - facts that expire, each paired with the command that re-derives it, then the traps that have already cost a day each.</li>
+    <li><strong>One position page</strong> - the current truth on the topic the next task touches, at most 130 lines, every figure with its source.</li>
+    <li><strong>One section of the record</strong> - the dated, append-only record of every decision, found through its index. The record is over 18,000 lines. Nobody reads it whole.</li>
+  </ul>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 720 280" role="img" aria-label="A funnel of five layers read in order by a new session. The goal, one page. The board, one page, mostly generated. The brief, expiring facts with the command that re-derives each. One position page, at most 130 lines. One section of the record, found through its index, from a record over 18,000 lines that is never read whole.">
+      <defs>
+        <pattern id="g1" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="720" height="280" fill="url(#g1)"/>
+      <text class="sv-band" x="16" y="24">WHAT A SESSION WITH NO MEMORY READS, IN ORDER</text>
+
+      <rect x="60" y="40" width="600" height="38" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="76" y="64">1 &middot; THE GOAL</text>
+      <text class="sv-sub" x="644" y="64" text-anchor="end">one page &middot; what the twin is for</text>
+
+      <rect x="100" y="86" width="520" height="38" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="116" y="110">2 &middot; THE BOARD</text>
+      <text class="sv-sub" x="604" y="110" text-anchor="end">one page &middot; generated from run records</text>
+
+      <rect x="140" y="132" width="440" height="38" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="156" y="156">3 &middot; THE BRIEF</text>
+      <text class="sv-sub" x="564" y="156" text-anchor="end">expiring facts + the command for each</text>
+
+      <rect x="180" y="178" width="360" height="38" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
+      <text class="sv-lab-b" x="196" y="202">4 &middot; ONE POSITION PAGE</text>
+      <text class="sv-sub" x="524" y="202" text-anchor="end">&le; 130 lines</text>
+
+      <rect x="220" y="224" width="280" height="38" rx="5" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="236" y="248" style="fill:var(--flag)">5 &middot; ONE RECORD SECTION</text>
+      <text class="sv-sub" x="484" y="248" text-anchor="end">via its index</text>
+
+      <text class="sv-sub" x="704" y="274" text-anchor="end">about 600 lines in total; the 18,000-line record is never read whole</text>
+    </svg>
+    </div>
+    <figcaption><b>FIG 1</b> - The table of contents a session reads. Part of the software engineering agent's idea survives intact: consult the outline, open only the chapter that matters. What changed is who keeps the outline current.</figcaption>
+  </figure>
+
+  <p>The rule that holds this together is that <strong>a fact has one home</strong>. The number of runs, the count of registry fields, the current scoreboard: each lives in one artefact, and every document that states it is either generated from that artefact or pinned to it by a check that fails when they disagree. Prose is either a dated record that is never edited, or a current page that is rewritten in place. It is never appended to.</p>
+  <p>That rule was learned the hard way. By 30 August the record was 911 KB and out of order, the "one-page" board ran to 805 lines under a heading that said it was not a diary, the brief named five different families of runs as current, and orienting a new session took about forty minutes. The restructure that day produced the funnel above. The checks that keep it that way cap each page's size, require every figure to carry a source, and refuse to open a pull request while any document is out of step with its artefacts.</p>
+</section>
+
+<section>
+  <h2>Onboard, work, hand off</h2>
+  <p>Two <span class="t" data-k="skill">skills</span> bracket every session. <strong>Onboard</strong> reads the funnel, re-derives every expiring fact by command, runs the full gate, and reports the state in forty lines before touching anything. <strong>Handoff</strong> does the reverse: it rewrites the position pages the session touched, appends one section to the record, regenerates the board, rewrites the brief from its template, triages open issues on evidence, runs the gate, and lands everything as one pull request that it watches until it merges. Both follow a single written contract, created after the two skills' own copies of "what to check" had drifted apart.</p>
+  <p>The clearest evidence that the bracket matters came from the sessions that skipped it. Around 19 September, a run of work arrived with no handoff at all: twenty-two record sections and 131 uncommitted files. When the next session checked those changes against the Newcastle model, three of them were wrong. Nothing about the work itself was careless. It simply had not passed through the step whose job is to check it against everything else.</p>
+</section>
+
+<section>
+  <h2>A rule a session can skip is a wish</h2>
+  <p>That phrase is a comment in one of the project's hooks, and it is the whole method. A mistake is first written down as a trap in the brief, or as a note in the agent's memory. If it happens again, it becomes a step in a skill. If it happens again after that, it becomes a check in the gate, or a <span class="t" data-k="hook">hook</span> that refuses the action outright. Written advice is the bottom rung, not the top.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 720 270" role="img" aria-label="A ladder of five rungs from bottom to top: an incident, a note or brief trap, a skill step, a gate check, a hook or launcher refusal. Each rung is enforced more strongly than the one below. Example: shell heredocs corrupted files five times before a hook refused them.">
+      <defs>
+        <pattern id="g2" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/>
+        </pattern>
+        <marker id="m2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+        </marker>
+      </defs>
+      <rect x="0" y="0" width="720" height="270" fill="url(#g2)"/>
+
+      <rect x="16" y="214" width="190" height="40" rx="5" fill="var(--surface)" stroke="var(--ink-soft)" stroke-width="1.2"/>
+      <text class="sv-lab-b" x="30" y="238">an incident</text>
+      <rect x="146" y="166" width="190" height="40" rx="5" fill="var(--surface)" stroke="var(--ink-soft)" stroke-width="1.2"/>
+      <text class="sv-lab-b" x="160" y="190">a note or brief trap</text>
+      <rect x="276" y="118" width="190" height="40" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.3"/>
+      <text class="sv-lab-b" x="290" y="142">a skill step</text>
+      <rect x="406" y="70" width="190" height="40" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="420" y="94">a gate check</text>
+      <rect x="514" y="22" width="190" height="40" rx="5" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.5"/>
+      <text class="sv-lab-b" x="528" y="46" style="fill:var(--flag)">a hook or a refusal</text>
+
+      <path d="M110 212 C 120 200 130 194 144 188" fill="none" stroke="var(--accent)" stroke-width="1.3" marker-end="url(#m2)"/>
+      <path d="M240 164 C 250 152 260 146 274 140" fill="none" stroke="var(--accent)" stroke-width="1.3" marker-end="url(#m2)"/>
+      <path d="M370 116 C 380 104 390 98 404 92" fill="none" stroke="var(--accent)" stroke-width="1.3" marker-end="url(#m2)"/>
+      <path d="M500 68 C 506 58 510 52 512 46" fill="none" stroke="var(--accent)" stroke-width="1.3" marker-end="url(#m2)"/>
+
+      <text class="sv-sub" x="16" y="30">recurs?  climb a rung</text>
+      <text class="sv-sub" x="16" y="44">enforced &gt; advised</text>
+      <text class="sv-flag" x="704" y="262" text-anchor="end">heredocs: note, note, note, note, note, then a hook</text>
+    </svg>
+    </div>
+    <figcaption><b>FIG 2</b> - The promotion ladder. A trap is retired from the brief only when something below the agent's judgement enforces it.</figcaption>
+  </figure>
+
+  <table>
+    <thead><tr><th>What happened</th><th>What it cost</th><th>What now refuses it</th></tr></thead>
+    <tbody>
+      <tr><td>A study area typed into a script as a rectangle</td><td>87 of 1,500 census areas outside the road network for three phases</td><td>No coordinate may appear in code; the extent is derived from a boundary, and a check counts to zero</td></tr>
+      <tr><td>Shell heredocs mangled scripts in five separate sessions</td><td>Silently wrong files, one that stamped gradients on zero links</td><td>A hook refuses the heredoc before it runs</td></tr>
+      <tr><td>A forced Windows Update restart</td><td>A 28-hour run killed at iteration 237 of 250</td><td>The launcher refuses unless the user has paused updates past the run's ceiling</td></tr>
+      <tr><td>A run launched from inside an agent session</td><td>It died with the session, 13 hours in</td><td>Runs launch detached only; a dead run is recorded and can be resumed</td></tr>
+      <tr><td>A scoring class compiled but never exercised</td><td>An all-day bus charged a 900-minute penalty per boarding, caught by a short probe just before a day-long run</td><td>Every new mechanism gets a probe before a full run</td></tr>
+    </tbody>
+  </table>
+
+  <p>The ladder also has to resist being gamed, including by the agents. An early version of the rule "no run while an issue is open" only checked a label. A measured defect was then deliberately left unfiled, because filing it would have turned the launcher red. The gate's own documentation now says it plainly: "A gate that makes filing a defect costly is selecting against being told." It asks instead for the specific measurement the run will supply, and reports when that measurement is due.</p>
+</section>
+
+<section>
+  <h2>Where the human stays in the loop</h2>
+  <p>Agents do most of the work; three things stay with me, and each is structured so that it costs little attention.</p>
+  <ul>
+    <li><strong>Decisions are asked once.</strong> Every open decision lives in one ledger with its options, the recommended one first. A session puts it to me as clickable choices at the end of onboarding, records the answer, and never asks it again. This replaced a board where the same four decisions had sat for several sessions, re-recommended by six reports.</li>
+    <li><strong>Compute is approved at a stated price, and each approval is spent on use.</strong> A full run costs a day of the workstation, so none starts without my approval of its stated cost. The price comes from the project's own measured runs rather than an estimate, after one run priced at 260 seconds an iteration ran at 376.</li>
+    <li><strong>The project audits itself, on a schedule it cannot inflate.</strong> A project-report skill sends six agents, one per area and each with a research budget, to assess the whole repository and place it against comparable twins. Its recommendations go into a ledger - 84 so far, 58 taken, each tied to the commit that took it. Its eighth run found a flaw in its own cadence: nine reports in eight days had had 76 of 105 recommendations taken while the number of modes inside 10% had not moved. It now runs once per new reading, not once per session.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>The proof: a second city</h2>
+  <p>The test of whether all this is a framework or one city's scaffolding is whether a second city fits. That was prepared early. On 14 August the code had 338 file paths across 46 scripts that assumed Newcastle was the only city. They were moved behind a single module that knows where a city lives, and the rule became that the framework may not name a place. A city is now one folder that has to supply a described contract.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg viewBox="0 0 720 250" role="img" aria-label="On the left, the framework: the simulation code, the schema, the tests and the run command, which may not name any place. On the right, two city folders, Newcastle and Mumbai, each supplying a descriptor with a derived boundary, a registry of declared values, a hashed manifest, its own adapters and builders, and its own documents. A contract check between them refuses a city that is missing anything.">
+      <rect x="0" y="0" width="720" height="250" fill="url(#g1)"/>
+      <text class="sv-band" x="16" y="24">FRAMEWORK</text>
+      <text class="sv-band" x="440" y="24" style="fill:var(--flag)">CITIES</text>
+
+      <rect x="16" y="40" width="250" height="176" rx="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="30" y="64">simulation code &middot; schema</text>
+      <text class="sv-lab-b" x="30" y="82">tests &middot; the run command</text>
+      <text class="sv-sub" x="30" y="108">names no place, no coordinate,</text>
+      <text class="sv-sub" x="30" y="122">no extent</text>
+      <text class="sv-sub" x="30" y="148">a throwaway test city with a</text>
+      <text class="sv-sub" x="30" y="162">different projection, seed and</text>
+      <text class="sv-sub" x="30" y="176">modes must run it unchanged</text>
+      <text class="sv-sub" x="30" y="202">checked in CI on every change</text>
+
+      <rect x="290" y="96" width="126" height="64" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
+      <text class="sv-lab-b" x="302" y="120">the contract</text>
+      <text class="sv-sub" x="302" y="138">refuses a city</text>
+      <text class="sv-sub" x="302" y="151">missing anything</text>
+
+      <rect x="440" y="40" width="264" height="80" rx="5" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="454" y="62">cities/newcastle</text>
+      <text class="sv-sub" x="454" y="80">derived boundary &middot; 600 values</text>
+      <text class="sv-sub" x="454" y="94">968 hashed files &middot; adapters</text>
+      <text class="sv-sub" x="454" y="108">its own documents</text>
+
+      <rect x="440" y="136" width="264" height="80" rx="5" fill="var(--flag-wash)" stroke="var(--flag)" stroke-width="1.4"/>
+      <text class="sv-lab-b" x="454" y="158">cities/mumbai</text>
+      <text class="sv-sub" x="454" y="176">derived boundary &middot; 428 values</text>
+      <text class="sv-sub" x="454" y="190">1,459 hashed files &middot; adapters</text>
+      <text class="sv-sub" x="454" y="204">its own documents</text>
+
+      <line x1="266" y1="128" x2="290" y2="128" stroke="var(--ink-soft)" stroke-width="1.3"/>
+      <line x1="416" y1="120" x2="440" y2="84" stroke="var(--ink-soft)" stroke-width="1.3"/>
+      <line x1="416" y1="136" x2="440" y2="176" stroke="var(--ink-soft)" stroke-width="1.3"/>
+
+      <text class="sv-flag" x="16" y="242">differences between cities are declared switches, never a branch on a city's name</text>
+    </svg>
+    </div>
+    <figcaption><b>FIG 3</b> - What "a city" is to the framework. The throwaway test city exists only to prove the framework reads identically for a city it has never seen.</figcaption>
+  </figure>
+
+  <p>On 19 September the priority changed: a running, broad, all-mode simulator of Mumbai came before more precision in Newcastle. Within about four days the Mumbai metropolitan region had its own folder and its own pipeline:</p>
+  <ul>
+    <li><strong>27 million synthetic residents</strong> in 6 million households, drawn from the 2011 census and carried forward to 2026.</li>
+    <li><strong>A road network of 846,699 links</strong> from OpenStreetMap, with gradients from a global elevation model.</li>
+    <li><strong>Suburban trains from the printed timetables</strong> of the Western and Central Railways: 3,289 trains against the 3,234 the operators publish. The metro runs at its published headways, seven commuter ferry crossings run too, and the metro's daily ridership from the government's open-data portal became its target.</li>
+    <li><strong>572 of 600 catalogued sources acquired</strong>, each with a stated use, hashed into a 1,459-file manifest.</li>
+  </ul>
+  <p>Acquiring it was its own lesson. Many Indian government hosts refuse connections from an Australian address, so sources came through Internet Archive copies, a VPN endpoint in India, and, for data behind a captcha, downloads from my own logged-in browser that a script then imported with their provenance. The one approach the agents were not allowed to take was weakening TLS to get past a refusal.</p>
+  <p>Mumbai does not have a ridership reading yet, and the reason is instructive. MATSim scales every road's capacity with the sample, so at a 1% sample each link passes one vehicle every 200 seconds, and on a network whose median link is 65 metres the city gridlocks regardless of how much memory the machine has. The smallest honest sample is about 10%: 2.7 million agents and roughly 247 GB of working memory, several times what this workstation has. Mumbai runs through the same harness, checks and scoreboard as Newcastle, with its differences declared as switches rather than written as code. The machine is what it now waits on.</p>
+
+  <div class="callout">
+    <span class="k">What transfers</span>
+    <p>Treat every agent session as a new engineer with no memory, and keep the repository as the table of contents it reads, with a budget. Give every fact one home and generate the rest. Let mistakes climb from advice to enforcement, because a rule a session can skip is a wish. Keep the human on the decisions and the spending, asked once and priced from evidence. None of it is specific to transport - and the second city is the proof that none of it was specific to Newcastle either.</p>
+  </div>
+  <p>Mumbai is also where the next chapter came from. A twin that can stand up a city of 27 million people on one contract caught the attention of a department of the Indian government, and the proposal we prepared for it is the subject of the next post.</p>
+</section>
+
+<div class="sources">
+  <h2>Sources &amp; anchors</h2>
+  <ol>
+    <li>The session skills - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/.claude/skills/onboard/SKILL.md">onboard</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/.claude/skills/handoff/SKILL.md">handoff</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/.claude/skills/project-report/SKILL.md">project-report</a> &middot; the contract between them - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/HANDOVER_CONTRACT.md">HANDOVER_CONTRACT.md</a></li>
+    <li>The funnel a session reads - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/GOAL.md">GOAL.md</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/STATUS.md">STATUS.md</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/NEXT_AGENT_BRIEF.md">NEXT_AGENT_BRIEF.md</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/tree/main/docs/positions">positions/</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/DECISIONS.md">DECISIONS.md</a></li>
+    <li>Enforcement - the heredoc hook - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/.claude/hooks/block-stdin-trap.sh">block-stdin-trap.sh</a> &middot; the issue gate - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/src/run/issue_gate.py">issue_gate.py</a> &middot; the hardcoding ledger - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/src/registry/check_hardcoding.py">check_hardcoding.py</a></li>
+    <li>The human in the loop - the decision ledger - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/lane.json">lane.json</a> &middot; the recommendation ledger - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/docs/reports/recommendations.json">recommendations.json</a> &middot; the dated project reports - <a href="https://praneetdhoolia.github.io/city-digital-twin/">praneetdhoolia.github.io/city-digital-twin</a></li>
+    <li>The city contract - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/src/city.py">src/city.py</a> &middot; <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/config/schema/city.schema.json">city.schema.json</a> &middot; the throwaway-city test - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/tests/check_city_agnostic.py">check_city_agnostic.py</a></li>
+    <li>Mumbai - <a href="https://github.com/praneetdhoolia/city-digital-twin/blob/main/cities/mumbai/docs/README.md">cities/mumbai/docs/README.md</a></li>
+    <li>Claude Code - <a href="https://github.com/anthropics/claude-code">github.com/anthropics/claude-code</a></li>
+  </ol>
+</div>
+
+  </article>
+
+  <p class="colophon"><span>City digital twin &middot; Part 6 of the series &middot;</span>
+    <span>Back to <a class="t" data-ref="Part 5 &middot; The synthetic city"
+    data-tip="A census-drawn population choosing its own trips on one MATSim engine, every input on a ledger, held to twelve real ridership figures."
+    href="/digital-twins/part-5-a-synthetic-city-held-to-reality.html">the synthetic city</a></span>
+    <span>Next: <a class="t" data-ref="Part 7 &middot; The City, Twice"
+    data-tip="The proposal prepared for a department of the Indian government: what it shows, and how and why each part of it came to be."
+    href="/digital-twins/part-7-the-city-twice.html">the City, Twice</a></span></p>
+
+</main>
+
+<footer class="site-footer wrap">
+  <span>Praneet Dhoolia</span>
+  <span><a href="https://github.com/praneetdhoolia">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
+</footer>
+
+<div id="tip" role="tooltip"></div>
+
+<script>
+window.GLOSS = {
+  agent:{t:"AI coding agent",d:"A language model working inside a code repository through tools - reading files, running commands, editing and committing - rather than answering in a chat window."},
+  skill:{t:"Skill",d:"A packaged set of written instructions an AI coding agent loads for one kind of task, such as opening or closing a session, so that every session does it the same way."},
+  hook:{t:"Hook",d:"A small script the agent's harness runs before or after an action. It can refuse the action outright, so a rule enforced by a hook cannot be skipped by the agent."}
+};
+</script>
+<script src="/assets/tip.js" defer></script>
+</body>
+</html>

@@ -148,10 +148,13 @@ def check_index() -> list[str]:
 
 
 def check_em_dashes() -> list[str]:
-    """Every served page, stylesheet and script (the conventions file quotes the rule itself)."""
+    """Every served page, stylesheet and script (the conventions file quotes the rule itself).
+
+    A `vendor/` folder holds third-party code copied in unchanged (a hosted artefact's libraries);
+    it is not this site's writing, so it is not held to this site's typography."""
     bad = []
     for f in sorted(ROOT.rglob("*")):
-        if not f.is_file() or ".git" in f.parts or f.suffix not in {".html", ".css", ".js"}:
+        if not f.is_file() or ".git" in f.parts or "vendor" in f.parts or f.suffix not in {".html", ".css", ".js"}:
             continue
         s = f.read_text(encoding="utf-8", errors="replace")
         if EM_DASH in s or EM_DASH_ENTITY in s:
