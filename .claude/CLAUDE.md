@@ -219,5 +219,6 @@ sources and colophon added. `python .github/scripts/check_posts.py` (also CI,
 | `.githooks/commit-msg` | Strips any `claude.ai/code` session link from commit messages. |
 | `.github/workflows/strip-session-ref.yml` | Server-side scrub of a session link from a PR body. |
 | `.github/scripts/check_posts.py` | The post-anatomy check (standard library only): every post against the shell above, the index and series landings against the files on disk, and no em dash in any served file. Run before every commit. |
-| `.github/workflows/check-posts.yml` | Runs `check_posts.py` on every PR and every push to `main`. |
+| `.github/scripts/check_svg_text.py` | Lays every post out in a headless browser and fails any inline-SVG label that runs past its box or the diagram's edge (the author's rule, October 2026: no text clipping outside boxes). Needs Playwright; run it after drawing or editing a diagram. |
+| `.github/workflows/check-posts.yml` | Runs `check_posts.py` and `check_svg_text.py` on every PR and every push to `main`. |
 | `.gitattributes` | Pins LF endings for `*.sh` / `.githooks/*` so hooks stay runnable on Linux. |

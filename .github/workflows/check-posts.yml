@@ -19,3 +19,5 @@ jobs:
         with:
           python-version: "3.12"
       - run: python .github/scripts/check_posts.py
+      - run: pip install playwright && python -m playwright install --with-deps chromium
+      - run: python .github/scripts/check_svg_text.py
