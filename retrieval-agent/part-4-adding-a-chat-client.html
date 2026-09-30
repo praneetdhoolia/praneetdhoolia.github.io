@@ -24,63 +24,93 @@
 <main class="wrap">
 
   <div class="post-header">
-    <p class="eyebrow"><a href="/retrieval-agent/">Building a Retrieval Agent with LangGraph</a> &middot; Part 4 of 5</p>
-    <h1>Adding a Chat Client to a LangGraph Assistant</h1>
-    <p class="date"><time datetime="2025-01-08">January 8, 2025</time></p>
+    <p class="eyebrow ruled"><span><a href="/retrieval-agent/">Retrieval agent</a> &middot; Part 4 &middot; The chat client</span></p>
+    <h1>Adding a <em>Chat Client</em> to a LangGraph Assistant</h1>
+    <p class="standfirst">Point an assistant-ui chat client at the deployed graph: scaffold from the
+      LangGraph template, create an assistant in LangGraph Studio, and wire the two together with
+      three environment variables.</p>
+    <p class="date"><time datetime="2025-01-08">January 8, 2025</time> &middot; ~2 min read &middot; Part 4 of 5</p>
   </div>
 
   <article class="post-body">
-    <p><a class="t" data-ref="Part 3 &middot; Deploying to LangGraph Cloud"
-      data-tip="Taking the enhanced retrieval template from local runs to a deployed assistant on LangGraph Cloud."
-      href="/retrieval-agent/part-3-deploying-to-langgraph-cloud.html">Previously</a>, I deployed an enhanced retrieval template to langgraph cloud. Now, I want to point a chat client to it using <a href="https://www.assistant-ui.com/"><strong>assistant-ui</strong></a>.</p>
-    <p>The following are required before deploying the chat client:</p>
-    <ol>
-    <li>An existing <a href="https://nodejs.org/en/download">node.js installation</a>.</li>
-    <li>An active deployment on the <a href="https://langchain-ai.github.io/langgraph/cloud/quick_start/">LangGraph Cloud API Server</a>.
-    Assistant UI can be also be installed in an existing React Project, as covered in the <a href="https://www.assistant-ui.com/docs/runtimes/langgraph">assistant-ui langgraph cloud docs</a>.</li>
-    </ol>
-    <p>To create a new chat client, I'll follow these steps:</p>
-    <ol>
-    <li>
-    <p>Ensure <code>npx</code> is installed.</p>
-    <pre><code class="language-bash">npm install -g npx
+
+<section>
+  <h2>What you need first</h2>
+  <p><a class="t" data-ref="Part 3 &middot; Deployment"
+    data-tip="Taking the enhanced retrieval template from local runs to a deployed assistant on LangGraph Cloud."
+    href="/retrieval-agent/part-3-deploying-to-langgraph-cloud.html">Previously</a>, I deployed an enhanced retrieval template to langgraph cloud. Now, I want to point a chat client to it using <a class="t" data-k="assistantui" href="https://www.assistant-ui.com/"><strong>assistant-ui</strong></a>.</p>
+  <p>The following are required before deploying the chat client:</p>
+  <ol>
+  <li>An existing <a href="https://nodejs.org/en/download">node.js installation</a>.</li>
+  <li>An active deployment on the <a href="https://langchain-ai.github.io/langgraph/cloud/quick_start/">LangGraph Cloud API Server</a>.
+  Assistant UI can be also be installed in an existing React Project, as covered in the <a href="https://www.assistant-ui.com/docs/runtimes/langgraph">assistant-ui langgraph cloud docs</a>.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Creating the chat client</h2>
+  <p>To create a new chat client, I'll follow these steps:</p>
+  <ol>
+  <li>
+  <p>Ensure <span class="t" data-k="npx"><code>npx</code></span> is installed.</p>
+  <pre><code class="language-bash">npm install -g npx
 </code></pre>
-    </li>
-    <li>
-    <p>Create a new project based on the LangGraph assistant-ui template</p>
-    <pre><code class="language-bash">npx create-assistant-ui@latest -t langgraph my-app
+  </li>
+  <li>
+  <p>Create a new project based on the LangGraph assistant-ui template</p>
+  <pre><code class="language-bash">npx create-assistant-ui@latest -t langgraph my-app
 </code></pre>
-    </li>
-    <li>
-    <p>Create a new assistant for your graph on LangSmith using LangGraph Studio or the API Docs.</p>
-    <p><img src="/media/create-assistant.png" alt="Create a new assistant" /></p>
-    </li>
-    <li>
-    <p>Create an <code>.env.local</code> file in your project with the following variables:</p>
-    <pre><code class="language-bash">LANGCHAIN_API_KEY=your_api_key
+  </li>
+  <li>
+  <p>Create a new <span class="t" data-k="assistant">assistant</span> for your graph on LangSmith using LangGraph Studio or the API Docs.</p>
+  <figure>
+    <img src="/media/create-assistant.png" alt="Create a new assistant" width="1891" height="1227">
+    <figcaption><b>FIG 1</b> - Creating a new assistant for the graph in LangGraph Studio.</figcaption>
+  </figure>
+  </li>
+  <li>
+  <p>Create an <code>.env.local</code> file in your project with the following variables:</p>
+  <pre><code class="language-bash">LANGCHAIN_API_KEY=your_api_key
 LANGGRAPH_API_URL=your_api_url
 NEXT_PUBLIC_LANGGRAPH_ASSISTANT_ID=your_assistant_id
 </code></pre>
-    </li>
-    <li>
-    <p>Ensure the LangChain API Key is also present in your <a href="https://smith.langchain.com/settings/workspaces/apikeys">LangSmith API Keys</a> to allow access to your deployments.</p>
-    </li>
-    <li>
-    <p>Navigate to the <code>assistant-ui</code> project root folder and start the node.js server.</p>
-    <pre><code class="language-bash">npm run dev
+  </li>
+  <li>
+  <p>Ensure the LangChain API Key is also present in your <a href="https://smith.langchain.com/settings/workspaces/apikeys">LangSmith API Keys</a> to allow access to your deployments.</p>
+  </li>
+  <li>
+  <p>Navigate to the <code>assistant-ui</code> project root folder and start the node.js server.</p>
+  <pre><code class="language-bash">npm run dev
 </code></pre>
-    </li>
-    <li>
-    <p>You can now use the Chat Client using the server's port! (https://localhost:3000 in my case)</p>
-    <p><img src="/media/assistant-demo.gif" alt="Assistant Demo" /></p>
-    </li>
-    </ol>
+  </li>
+  <li>
+  <p>You can now use the Chat Client using the server's port! (https://localhost:3000 in my case)</p>
+  <figure>
+    <img src="/media/assistant-demo.gif" alt="Assistant Demo" width="1586" height="1248">
+    <figcaption><b>FIG 2</b> - The chat client answering from the deployed retrieval graph.</figcaption>
+  </figure>
+  </li>
+  </ol>
+</section>
+
+<div class="sources">
+  <h2>Code &amp; references</h2>
+  <ol>
+    <li>assistant-ui - <a href="https://www.assistant-ui.com/">assistant-ui.com</a> &middot; its LangGraph Cloud runtime docs - <a href="https://www.assistant-ui.com/docs/runtimes/langgraph">assistant-ui.com/docs/runtimes/langgraph</a></li>
+    <li>LangGraph Cloud quick start - <a href="https://langchain-ai.github.io/langgraph/cloud/quick_start/">langchain-ai.github.io</a> &middot; LangSmith API keys - <a href="https://smith.langchain.com/settings/workspaces/apikeys">smith.langchain.com</a></li>
+    <li>Node.js - <a href="https://nodejs.org/en/download">nodejs.org</a></li>
+  </ol>
+</div>
+
   </article>
 
-  <nav class="pager">
-    <a class="prev" href="/retrieval-agent/part-3-deploying-to-langgraph-cloud.html"><span class="dir">&larr; Part 3</span><span class="ttl">Deploying to LangGraph Cloud</span></a>
-    <a class="next" href="/retrieval-agent/part-5-improvements.html"><span class="dir">Part 5 &rarr;</span><span class="ttl">Improvements to the Retrieval Agent</span></a>
-  </nav>
+  <p class="colophon"><span>Retrieval agent &middot; Part 4 of the series &middot;</span>
+    <span>Back to <a class="t" data-ref="Part 3 &middot; Deployment"
+    data-tip="Import the repo from GitHub into LangGraph Cloud, add the environment, submit, and wait out the 15-minute deploy."
+    href="/retrieval-agent/part-3-deploying-to-langgraph-cloud.html">deploying to LangGraph Cloud</a></span>
+    <span>Next: <a class="t" data-ref="Part 5 &middot; What real use exposed"
+    data-tip="Four fixes real use forced: pre-crawled Apify datasets, finer splitting, embedding rate limits, and pre-created indexes."
+    href="/retrieval-agent/part-5-improvements.html">improvements to the retrieval agent</a></span></p>
 
 </main>
 
@@ -91,7 +121,14 @@ NEXT_PUBLIC_LANGGRAPH_ASSISTANT_ID=your_assistant_id
 </footer>
 
 <div id="tip" role="tooltip"></div>
-<script src="/assets/tip.js" defer></script>
 
+<script>
+window.GLOSS = {
+  assistantui:{t:"assistant-ui",d:"An open-source React library of chat components, with a runtime that talks to a LangGraph deployment. Click to visit."},
+  npx:{t:"npx",d:"The package runner that ships with npm. It runs a Node.js command-line tool, such as a project scaffolder, without installing it globally first."},
+  assistant:{t:"Assistant",d:"In LangGraph, a named, configured instance of a deployed graph. A client addresses it by its assistant ID."}
+};
+</script>
+<script src="/assets/tip.js" defer></script>
 </body>
 </html>

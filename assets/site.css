@@ -462,7 +462,7 @@ a.part .read {
 
 /* ---------- essay artifacts ----------
    Shared by posts that argue with diagrams: a standfirst under the title,
-   numbered sections, figures that scroll rather than overflow, callout
+   sectioned headings, figures that scroll rather than overflow, callout
    boxes, a sources list, and the glossary tooltip. */
 
 /* opt-in: eyebrow trailed by a rule to the right margin */
@@ -491,16 +491,7 @@ a.part .read {
 .post-body section:first-child { margin-top: 0; }
 .post-body section > h2 { margin-top: 0; }
 
-/* section number, and the flag that marks a correction */
-.post-body h2 .no {
-  font-family: var(--mono);
-  font-weight: 500;
-  font-size: 12.5px;
-  color: var(--accent);
-  vertical-align: 0.42em;
-  margin-right: 10px;
-  letter-spacing: 0.08em;
-}
+/* the flag that marks a correction */
 .post-body h2 .fix {
   font-family: var(--mono);
   font-weight: 600;
@@ -658,40 +649,6 @@ a.t { cursor: pointer; }
 #tip.ref .tt { color: #8fe0bb; text-transform: none; letter-spacing: 0.04em; }
 #tip a { color: #bfd0ff; }
 
-/* ---------- prev / next ---------- */
-
-.pager {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: space-between;
-  margin: 48px 0 0;
-  padding-top: 28px;
-  border-top: 1px solid var(--line);
-}
-.pager a {
-  flex: 1 1 240px;
-  text-decoration: none;
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  transition: border-color 160ms ease;
-}
-.pager a:hover { border-color: var(--accent); }
-.pager .dir {
-  display: block;
-  color: var(--faint);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-.pager .ttl { color: var(--ink); font-weight: 600; font-size: 15px; line-height: 1.4; }
-.pager a:hover .ttl { color: var(--accent); }
-.pager .next { text-align: right; }
-
 /* ---------- about ---------- */
 
 .about-section {
@@ -753,5 +710,4 @@ a.t { cursor: pointer; }
   .masthead { padding: 52px 0 32px; }
   .post-header { padding: 36px 0 24px; }
   .site-header .wrap { flex-wrap: wrap; gap: 8px 16px; }
-  .pager .next { text-align: left; }
 }

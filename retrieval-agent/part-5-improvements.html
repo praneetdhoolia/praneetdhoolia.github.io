@@ -24,19 +24,27 @@
 <main class="wrap">
 
   <div class="post-header">
-    <p class="eyebrow"><a href="/retrieval-agent/">Building a Retrieval Agent with LangGraph</a> &middot; Part 5 of 5</p>
-    <h1>Improvements to the Retrieval Agent</h1>
-    <p class="date"><time datetime="2025-01-16">January 16, 2025</time></p>
+    <p class="eyebrow ruled"><span><a href="/retrieval-agent/">Retrieval agent</a> &middot; Part 5 &middot; What real use exposed</span></p>
+    <h1>Improvements to the <em>Retrieval Agent</em></h1>
+    <p class="standfirst">Four fixes: loading pre-crawled Apify datasets when crawling would time out,
+      splitting documents for finer-grained retrieval, batching around embedding rate limits, and
+      pre-created indexes so demonstrations stay fast and cheap.</p>
+    <p class="date"><time datetime="2025-01-16">January 16, 2025</time> &middot; ~5 min read &middot; Part 5 of 5</p>
   </div>
 
   <article class="post-body">
-    <h3>1. Creating indexes from pre-crawled sites</h3>
-    <p>Depending on the size of a site, crawling may be a long running process. In such cases our indexing process may timeout. We may want to run crawling actors independently (i.e., outside of our Index Graph)
-    To accommodate such cases, I added a new indexing configuration <code>apify_dataset_id</code> which may be used to directly load a pre-crawled dataset. Apify stores the outcome of a crawl, and allows loading the dataset directly to a <code>langchain.core.Document</code> loader.</p>
-    <p>Apify dataset storage
-    <img src="/media/apify-dataset.jpg" alt="Apify Dataset" /></p>
-    <p>Additional indexing configuration</p>
-    <pre><code class="language-python"># same as before
+
+<section>
+  <h2>Creating indexes from pre-crawled sites</h2>
+  <p>Depending on the size of a site, crawling may be a long running process. In such cases our indexing process may timeout. We may want to run crawling actors independently (i.e., outside of our Index Graph)
+  To accommodate such cases, I added a new indexing configuration <code>apify_dataset_id</code> which may be used to directly load a pre-crawled dataset. <span class="t" data-k="apify">Apify</span> stores the outcome of a crawl, and allows loading the dataset directly to a <code>langchain.core.Document</code> loader.</p>
+  <p>Apify dataset storage</p>
+  <figure>
+    <img src="/media/apify-dataset.jpg" alt="Apify Dataset" width="1600" height="1174">
+    <figcaption><b>FIG 1</b> - A crawl stored as an Apify dataset, ready to load without crawling again.</figcaption>
+  </figure>
+  <p>Additional indexing configuration</p>
+  <pre><code class="language-python"># same as before
 @dataclass(kw_only=True)
 class IndexConfiguration(CommonConfiguration):
     # new configuration for specifying pre-crawled Apify dataset id
@@ -49,8 +57,8 @@ class IndexConfiguration(CommonConfiguration):
 
     # same as before
 </code></pre>
-    <p>Modifications to index_graph for directly building an index from pre-crawled dataset.</p>
-    <pre><code class="language-python"># same as before
+  <p>Modifications to index_graph for directly building an index from pre-crawled dataset.</p>
+  <pre><code class="language-python"># same as before
 from langchain_community.document_loaders import ApifyDatasetLoader
 # same as before
 
@@ -69,7 +77,7 @@ def apify_crawl(configuration: IndexConfiguration):
         )
     else:
         # same as before: use the apify actor to crawl
-        
+
 
     return loader.load()
 
@@ -82,21 +90,24 @@ async def index_docs(
         raise ValueError(&quot;Configuration required to run index_docs.&quot;)
     with retrieval.make_retriever(config) as retriever:
         configuration = IndexConfiguration.from_runnable_config(config)
-        # either starter_urls, or apify_dataset_id of pre-crawled should be able to trigger 
-        # crawling / loading the documents 
+        # either starter_urls, or apify_dataset_id of pre-crawled should be able to trigger
+        # crawling / loading the documents
         if not state.docs and (configuration.starter_urls or configuration.apify_dataset_id):
             print(f&quot;starting crawl ...&quot;)
             crawled_docs = apify_crawl(configuration)
             # same as before
 </code></pre>
-    <h3>2. Splitting documents for fine-grained retrieval</h3>
-    <p>So far I directly embedded a crawled document. Crawled documents may be arbitrarily large.</p>
-    <ol>
-    <li>This puts an uncertainity on how many <code>top_k</code> retrieval results I should consider for response generation. In fact, for one site the documents were so large that only 3 of them crossed the token limit allowed on the generation node.</li>
-    <li>For complex queries, where composing high quality answers may need information from multiple documents, limiting <code>top_k</code> may lead to poor results.</li>
-    </ol>
-    <p>To address this, I split crawled documents into multiple documents as follows:</p>
-    <pre><code class="language-python"># src/retrieval_graph/index_graph.py
+</section>
+
+<section>
+  <h2>Splitting documents for fine-grained retrieval</h2>
+  <p>So far I directly embedded a crawled document. Crawled documents may be arbitrarily large.</p>
+  <ol>
+  <li>This puts an uncertainity on how many <span class="t" data-k="topk"><code>top_k</code></span> retrieval results I should consider for response generation. In fact, for one site the documents were so large that only 3 of them crossed the token limit allowed on the generation node.</li>
+  <li>For complex queries, where composing high quality answers may need information from multiple documents, limiting <code>top_k</code> may lead to poor results.</li>
+  </ol>
+  <p>To address this, I split crawled documents into multiple documents as follows:</p>
+  <pre><code class="language-python"># src/retrieval_graph/index_graph.py
 
 # new import
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -116,11 +127,11 @@ async def index_docs(
             # use a 1000 char size overlapping window based splitter to create smaller document chunks to index
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
             state.docs = text_splitter.split_documents(crawled_docs)
-            
+
             # same as before
 </code></pre>
-    <p>We can now retrieve a larger set of <code>top_k</code> results. Since the maximum chunk size here is <code>1000</code>, we can deterministically configure the <code>top_k</code> based on the token limits supported by the language model used in the response generation node. E.g., if the token limit is 100,000 tokens, we can potentially use <code>top_k</code> upto <code>500</code> (assuming an average token size of 5 characters). Note that I already support a configuration for specifying <code>top_k</code>.</p>
-    <pre><code class="language-python"># src/retrieval_graph/retreival.py
+  <p>We can now retrieve a larger set of <code>top_k</code> results. Since the maximum <span class="t" data-k="chunk">chunk</span> size here is <code>1000</code>, we can deterministically configure the <code>top_k</code> based on the token limits supported by the language model used in the response generation node. E.g., if the token limit is 100,000 tokens, we can potentially use <code>top_k</code> upto <code>500</code> (assuming an average token size of 5 characters). Note that I already support a configuration for specifying <code>top_k</code>.</p>
+  <pre><code class="language-python"># src/retrieval_graph/retreival.py
 # ...
 def make_milvus_retriever(
     configuration: IndexConfiguration, embedding_model: Embeddings, **kwargs
@@ -129,10 +140,13 @@ def make_milvus_retriever(
     yield vstore.as_retriever(search_kwargs=configuration.search_kwargs)
 # ...
 </code></pre>
-    <p>Here, <code>search_kwargs = {&quot;k&quot;: 10}</code> conveys that retriever will return top 10 results.</p>
-    <h3>3. Rate limit errors while embedding</h3>
-    <p>Emebedding Models put limits on the number of token per unit time. Initially, I embedded the whole set of crawled (or split) documents in a single call. For large sites, this ran into rate limit errors. With the following enhancement I added a batch size configuration, split documents into multiple batches, and added a time delay to avoid rate limits.</p>
-    <pre><code class="language-python"># src/retrieval_graph/configuration.py
+  <p>Here, <code>search_kwargs = {&quot;k&quot;: 10}</code> conveys that retriever will return top 10 results.</p>
+</section>
+
+<section>
+  <h2>Rate limit errors while embedding</h2>
+  <p>Emebedding Models put limits on the number of token per unit time. Initially, I embedded the whole set of crawled (or split) documents in a single call. For large sites, this ran into <span class="t" data-k="ratelimit">rate limit</span> errors. With the following enhancement I added a batch size configuration, split documents into multiple batches, and added a time delay to avoid rate limits.</p>
+  <pre><code class="language-python"># src/retrieval_graph/configuration.py
 # ...
 @dataclass(kw_only=True)
 class IndexConfiguration(CommonConfiguration):
@@ -145,7 +159,7 @@ class IndexConfiguration(CommonConfiguration):
     )
     # ...
 </code></pre>
-    <pre><code class="language-python"># src/retrieval_graph/index_graph.py
+  <pre><code class="language-python"># src/retrieval_graph/index_graph.py
 # ...
 
 # generator function to create batches
@@ -176,18 +190,21 @@ async def index_docs(
     return {&quot;docs&quot;: &quot;delete&quot;}
 # ...
 </code></pre>
-    <h3>4. Pre-created indexes (for ease of demo)</h3>
-    <p>While demonstrating the solution to clients, I noticed the following:</p>
-    <ol>
-    <li>Live crawling can take quite a while.</li>
-    <li>Indexing pre-crawled datasets may also take some time due to delays needed to avoid rate limit errors. It also adds to model usage cost (if you are repeating it).</li>
-    </ol>
-    <p>To address these, I added:</p>
-    <ol>
-    <li>Configurations that (optionally) load an index from an alternate location.</li>
-    <li>Some of the pre-created indexes for clients to the repository, so the index files are available in the LangGraph cloud deployment.</li>
-    </ol>
-    <pre><code class="language-python"># src/retrieval_graph/configuration.py
+</section>
+
+<section>
+  <h2>Pre-created indexes (for ease of demo)</h2>
+  <p>While demonstrating the solution to clients, I noticed the following:</p>
+  <ol>
+  <li>Live crawling can take quite a while.</li>
+  <li>Indexing pre-crawled datasets may also take some time due to delays needed to avoid rate limit errors. It also adds to model usage cost (if you are repeating it).</li>
+  </ol>
+  <p>To address these, I added:</p>
+  <ol>
+  <li>Configurations that (optionally) load an index from an alternate location.</li>
+  <li>Some of the pre-created indexes for clients to the repository, so the index files are available in the LangGraph cloud deployment.</li>
+  </ol>
+  <pre><code class="language-python"># src/retrieval_graph/configuration.py
 # ...
 @dataclass(kw_only=True)
 class Configuration(CommonConfiguration):
@@ -201,7 +218,7 @@ class Configuration(CommonConfiguration):
     )
     # ...
 </code></pre>
-    <pre><code class="language-python"># src/retrieval_graph/retrieval.py
+  <pre><code class="language-python"># src/retrieval_graph/retrieval.py
 # ...
 @contextmanager
 def make_milvus_retriever(
@@ -216,12 +233,25 @@ def make_milvus_retriever(
     # ...
 # ...
 </code></pre>
-    <p>During demonstrations, I now use pre-created indexes to save time and money.</p>
+  <p>During demonstrations, I now use pre-created indexes to save time and money.</p>
+</section>
+
+<div class="sources">
+  <h2>Code &amp; references</h2>
+  <ol>
+    <li>The repository this series builds - <a href="https://github.com/praneetdhoolia/retrieval-agent-template">github.com/praneetdhoolia/retrieval-agent-template</a></li>
+  </ol>
+</div>
+
   </article>
 
-  <nav class="pager">
-    <a class="prev" href="/retrieval-agent/part-4-adding-a-chat-client.html"><span class="dir">&larr; Part 4</span><span class="ttl">Adding a Chat Client to a LangGraph Assistant</span></a>
-  </nav>
+  <p class="colophon"><span>Retrieval agent &middot; Part 5 of the series &middot;</span>
+    <span>Back to <a class="t" data-ref="Part 4 &middot; The chat client"
+    data-tip="Point an assistant-ui chat client at the deployed graph with three environment variables."
+    href="/retrieval-agent/part-4-adding-a-chat-client.html">adding a chat client</a></span>
+    <span>Series: <a class="t" data-ref="Retrieval agent &middot; 5 parts"
+    data-tip="The whole series in one page: template, debugging, deployment, chat client and improvements."
+    href="/retrieval-agent/">all five parts</a></span></p>
 
 </main>
 
@@ -231,5 +261,16 @@ def make_milvus_retriever(
         <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
 </footer>
 
+<div id="tip" role="tooltip"></div>
+
+<script>
+window.GLOSS = {
+  apify:{t:"Apify",d:"A hosted web-scraping platform. Its crawlers (actors) store each crawl as a dataset that can be loaded again later without re-crawling."},
+  topk:{t:"top_k",d:"How many of the closest-matching passages the retriever returns for one question. More passages give more context but use more of the model's token budget."},
+  chunk:{t:"Chunk",d:"A piece of a longer document, cut to a fixed maximum size (here 1,000 characters, overlapping by 200) so each piece can be embedded and retrieved on its own."},
+  ratelimit:{t:"Rate limit",d:"A provider's cap on how many requests or tokens a client may send per minute. Exceeding it returns errors until the window resets."}
+};
+</script>
+<script src="/assets/tip.js" defer></script>
 </body>
 </html>

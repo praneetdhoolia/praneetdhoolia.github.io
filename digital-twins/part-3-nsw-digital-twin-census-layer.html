@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Exploring the official NSW Digital Twin portal: a census layer, one land parcel at a time - Praneet Dhoolia</title>
+<title>Exploring the official NSW Digital Twin portal - Praneet Dhoolia</title>
 <meta name="description" content="A side quest into the NSW Spatial Digital Twin. The census never publishes below the SA1, so getting census-night counts onto individual land parcels meant borrowing detail from the cadastre itself: a two-stage disaggregation, run entirely in two browser consoles.">
 <link rel="canonical" href="https://praneetdhoolia.github.io/digital-twins/part-3-nsw-digital-twin-census-layer.html">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
@@ -33,7 +33,7 @@
   <article class="post-body">
 
 <section>
-  <h2><span class="no">&sect;1</span>Official digital twins</h2>
+  <h2>Official digital twins</h2>
   <p>The two posts before this one argued about city twins from the outside. <a class="t" data-ref="Part 1 &middot; The model" data-tip="A city as entities, flows and senses - a state-space model, and the six assumptions resting on it that broke." href="/digital-twins/part-1-my-mental-model-of-a-city.html">Part 1</a> wrote down the mental model and recorded the corrections; <a class="t" data-ref="Part 2 &middot; The track record" data-tip="A decade of government everything-twins, the scoped twins that outlived them, and a US$2 billion company running the same experiment today." href="/digital-twins/part-2-lets-simulate-everything.html">Part 2</a> checked that argument against a decade of programs. This post is a side quest: I went and stood inside one.</p>
   <p>I'd been working my way through the digital-city-twin space: reading up on the stacks people build them on, and happily running my own simulations. Road traffic in <strong>SUMO</strong> (Simulation of Urban MObility), agent-based travel demand in <strong>MATSim</strong> (Multi-Agent Transport Simulation), that kind of thing. Sooner or later that curiosity turns to the question: what do the <em>real</em> twins look like, the official ones governments actually run?</p>
   <p>In New South Wales (<span class="t" data-k="nsw">NSW</span>) the answer is the <strong>NSW Spatial Digital Twin</strong>, a government-run <span class="t" data-k="dim">2D/3D/4D</span> model of the state built by the Department of Customer Service (<span class="t" data-k="dcs">DCS</span>) Spatial Services with Data61, the digital research arm of the Commonwealth Scientific and Industrial Research Organisation (<span class="t" data-k="csiro">CSIRO</span>). Its public front door is the <strong>Spatial Digital Twin Explorer</strong> (<span class="t" data-k="sdt">SDT</span> Explorer), the viewer that in May 2025 replaced the long-serving Spatial Information eXchange (<span class="t" data-k="six">SIX</span>) Maps, laying authoritative spatial data over a precise basemap of every street, parcel and building. Esri, the company whose mapping platform runs it, calls it "one of the largest spatial digital twins in the world," now spanning more than nineteen council areas.</p>
@@ -68,7 +68,7 @@
 </section>
 
 <section>
-  <h2><span class="no">&sect;2</span>The stack</h2>
+  <h2>The stack</h2>
   <p>My own experiments had been on the <em>simulation</em> side of the twin world: engines that move agents and vehicles around a network. The official twin is the other half, the authoritative, continuously updated model of the physical city those simulations want to run against.</p>
   <ul>
     <li><strong>SUMO</strong> &middot; <span class="t" data-k="microsim">traffic microsimulation</span></li>
@@ -92,18 +92,18 @@
 </section>
 
 <section>
-  <h2><span class="no">&sect;3</span>Layers, formats, and the fabric of the <span class="t" data-k="cadastre">cadastre</span></h2>
+  <h2>Layers, formats, and the fabric of the <span class="t" data-k="cadastre">cadastre</span></h2>
   <p>The base data is organised into a handful of authoritative <strong>themes</strong>, each a live service: Land Parcel &amp; Property (<span class="t" data-k="lot">lots</span>), Geocoded Addressing (<span class="t" data-k="geocoded">points</span>), Administrative Boundaries, Imagery, Elevation &amp; Depth, Transport and Water.</p>
   <p>To add your own, the uploader accepts a short menu of formats: <strong><span class="t" data-k="shapefile">zipped shapefile</span></strong>, <span class="t" data-k="csv">CSV</span>, <span class="t" data-k="kmz">KMZ</span>, geotagged <span class="t" data-k="jpeg">JPEG</span>, <span class="t" data-k="gpx">GPX</span>, and a web service <span class="t" data-k="url">URL</span>. The zipped shapefile is the one that carries <span class="t" data-k="polygons">polygons</span> <em>and</em> a full <span class="t" data-k="attrtable">attribute table</span>, so it's what a lot-level census layer has to be.</p>
 
   <figure>
     <img src="/media/nsw-sdt-land-parcel-theme.jpg" alt="The NSW SDT Explorer viewer with the Add data panel open on the Quick Layers tab. The NSW Land Parcel Property Theme checkbox is ticked, and the aerial basemap behind it is covered in blue lot boundaries across Forest Lodge, Glebe and the University end of Broadway." width="1480" height="763">
-    <figcaption>FIG 1 - Enabling the official <b>NSW Land Parcel &amp; Property</b> theme from Quick Layers draws every lot boundary in blue over the SDT Explorer aerial basemap. This is the authoritative cadastre the whole exercise builds on.</figcaption>
+    <figcaption><b>FIG 1</b> - Enabling the official <b>NSW Land Parcel &amp; Property</b> theme from Quick Layers draws every lot boundary in blue over the SDT Explorer aerial basemap. This is the authoritative cadastre the whole exercise builds on.</figcaption>
   </figure>
 </section>
 
 <section>
-  <h2><span class="no">&sect;4</span>A census-night coincidence</h2>
+  <h2>A census-night coincidence</h2>
   <p>The timing was pure accident. The evening I was poking around the official twins happened to be <strong>census night, 11 August 2026</strong>. I'd filled in the form for my current location a few hours earlier. So when it clicked that the twin would take my own layers, the obvious playful question was: could I put the census itself on this map? It seemed like a fun thing to try on the one night of the year everybody is being counted.</p>
   <p>Fresh census data takes many months to publish, and NSW won't see 2026 figures until well into 2027, so I reached back to the <strong>2021</strong> census night instead, the last time everyone was counted (10 August 2021). And there was a real puzzle to make it interesting. The Australian Bureau of Statistics (<span class="t" data-k="abs">ABS</span>) never publishes "where people actually were" below the <strong>Statistical Area Level 1</strong> (<span class="t" data-k="sa1">SA1</span>), a statistical area of a few hundred people. Nothing exists at the parcel level. Getting to a per-lot layer meant borrowing detail from the cadastre itself, in three moves.</p>
 
@@ -166,7 +166,7 @@
       <text class="sv-flag" x="16" y="236">lot values are modelled estimates - they sum back exactly to the published SA1 total, and no further</text>
     </svg>
     </div>
-    <figcaption>FIG 2 - The two-stage dasymetric disaggregation. <b>Only the leftmost box is published data</b>; everything to the right of it is modelled, and the ABS perturbs its published cells slightly in any case.</figcaption>
+    <figcaption><b>FIG 2</b> - The two-stage dasymetric disaggregation. <b>Only the leftmost box is published data</b>; everything to the right of it is modelled, and the ABS perturbs its published cells slightly in any case.</figcaption>
   </figure>
 
   <table>
@@ -183,12 +183,12 @@
 </section>
 
 <section>
-  <h2><span class="no">&sect;5</span>How many people were there in my building</h2>
+  <h2>How many people were there in my building</h2>
   <p>Here is my census data overlaid on the NSW digital portal. Nice to know that there were 45 people in this building on the last census night from 2021. I'll create a dataset to overlay on the digital twin portal once 2026 census data is available.</p>
 
   <figure>
     <img src="/media/nsw-sdt-census-lot-identify.jpg" alt="The SDT Explorer viewer with the uploaded census layer drawn as orange lot outlines over the aerial basemap of Forest Lodge. One strata lot is highlighted in cyan, and an identify popup titled census2021_night_persons_forest_lodge_lots.zip lists its attributes, including PERSONS 45.47 and PERSONS_R 45." width="1480" height="762">
-    <figcaption>FIG 3 - The estimate for the whole <span class="t" data-k="strata">strata</span> block on census night 2021. It flows from the block's 25 units taking a 25-address share of Mesh Block <code>10757722000</code>, itself a slice of SA1 <code>&hellip;3113</code>'s published 327 residents.</figcaption>
+    <figcaption><b>FIG 3</b> - The estimate for the whole <span class="t" data-k="strata">strata</span> block on census night 2021. It flows from the block's 25 units taking a 25-address share of Mesh Block <code>10757722000</code>, itself a slice of SA1 <code>&hellip;3113</code>'s published 327 residents.</figcaption>
   </figure>
 </section>
 

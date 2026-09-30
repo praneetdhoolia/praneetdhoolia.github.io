@@ -24,36 +24,60 @@
 <main class="wrap">
 
   <div class="post-header">
-    <p class="eyebrow"><a href="/retrieval-agent/">Building a Retrieval Agent with LangGraph</a> &middot; Part 3 of 5</p>
-    <h1>Deploying to LangGraph Cloud</h1>
-    <p class="date"><time datetime="2025-01-06">January 6, 2025</time></p>
+    <p class="eyebrow ruled"><span><a href="/retrieval-agent/">Retrieval agent</a> &middot; Part 3 &middot; Deployment</span></p>
+    <h1>Deploying to <em>LangGraph Cloud</em></h1>
+    <p class="standfirst">Import the repo straight from GitHub, add the environment configuration,
+      submit - then wait out the 15-minute deploy, which you pay again in full for every
+      environment-variable change.</p>
+    <p class="date"><time datetime="2025-01-06">January 6, 2025</time> &middot; ~1 min read &middot; Part 3 of 5</p>
   </div>
 
   <article class="post-body">
-    <p>I deployed my retrieval graph to langgraph cloud. The process was quite straight-forward.</p>
-    <ol>
-    <li>
-    <p>I created a <strong>Plus</strong> account on <a href="https://smith.langchain.com/"><strong>LangSmith</strong></a>. This is necessary. Free-tier developer account does not allow deploying to LangGraph cloud. This costs 39 USD / month.</p>
-    </li>
-    <li>
-    <p>Now from LangSmith left-nav bar, I can go to <em>Deployments &gt; LangGraph Platform</em>. Here I can initiate a <strong>+ New Deployment</strong>.</p>
-    </li>
-    <li>
-    <p>I can <em>Import from GitHub</em> my langGraph repo! And add my environment configurations (the ones in <code>.env</code> file).</p>
-    <p><img src="/media/langgraph-cloud-deployment.png" alt="LangGraph Cloud Deployment" /></p>
-    </li>
-    <li>
-    <p>And I just <strong>Submit</strong> to deploy! This step takes around 15+ minutes. Once this finishes, I click on LangGraph Studio to access the studio to test my graphs!</p>
-    </li>
-    </ol>
-    <hr />
-    <p>I noticed that to update an environment variable, I need to deploy a new version. Whole 15+ minutes once again 😞. I have no doubt that this will get better in the future.</p>
+
+<section>
+  <h2>Deploying</h2>
+  <p>I deployed my retrieval graph to langgraph cloud. The process was quite straight-forward.</p>
+  <ol>
+  <li>
+  <p>I created a <strong>Plus</strong> account on <a class="t" data-k="langsmith" href="https://smith.langchain.com/"><strong>LangSmith</strong></a>. This is necessary. Free-tier developer account does not allow deploying to LangGraph cloud. This costs 39 USD / month.</p>
+  </li>
+  <li>
+  <p>Now from LangSmith left-nav bar, I can go to <em>Deployments &gt; LangGraph Platform</em>. Here I can initiate a <strong>+ New Deployment</strong>.</p>
+  </li>
+  <li>
+  <p>I can <em>Import from GitHub</em> my langGraph repo! And add my environment configurations (the ones in <code>.env</code> file).</p>
+  <figure>
+    <img src="/media/langgraph-cloud-deployment.png" alt="LangGraph Cloud Deployment" width="1600" height="1069">
+    <figcaption><b>FIG 1</b> - A new LangGraph Cloud deployment, imported from GitHub with its environment configuration.</figcaption>
+  </figure>
+  </li>
+  <li>
+  <p>And I just <strong>Submit</strong> to deploy! This step takes around 15+ minutes. Once this finishes, I click on LangGraph Studio to access the studio to test my graphs!</p>
+  </li>
+  </ol>
+</section>
+
+<section>
+  <h2>What I noticed</h2>
+  <p>I noticed that to update an <span class="t" data-k="envvar">environment variable</span>, I need to deploy a new version. Whole 15+ minutes once again 😞. I have no doubt that this will get better in the future.</p>
+</section>
+
+<div class="sources">
+  <h2>Code &amp; references</h2>
+  <ol>
+    <li>LangSmith, where LangGraph Cloud deployments live - <a href="https://smith.langchain.com/">smith.langchain.com</a></li>
+  </ol>
+</div>
+
   </article>
 
-  <nav class="pager">
-    <a class="prev" href="/retrieval-agent/part-2-step-thru-debugging.html"><span class="dir">&larr; Part 2</span><span class="ttl">Step-thru Debugging your LangGraphs</span></a>
-    <a class="next" href="/retrieval-agent/part-4-adding-a-chat-client.html"><span class="dir">Part 4 &rarr;</span><span class="ttl">Adding a Chat Client to a LangGraph Assistant</span></a>
-  </nav>
+  <p class="colophon"><span>Retrieval agent &middot; Part 3 of the series &middot;</span>
+    <span>Back to <a class="t" data-ref="Part 2 &middot; Debugging"
+    data-tip="Run the API server with --debug-port, attach debugpy from VS Code, and step through any graph node."
+    href="/retrieval-agent/part-2-step-thru-debugging.html">step-thru debugging</a></span>
+    <span>Next: <a class="t" data-ref="Part 4 &middot; The chat client"
+    data-tip="Point an assistant-ui chat client at the deployed graph with three environment variables."
+    href="/retrieval-agent/part-4-adding-a-chat-client.html">adding a chat client</a></span></p>
 
 </main>
 
@@ -63,5 +87,14 @@
         <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
 </footer>
 
+<div id="tip" role="tooltip"></div>
+
+<script>
+window.GLOSS = {
+  langsmith:{t:"LangSmith",d:"LangChain's hosted platform for tracing, evaluating and deploying LLM applications. LangGraph Cloud deployments are created from inside it. Click to visit."},
+  envvar:{t:"Environment variable",d:"A named setting supplied to a program from outside its code, such as an API key. In a LangGraph Cloud deployment these are fixed when a revision is built."}
+};
+</script>
+<script src="/assets/tip.js" defer></script>
 </body>
 </html>
