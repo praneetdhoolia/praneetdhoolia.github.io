@@ -86,7 +86,8 @@
   <h2><span class="fix">CORRECTION 1</span><span class="no">§3</span>The city senses itself unevenly</h2>
   <p>The first crack in my assumptions appeared as soon as I catalogued real Australian data sources. The sensors do not report at the same speed - not even close. A transit vehicle-position feed updates <a href="https://translink.com.au/about-translink/open-data/gtfs-rt" data-src="TransLink open data - GTFS-realtime feeds">every 15 to 30 seconds</a>. The electricity market publishes <a href="https://www.aemo.com.au/energy-systems/electricity/national-electricity-market-nem/data-nem" data-src="AEMO - National Electricity Market data">demand every five minutes</a>. Land valuations arrive <a href="https://www.data.qld.gov.au/dataset/historical-trends-in-land-valuations" data-src="Queensland Government - historical land valuation trends">once a year</a>. Council budgets arrive <a href="https://www.brisbane.qld.gov.au/about-council/governance-and-strategy/annual-plan-and-budget/2025-26-brisbane-budget" data-src="Brisbane City Council - Annual Plan and Budget">once a year, as PDF documents</a>. National taxation statistics lag by <a href="https://www.ato.gov.au/about-ato/research-and-statistics/in-detail/taxation-statistics/taxation-statistics-2022-23" data-src="Australian Taxation Office - taxation statistics">about two years</a>. The census runs every five years, and its first results take <a href="https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis" data-src="Australian Bureau of Statistics - data services and release timing">ten months to appear</a>.</p>
 
-  <figure class="fig-scroll">
+  <figure>
+    <div class="fig-scroll">
     <svg viewBox="0 0 720 300" role="img" aria-label="A logarithmic timeline of observation cadence from seconds to five years. Transit positions and electricity sit at the fast end. Budgets, valuations, tax statistics, and the census sit at the slow end. The spread covers about seven orders of magnitude.">
       <defs>
         <pattern id="g2" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -136,6 +137,7 @@
       <text class="sv-sub" x="93" y="36">streams</text>
       <text class="sv-sub" x="690" y="284" text-anchor="end">ledgers &amp; surveys</text>
     </svg>
+    </div>
     <figcaption><b>FIG 2</b> - The cadence of the city's senses, on Australian public data. The fast end updates before you finish a coffee. The slow end updates twice a decade.</figcaption>
   </figure>
 
@@ -228,7 +230,8 @@
   <h2><span class="no">§9</span>My mental model now</h2>
   <p>In my refined mental model, I keep the initial skeleton. It is still a state-space model: state, dynamics, observation. I now understand that the state is partly unobserved, and the unobserved part stays labelled. The observation function is a shadow at mixed cadences, not a mirror. The dynamics contain choosing agents, not particles. Every quantity carries a distribution. Governance sits outside the bands, as the controller of the loop. And the output that matters is a comparison, not a prophecy.</p>
 
-  <figure class="fig-scroll">
+  <figure>
+    <div class="fig-scroll">
     <svg viewBox="0 0 720 360" role="img" aria-label="The revised model. The three layers remain, with amendments marked: an unobserved region of the state, choosing agents in the flows, mixed-cadence partial observation, a governance control loop outside the bands, and a note that every quantity carries a distribution.">
       <defs>
         <pattern id="g4" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -283,6 +286,7 @@
       <line x1="120" y1="336" x2="590" y2="336" stroke="var(--flag)" stroke-width="1.2" stroke-dasharray="4 3"/>
       <text class="sv-flag" x="355" y="352" text-anchor="middle">every quantity carries a distribution · outputs are comparisons, never prophecies</text>
     </svg>
+    </div>
     <figcaption><b>FIG 4</b> - My refined mental model. Same skeleton, six amendments. <span style="color:var(--flag)">Pink</span> marks what my initial model could not say: the unobserved state, the uncertainty, and the refusal to prophesy.</figcaption>
   </figure>
 

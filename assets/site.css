@@ -658,40 +658,6 @@ a.t { cursor: pointer; }
 #tip.ref .tt { color: #8fe0bb; text-transform: none; letter-spacing: 0.04em; }
 #tip a { color: #bfd0ff; }
 
-/* ---------- prev / next ---------- */
-
-.pager {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: space-between;
-  margin: 48px 0 0;
-  padding-top: 28px;
-  border-top: 1px solid var(--line);
-}
-.pager a {
-  flex: 1 1 240px;
-  text-decoration: none;
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  transition: border-color 160ms ease;
-}
-.pager a:hover { border-color: var(--accent); }
-.pager .dir {
-  display: block;
-  color: var(--faint);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-.pager .ttl { color: var(--ink); font-weight: 600; font-size: 15px; line-height: 1.4; }
-.pager a:hover .ttl { color: var(--accent); }
-.pager .next { text-align: right; }
-
 /* ---------- about ---------- */
 
 .about-section {
@@ -753,5 +719,4 @@ a.t { cursor: pointer; }
   .masthead { padding: 52px 0 32px; }
   .post-header { padding: 36px 0 24px; }
   .site-header .wrap { flex-wrap: wrap; gap: 8px 16px; }
-  .pager .next { text-align: left; }
 }

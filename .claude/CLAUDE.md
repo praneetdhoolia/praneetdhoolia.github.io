@@ -61,9 +61,10 @@ Whenever a post, collection, or series is added (or renamed/removed), update the
 
 1. Add a new `<li class="note">` at the **top** of the `ol.notes` list (newest first).
 2. Use the post's `<h1>` as the entry title, and its standfirst as the **summary** - write the
-   standfirst once, reuse it verbatim here. Where a post has none (the seven converted posts do
-   not), write a real summary: the insight, not a restatement of the title. This is the point of
-   the index; an entry without one is incomplete.
+   standfirst once, reuse it verbatim here (every post has one since the format was unified;
+   the seven converted posts took theirs from the summaries already on the index and the series
+   cards). The summary is the insight, not a restatement of the title. This is the point of the
+   index; an entry without one is incomplete.
 3. For a series, link the entry title to `<folder>/`, tag it `Series · N parts`, and list the
    parts in a `ul.parts` block. Adding a part updates that entry's part list and count; the entry
    only moves to the top if the series is the newest work.
@@ -86,6 +87,45 @@ A series folder's `index.html` carries four things, in order (see
    affordance.
 4. The standard site footer.
 
+## Post anatomy
+
+Every post - a series part or a standalone - is the same essay shell. Since October 2026 there is
+one format, not two: the seven converted LangGraph posts were brought onto the shell the
+digital-twins series introduced, word for word, with only the shell, headings, figures, glossary,
+sources and colophon added. `python .github/scripts/check_posts.py` (also CI,
+`.github/workflows/check-posts.yml`) fails any post that drifts from it. In order:
+
+1. **`<head>`** - `<title>` is exactly the `<h1>` text plus ` - Praneet Dhoolia`; a
+   `<meta name="description">`; `<link rel="canonical">` at the page's own URL; the favicon;
+   `/assets/site.css`. Post-specific CSS, if any, goes in one `<style>` block here (Part 4 of the
+   digital twins does this for its embedded simulation).
+2. **Site header** - the `site-header` with `Writing` and `About`.
+3. **`div.post-header`**, in order:
+   - `<p class="eyebrow ruled"><span>...</span></p>` - for a series part,
+     `<a href="/<series>/">Series label</a> &middot; Part N &middot; <thematic label>` (sentence
+     case; the series landing's part-card kicker carries the same label in title case); for a
+     standalone, its category (`Agent design`, `MCP`).
+   - `<h1>` with one accented phrase in `<em>`.
+   - `<p class="standfirst">` - the post's one-paragraph point, reused verbatim as the index
+     summary.
+   - `<p class="date"><time datetime="...">...</time> &middot; ~N min read &middot; Part N of M</p>`
+     (`Part N of a series` while a series is open-ended; nothing after the read time for a
+     standalone).
+4. **`article.post-body`** - content in `<section>`s, each opening
+   `<h2><span class="no">&sect;N</span>Heading</h2>`, numbered from 1; `h3`/`h4` inside.
+   - Every image is a `<figure>` holding an `<img>` with `width` and `height`, then
+     `<figcaption><b>FIG N</b> - caption</figcaption>`; figures are numbered from 1. Diagrams are
+     inline SVG using the `.sv-*` text classes, wide ones inside `<div class="fig-scroll">`.
+   - `.callout` / `.callout.flag` for a takeaway or a caveat.
+   - Ends with `<div class="sources">` - `Sources &amp; anchors` for an essay, `Code &amp;
+     references` for a build post - listing only what the post itself cites.
+5. **`<p class="colophon">`** after the article - `<Series label> &middot; Part N of the series
+   &middot;` then `Back to` / `Next:` cross-references (the last part links the series landing);
+   a standalone says `A standalone post` and links its nearest related writing. There is no
+   prev/next pager; it was retired with the format unification.
+6. **Site footer**, then `<div id="tip" role="tooltip"></div>`, the page's `window.GLOSS`
+   (every `data-k` key used must be defined), and `<script src="/assets/tip.js" defer></script>`.
+
 ## Conventions
 
 - **Cross-references carry a hover description.** A link in prose (or in a colophon) to another
@@ -94,8 +134,8 @@ A series folder's `index.html` carries four things, in order (see
   `<a class="t" data-ref="Part 1 &middot; The model" data-tip="One sentence on what they will
   find there." href="/...">link text</a>`. The page needs `<div id="tip" role="tooltip"></div>`
   and `<script src="/assets/tip.js" defer></script>` before `</body>`. This does **not** apply to
-  the prev/next pager cards or the index and series-landing cards - those already show the target's
-  title and summary on screen.
+  the index and series-landing cards - those already show the target's title and summary on
+  screen.
 - **Tooltips are one shared script.** `assets/tip.js` drives all three tooltip forms - `data-k`
   (glossary, defined per page as `window.GLOSS = {...}` in an inline `<script>` before the file
   loads), `data-src` (outbound citation, labelled SOURCE), and `data-ref` + `data-tip`
@@ -114,7 +154,8 @@ A series folder's `index.html` carries four things, in order (see
   absolute paths work identically from a root page, a series folder, and a dated stub.
 - **New pages start from an existing one.** Copy the nearest sibling (a post artifact, or
   `retrieval-agent/index.html` for a series) rather than writing markup from scratch, so the
-  header, footer, `<link rel="canonical">` and metadata stay consistent.
+  header, footer, `<link rel="canonical">` and metadata stay consistent, then check it against
+  the post anatomy with `python .github/scripts/check_posts.py`.
 - **Branch naming.** `<git-handle>/<short-kebab-description>`, with `<git-handle>` derived from
   the active git identity (the `…+<handle>@users.noreply.github.com` email, else the owner
   segment of the `origin` remote - here `praneetdhoolia`). **Never `claude/*`** - if the
@@ -161,4 +202,6 @@ A series folder's `index.html` carries four things, in order (see
 | `.claude/hooks/` | PreToolUse session-link guards + the SessionStart branch-naming reminder. |
 | `.githooks/commit-msg` | Strips any `claude.ai/code` session link from commit messages. |
 | `.github/workflows/strip-session-ref.yml` | Server-side scrub of a session link from a PR body. |
+| `.github/scripts/check_posts.py` | The post-anatomy check (standard library only): every post against the shell above, the index and series landings against the files on disk, and no em dash in any served file. Run before every commit. |
+| `.github/workflows/check-posts.yml` | Runs `check_posts.py` on every PR and every push to `main`. |
 | `.gitattributes` | Pins LF endings for `*.sh` / `.githooks/*` so hooks stay runnable on Linux. |

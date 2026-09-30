@@ -24,44 +24,53 @@
 <main class="wrap">
 
   <div class="post-header">
-    <p class="eyebrow"><a href="/retrieval-agent/">Building a Retrieval Agent with LangGraph</a> &middot; Part 2 of 5</p>
-    <h1>Step-thru Debugging your LangGraphs</h1>
-    <p class="date"><time datetime="2025-01-01">January 1, 2025</time></p>
+    <p class="eyebrow ruled"><span><a href="/retrieval-agent/">Retrieval agent</a> &middot; Part 2 &middot; Debugging</span></p>
+    <h1>Step-thru <em>Debugging</em> your LangGraphs</h1>
+    <p class="standfirst">Run the API server with <b>--debug-port</b>, attach debugpy from VS Code, and
+      put a breakpoint on any graph node to step through execution instead of inferring it from
+      the outside.</p>
+    <p class="date"><time datetime="2025-01-01">January 1, 2025</time> &middot; ~2 min read &middot; Part 2 of 5</p>
   </div>
 
   <article class="post-body">
-    <p>Most of the details required are already covered in langgraph tutorial here: https://langchain-ai.github.io/langgraph/tutorials/langgraph-platform/local-server/</p>
-    <p><em>Key points covered there are:</em></p>
-    <ol>
-    <li>Install LangGraph CLI<pre><code class="language-bash">pip install --upgrade &quot;langgraph-cli[inmem]&quot;
+
+<section>
+  <h2><span class="no">&sect;1</span>What the tutorial already covers</h2>
+  <p>Most of the details required are already covered in langgraph tutorial here: <a href="https://langchain-ai.github.io/langgraph/tutorials/langgraph-platform/local-server/">https://langchain-ai.github.io/langgraph/tutorials/langgraph-platform/local-server/</a></p>
+  <p><em>Key points covered there are:</em></p>
+  <ol>
+  <li>Install LangGraph CLI<pre><code class="language-bash">pip install --upgrade &quot;langgraph-cli[inmem]&quot;
 </code></pre>
-    </li>
-    <li>Install the dependencies<pre><code class="language-bash">pip install -e .
+  </li>
+  <li>Install the dependencies<pre><code class="language-bash">pip install -e .
 </code></pre>
-    </li>
-    <li>Use the CLI to run langGraph server<pre><code class="language-bash">langgraph dev
+  </li>
+  <li>Use the CLI to run langGraph server<pre><code class="language-bash">langgraph dev
 </code></pre>
-    </li>
-    <li>You may now use LangGraph Studio Web UI at: <a href="https://smith.langchain.com/studio/?baseUrl=http://locahost:2024">https://smith.langchain.com/studio/?baseUrl=http://locahost:2024</a></li>
-    </ol>
-    <p><em>Here are the additions to enable step-thru-debugging:</em></p>
-    <ol>
-    <li>
-    <p>Install debugpy in your virtual environment for the langgraph project</p>
-    <pre><code class="language-bash">pip install debugpy
+  </li>
+  <li>You may now use <span class="t" data-k="studio">LangGraph Studio</span> Web UI at: <a href="https://smith.langchain.com/studio/?baseUrl=http://localhost:2024">https://smith.langchain.com/studio/?baseUrl=http://localhost:2024</a></li>
+  </ol>
+</section>
+
+<section>
+  <h2><span class="no">&sect;2</span>The additions for step-thru debugging</h2>
+  <p><em>Here are the additions to enable step-thru-debugging:</em></p>
+  <ol>
+  <li>
+  <p>Install <span class="t" data-k="debugpy">debugpy</span> in your virtual environment for the langgraph project</p>
+  <pre><code class="language-bash">pip install debugpy
 </code></pre>
-    </li>
-    <li>
-    <p>Start langgraph API server in debug mode. In the following we are telling langgraph-cli to allow clients to listen on Port 2025 for debugger events</p>
-    <pre><code class="language-bash">langgraph dev --debug-port 2025
+  </li>
+  <li>
+  <p>Start langgraph API server in debug mode. In the following we are telling langgraph-cli to allow clients to listen on Port 2025 for debugger events</p>
+  <pre><code class="language-bash">langgraph dev --debug-port 2025
 </code></pre>
-    </li>
-    <li>
-    <p>Attach to debugger from your IDE. E.g., in here's my VS Code launch config:</p>
-    <pre><code class="language-json">{
+  </li>
+  <li>
+  <p>Attach to debugger from your IDE. E.g., in here's my VS Code <span class="t" data-k="attach">launch config</span>:</p>
+  <pre><code class="language-json">{
     &quot;version&quot;: &quot;0.2.0&quot;,
     &quot;configurations&quot;: [
-
         {
             &quot;name&quot;: &quot;Python Debugger: Remote Attach&quot;,
             &quot;type&quot;: &quot;debugpy&quot;,
@@ -81,17 +90,30 @@
     ]
 }
 </code></pre>
-    </li>
-    <li>
-    <p>I can now put a breakpoint on any of my langgraph code files and step-thru the execution!</p>
-    </li>
-    </ol>
+  </li>
+  <li>
+  <p>I can now put a breakpoint on any of my langgraph code files and step-thru the execution!</p>
+  </li>
+  </ol>
+</section>
+
+<div class="sources">
+  <h2>Code &amp; references</h2>
+  <ol>
+    <li>LangGraph tutorial, running a local server - <a href="https://langchain-ai.github.io/langgraph/tutorials/langgraph-platform/local-server/">langchain-ai.github.io</a></li>
+    <li>LangGraph Studio against a local server - <a href="https://smith.langchain.com/studio/?baseUrl=http://localhost:2024">smith.langchain.com/studio</a></li>
+  </ol>
+</div>
+
   </article>
 
-  <nav class="pager">
-    <a class="prev" href="/retrieval-agent/part-1-expanding-the-template.html"><span class="dir">&larr; Part 1</span><span class="ttl">Expanding the LangGraph Retrieval Agent</span></a>
-    <a class="next" href="/retrieval-agent/part-3-deploying-to-langgraph-cloud.html"><span class="dir">Part 3 &rarr;</span><span class="ttl">Deploying to LangGraph Cloud</span></a>
-  </nav>
+  <p class="colophon"><span>Retrieval agent &middot; Part 2 of the series &middot;</span>
+    <span>Back to <a class="t" data-ref="Part 1 &middot; The template"
+    data-tip="Start from LangGraph's RAG template and extend it: crawl starter URLs within a set number of hops, and index into Milvus."
+    href="/retrieval-agent/part-1-expanding-the-template.html">expanding the template</a></span>
+    <span>Next: <a class="t" data-ref="Part 3 &middot; Deployment"
+    data-tip="Import the repo from GitHub into LangGraph Cloud, add the environment, submit, and wait out the 15-minute deploy."
+    href="/retrieval-agent/part-3-deploying-to-langgraph-cloud.html">deploying to LangGraph Cloud</a></span></p>
 
 </main>
 
@@ -101,5 +123,15 @@
         <a href="https://www.linkedin.com/in/praneet-dhoolia">LinkedIn</a></span>
 </footer>
 
+<div id="tip" role="tooltip"></div>
+
+<script>
+window.GLOSS = {
+  studio:{t:"LangGraph Studio",d:"LangChain's visual interface for a LangGraph application: it draws the graph, lets you send inputs, and shows each node's state as the run moves through it."},
+  debugpy:{t:"debugpy",d:"Microsoft's debugger for Python. It opens a port that an editor such as VS Code attaches to, so breakpoints work in a process the editor did not start."},
+  attach:{t:"Remote attach",d:"A VS Code launch configuration that connects the debugger to a Python process already running and listening on a port, instead of starting the program itself."}
+};
+</script>
+<script src="/assets/tip.js" defer></script>
 </body>
 </html>
