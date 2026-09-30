@@ -134,10 +134,15 @@ sources and colophon added. `python .github/scripts/check_posts.py` (also CI,
    - `.callout` / `.callout.flag` for a takeaway or a caveat.
    - Ends with `<div class="sources">` - `Sources &amp; anchors` for an essay, `Code &amp;
      references` for a build post - listing only what the post itself cites.
-5. **`<p class="colophon">`** after the article - `<Series label> &middot; Part N of the series
-   &middot;` then `Back to` / `Next:` cross-references (the last part links the series landing);
-   a standalone says `A standalone post` and links its nearest related writing. There is no
-   prev/next pager; it was retired with the format unification.
+5. **`<p class="colophon">`** after the article. For a series part it is generated from one rule
+   (`check_posts.py` enforces it): the series name linked to its landing (`data-ref="<Series>
+   &middot; N parts"`), then `&middot; Part N of the series &middot;`, then `&larr; <title of the
+   previous part>` and `<title of the next part> &rarr;`, each a cross-reference whose link text is
+   the target's `<h1>` up to its colon, whose `data-ref` is the target's eyebrow without the series
+   name, and whose `data-tip` is the target's summary on the series landing. A standalone says
+   `<Category> &middot; A standalone post &middot;` and links its nearest related writing with
+   `data-ref="<Category> &middot; <descriptor>"`. There is no prev/next pager; it was retired with
+   the format unification.
 6. **Site footer**, then `<div id="tip" role="tooltip"></div>`, the page's `window.GLOSS`
    (every `data-k` key used must be defined), and `<script src="/assets/tip.js" defer></script>`.
 
