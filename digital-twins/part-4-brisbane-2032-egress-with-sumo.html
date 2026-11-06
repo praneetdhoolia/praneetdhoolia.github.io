@@ -56,22 +56,22 @@
   <div class="post-header">
     <p class="eyebrow ruled"><span><a href="/digital-twins/">City digital twin</a> &middot; Part 4 &middot; Hands on with SUMO</span></p>
     <h1>Brisbane 2032 egress from Victoria Park: <br/><em>hands on experiments with SUMO</em></h1>
-    <p class="standfirst">In this post we build a scoped twin by hand: OpenStreetMap roads, cropped with osmium, simulated in <span class="t" data-k="sumo">SUMO</span>. The question is concrete - 63,000 people leave the new Victoria Park stadium at once; how long until the precinct clears, and where does it choke? Thirteen real simulation runs are baked into an interactive map below</p>
-    <p class="date"><time datetime="2026-08">August 2026</time> &middot; ~15 min read &middot; Part 4 of a series &middot; with Pranav Dhoolia</p>
+    <p class="standfirst">In this post I build a scoped twin by hand: OpenStreetMap roads, cropped with osmium, simulated in <span class="t" data-k="sumo">SUMO</span>. The question is concrete - 63,000 people leave the new Victoria Park stadium at once; how long until the precinct clears, and where does it choke? Thirteen real simulation runs are baked into an interactive map below</p>
+    <p class="date"><time datetime="2026-08">August 2026</time> &middot; ~15 min read &middot; Part 4 of a series</p>
   </div>
 
   <article class="post-body">
 
 <section>
   <h2>Objective</h2>
-  <p>I wanted a hands-on understanding of digital twins of cities - take the tools practitioners actually use and point them at a problem that is grounded and potentially worth something. My brother Pranav came at it from the other side. He was exploring the digital-twin space broadly, looking for a theme valuable enough to build a startup around, and wanted to see what a small team could credibly ship. We did this build together: my hands on the pipeline, his eye on whether the result was something a planner or a council would pay attention to.</p>
-  <p>Olympics event egress seemed like a nice and timely problem. We did discuss flood evacuation, EV-charger placement problems as well (and we'll get to them). Event egress is pure demand plus geometry: a <span class="t" data-k="pulse">demand pulse</span> released from one place onto a real road network. There is no overlay model needed. It is also squarely on the Brisbane 2032 thesis - the exact question the Games' transport planners are paid to answer, at the <a class="t" data-src="GIICA, Games Independent Infrastructure and Coordination Authority: Brisbane Stadium at Victoria Park, 63,000 seats (verified Aug 2026)" href="https://giica.au/">63,000-seat stadium</a> whose design was locked this year.</p>
+  <p>I wanted a hands-on understanding of digital twins of cities - take the tools practitioners actually use and point them at a problem that is grounded and potentially worth something. I was also exploring the digital-twin space more broadly, looking for a theme valuable enough to build a startup around: what a small team could credibly ship, and whether the result would be something a planner or a council would pay attention to.</p>
+  <p>Olympics event egress seemed like a nice and timely problem. I did discuss flood evacuation, EV-charger placement problems as well (and I'll get to them). Event egress is pure demand plus geometry: a <span class="t" data-k="pulse">demand pulse</span> released from one place onto a real road network. There is no overlay model needed. It is also squarely on the Brisbane 2032 thesis - the exact question the Games' transport planners are paid to answer, at the <a class="t" data-src="GIICA, Games Independent Infrastructure and Coordination Authority: Brisbane Stadium at Victoria Park, 63,000 seats (verified Aug 2026)" href="https://giica.au/">63,000-seat stadium</a> whose design was locked this year.</p>
 </section>
 
 <section>
   <h2>The stack: three tools, no cloud</h2>
   <p>Everything runs on a laptop-class machine from free, permissively licensed parts. Three tools do the work.</p>
-  <p><strong>OpenStreetMap</strong> is the road network. We used a pre-built city extract of Brisbane - a 51&nbsp;MB <code>.osm.pbf</code> file, <span class="t" data-k="odbl">ODbL</span>-licensed, so a simulation built on it is legally ours to publish. <strong>osmium</strong> (the <a class="t" data-src="pyosmium 4.3.1, Python bindings for libosmium" href="https://osmcode.org/pyosmium/">pyosmium</a> bindings) crops that extract to a study area and keeps only drivable roads, dropping footways, service lanes and construction. Cropping matters: a whole-city network simulates slowly and adds nothing when the question is about one precinct - but the box must cover every plausible escape route. Our box runs from Toowong and Enoggera in the west to the Gateway Motorway in the east, and from Chermside down to Annerley: roughly 15&nbsp;km by 16&nbsp;km, every river crossing included.</p>
+  <p><strong>OpenStreetMap</strong> is the road network. I used a pre-built city extract of Brisbane - a 51&nbsp;MB <code>.osm.pbf</code> file, <span class="t" data-k="odbl">ODbL</span>-licensed, so a simulation built on it is legally mine to publish. <strong>osmium</strong> (the <a class="t" data-src="pyosmium 4.3.1, Python bindings for libosmium" href="https://osmcode.org/pyosmium/">pyosmium</a> bindings) crops that extract to a study area and keeps only drivable roads, dropping footways, service lanes and construction. Cropping matters: a whole-city network simulates slowly and adds nothing when the question is about one precinct - but the box must cover every plausible escape route. My box runs from Toowong and Enoggera in the west to the Gateway Motorway in the east, and from Chermside down to Annerley: roughly 15&nbsp;km by 16&nbsp;km, every river crossing included.</p>
   <p><strong>SUMO</strong> - <a class="t" data-src="Eclipse SUMO, Simulation of Urban MObility" href="https://eclipse.dev/sumo/">Simulation of Urban MObility</a>, version 1.27.1 installed from its PyPI wheel - does the rest. Its <code>netconvert</code> turns the cropped map into a routable network: 35,027 directed road <span class="t" data-k="edge">edges</span> and 23,585 junctions, with guessed traffic signals, ramps and roundabouts, and street names preserved so that "Butterfield Street" can be found afterwards. Its <code>duarouter</code> assigns each trip a route. Its simulation core then moves every vehicle through the network, second by second, with 35% of vehicles allowed to re-route mid-trip when they hit a queue.</p>
 
   <figure>
@@ -135,16 +135,16 @@
       <text class="sv-sub" x="30" y="174">p90 &middot; clearance</text>
       <text class="sv-sub" x="30" y="187">chokepoints &rarr; 1 page</text>
 
-      <text class="sv-flag" x="16" y="232">blue = the tool computes it &middot; pink = we authored it, listed below</text>
+      <text class="sv-flag" x="16" y="232">blue = the tool computes it &middot; pink = I authored it, listed below</text>
     </svg>
     </div>
-    <figcaption><b>FIG 1</b> - The pipeline. Every box is free software or open data; the whole loop from raw map to interactive page runs on one machine. Only the pink box carries assumptions we wrote ourselves.</figcaption>
+    <figcaption><b>FIG 1</b> - The pipeline. Every box is free software or open data; the whole loop from raw map to interactive page runs on one machine. Only the pink box carries assumptions I wrote myself.</figcaption>
   </figure>
 
-  <h3>Three levels of detail, and why we sat in the middle</h3>
+  <h3>Three levels of detail, and why I sat in the middle</h3>
   <p>A traffic simulator has to decide what a vehicle <em>is</em>. <span class="t" data-k="macro">Macroscopic</span> models decide it is nothing in particular: traffic is a fluid, and each link carries a flow, a density and a mean speed. <span class="t" data-k="micro">Microscopic</span> models decide it is everything: every car, every second, obeying a car-following rule for the gap ahead and a lane-changing rule for the lane beside. <span class="t" data-k="meso">Mesoscopic</span> sits between the two. Vehicles stay individual and countable, but they move as tokens through queues on each hundred-metre stretch of road, without second-by-second physics.</p>
-  <p>We ran meso. Our reasons: a) microscopic simulation of fourteen thousand vehicles would be too slow, we are interested in ballparks. SUMO's documentation puts the <a class="t" data-src="Eclipse SUMO documentation, Mesoscopic Model: the meso engine runs up to 100 times faster than the microscopic one" href="https://sumo.dlr.de/docs/Simulation/Meso.html">mesoscopic engine at up to a hundred times faster</a>. At that speed we can do many runs instead of one. b) Also our question is comparative. Rather than a forecast we are interested in the difference between two runs, and modelling error shared by both runs largely cancels in the difference.</p>
-  <p>Without lane-changing, a motorway merge is a capacity number on an edge rather than something that emerges from weaving, so ramps like Airport Link probably behave better in our runs than they would on the night. Meso does not model junctions at all by default; we ran with <code>--meso-junction-control</code>, which restores a simplified intersection model. That flag matters, because stadium egress is mostly an intersection problem rather than a road-length problem: whether the exit at Butterfield Street works is decided by the right-turn bay and the signal phase, and meso sees those only coarsely.</p>
+  <p>I ran meso. My reasons: a) microscopic simulation of fourteen thousand vehicles would be too slow, I am interested in ballparks. SUMO's documentation puts the <a class="t" data-src="Eclipse SUMO documentation, Mesoscopic Model: the meso engine runs up to 100 times faster than the microscopic one" href="https://sumo.dlr.de/docs/Simulation/Meso.html">mesoscopic engine at up to a hundred times faster</a>. At that speed I can do many runs instead of one. b) Also my question is comparative. Rather than a forecast I am interested in the difference between two runs, and modelling error shared by both runs largely cancels in the difference.</p>
+  <p>Without lane-changing, a motorway merge is a capacity number on an edge rather than something that emerges from weaving, so ramps like Airport Link probably behave better in my runs than they would on the night. Meso does not model junctions at all by default; I ran with <code>--meso-junction-control</code>, which restores a simplified intersection model. That flag matters, because stadium egress is mostly an intersection problem rather than a road-length problem: whether the exit at Butterfield Street works is decided by the right-turn bay and the signal phase, and meso sees those only coarsely.</p>
 
   <figure>
     <div class="fig-scroll">
@@ -213,7 +213,7 @@
       <text class="sv-sub" x="204" y="254">every gap, and the one car changing lane</text>
       <text class="sv-lab-b" x="486" y="216">TOO SLOW FOR A GRID</text>
       <text class="sv-sub" x="486" y="234">every second of every car. more</text>
-      <text class="sv-sub" x="486" y="248">fidelity than our demand earns</text>
+      <text class="sv-sub" x="486" y="248">fidelity than my demand earns</text>
 
       <text class="sv-flag" x="16" y="288">pink = where this build sits, with --meso-junction-control switched on</text>
     </svg>
@@ -223,31 +223,31 @@
 </section>
 
 <section>
-  <h2>What we authored, and what SUMO computed</h2>
-  <p>A traffic simulator moves vehicles. It does not know how many people came by car. Everything about demand is an input, and every input is an assumption we wrote down. Everything about what those vehicles then did is an output the engine computed.</p>
+  <h2>What I authored, and what SUMO computed</h2>
+  <p>A traffic simulator moves vehicles. It does not know how many people came by car. Everything about demand is an input, and every input is an assumption I wrote down. Everything about what those vehicles then did is an output the engine computed.</p>
 
   <table class="split">
     <thead><tr><th>Who</th><th>What</th><th>Value used</th></tr></thead>
     <tbody>
-      <tr><td>we authored</td><td>Attendance</td><td>40,000 &middot; 63,000 &middot; 80,000</td></tr>
-      <tr><td>we authored</td><td>Share of attendees leaving by car (the rest by rail, bus, or on foot)</td><td>45% ("car-heavy") &middot; 25% ("transit-first")</td></tr>
-      <tr><td>we authored</td><td>People per car</td><td>2.5</td></tr>
-      <tr><td>we authored</td><td>Release profile - how fast the car park empties onto the street</td><td>all within 30 min &middot; staggered over 90 min</td></tr>
-      <tr><td>we authored</td><td>Where cars start: six precinct car-park zones (Herston, Bowen Hills, Gregory Terrace east and south, Kelvin Grove, Countess Street) with shares</td><td>12-22% each</td></tr>
-      <tr><td>we authored</td><td>Where cars go: ten outbound corridors (Gympie Rd, Sandgate Rd, Airport, Kingsford Smith Dr, Wynnum Rd, Old Cleveland Rd, Pacific Mwy, Ipswich Mwy, Western Fwy, Enoggera) with weights</td><td>8-15% each</td></tr>
-      <tr><td>we authored</td><td>Background traffic on a late evening, so the event does not run on an empty city</td><td>random trips across the network, identical in every run</td></tr>
+      <tr><td>I authored</td><td>Attendance</td><td>40,000 &middot; 63,000 &middot; 80,000</td></tr>
+      <tr><td>I authored</td><td>Share of attendees leaving by car (the rest by rail, bus, or on foot)</td><td>45% ("car-heavy") &middot; 25% ("transit-first")</td></tr>
+      <tr><td>I authored</td><td>People per car</td><td>2.5</td></tr>
+      <tr><td>I authored</td><td>Release profile - how fast the car park empties onto the street</td><td>all within 30 min &middot; staggered over 90 min</td></tr>
+      <tr><td>I authored</td><td>Where cars start: six precinct car-park zones (Herston, Bowen Hills, Gregory Terrace east and south, Kelvin Grove, Countess Street) with shares</td><td>12-22% each</td></tr>
+      <tr><td>I authored</td><td>Where cars go: ten outbound corridors (Gympie Rd, Sandgate Rd, Airport, Kingsford Smith Dr, Wynnum Rd, Old Cleveland Rd, Pacific Mwy, Ipswich Mwy, Western Fwy, Enoggera) with weights</td><td>8-15% each</td></tr>
+      <tr><td>I authored</td><td>Background traffic on a late evening, so the event does not run on an empty city</td><td>random trips across the network, identical in every run</td></tr>
       <tr><td>SUMO computed</td><td>When each car actually gets onto the street (the kerb queue), which route it takes, where it re-routes, how long every road segment takes, where queues form and dissolve</td><td>-</td></tr>
       <tr><td>SUMO computed</td><td>Every number in the results below and on the map</td><td>-</td></tr>
     </tbody>
   </table>
 
-  <p>Two things are conspicuously <em>not</em> modelled, and the map cannot tell you about them. The crush at the gates and inside the concourse - the pedestrian phase before anyone reaches a car - is out of scope for this build. SUMO has a pedestrian model, but coupling it is its own project. And the transit riders are assumed to be absorbed by rail and bus without adding road load beyond the background level. Whether TransLink's stations can actually swallow forty thousand people in an hour is not something we expect to answer in this twin.</p>
-  <p>The numbers in the first column are plausible, not surveyed. They are the kind of values we expect a planner to replace for the 2032 transport plan's mode-split targets.</p>
+  <p>Two things are conspicuously <em>not</em> modelled, and the map cannot tell you about them. The crush at the gates and inside the concourse - the pedestrian phase before anyone reaches a car - is out of scope for this build. SUMO has a pedestrian model, but coupling it is its own project. And the transit riders are assumed to be absorbed by rail and bus without adding road load beyond the background level. Whether TransLink's stations can actually swallow forty thousand people in an hour is not something I expect to answer in this twin.</p>
+  <p>The numbers in the first column are plausible, not surveyed. They are the kind of values I expect a planner to replace for the 2032 transport plan's mode-split targets.</p>
 </section>
 
 <section>
-  <h2>Twelve runs and a baseline - we already simulated these offline</h2>
-  <p>A mesoscopic run of this network takes a bit, so we ran the whole <span class="t" data-k="grid">variant grid</span> offline - three attendance levels &times; two mode splits &times; two release profiles, twelve runs, plus one no-event baseline of the same evening - and baked all thirteen into the interactive twin below. The controls on the map switch between <strong>actual runs</strong>.</p>
+  <h2>Twelve runs and a baseline - I already simulated these offline</h2>
+  <p>A mesoscopic run of this network takes a bit, so I ran the whole <span class="t" data-k="grid">variant grid</span> offline - three attendance levels &times; two mode splits &times; two release profiles, twelve runs, plus one no-event baseline of the same evening - and baked all thirteen into the interactive twin below. The controls on the map switch between <strong>actual runs</strong>.</p>
   <p>Each run simulates four hours from the moment the gates open at 21:30. For every road segment, SUMO reports the vehicles that entered it and their mean travel time in each five-minute interval; for a 12% sample of vehicles it also writes a position every 30 seconds, which is what the moving dots on the map replay.</p>
 </section>
 
@@ -389,7 +389,7 @@
 </tbody></table>
 
   <h3>Sanity checks before quoting any of it</h3>
-  <p>A results table is only as good as the checks behind it. These are the ones we ran, with verdicts.</p>
+  <p>A results table is only as good as the checks behind it. These are the ones I ran, with verdicts.</p>
   <ul class="ledger">
     <li><span class="v pass">PASS</span><span><strong>The baseline is healthy.</strong> Over the four-hour no-event run, the precinct's mean delay factor never exceeds 1.14&times; (average 1.02&times;). The background traffic is busy-but-moving, not a gridlocked starting point that would flatter every variant.</span></li>
     <li><span class="v pass">PASS</span><span><strong>All demand was served.</strong> In every one of the twelve runs, every event vehicle was inserted and reached its corridor within the four-hour window - zero unfinished trips. The comparisons are between complete populations, not between whoever survived.</span></li>
@@ -402,21 +402,21 @@
 
 <section>
   <h2>Model caveats</h2>
-  <p>Everything above is <strong>directional and uncalibrated</strong>. The demand is synthetic: the mode splits, the car occupancy, the release windows, the six origin zones and the ten corridor weights are our assumptions, not survey data. There is one random <span class="t" data-k="seed">seed</span> per run, so the spread of outcomes you would see across many draws of the same scenario is not shown - Part 1's fourth correction, and we knowingly broke it here to fit thirteen runs into a session. The engine is mesoscopic, so intersection capacity - the thing an egress usually turns on - is modelled coarsely, and lane-level behaviour like motorway weaving not at all (see the stack, above). Nothing has been calibrated against real Brisbane traffic counts. The car-park queue is represented by SUMO's insertion queue, a reasonable stand-in but not a model of a car park.</p>
+  <p>Everything above is <strong>directional and uncalibrated</strong>. The demand is synthetic: the mode splits, the car occupancy, the release windows, the six origin zones and the ten corridor weights are my assumptions, not survey data. There is one random <span class="t" data-k="seed">seed</span> per run, so the spread of outcomes you would see across many draws of the same scenario is not shown - Part 1's fourth correction, and I knowingly broke it here to fit thirteen runs into a session. The engine is mesoscopic, so intersection capacity - the thing an egress usually turns on - is modelled coarsely, and lane-level behaviour like motorway weaving not at all (see the stack, above). Nothing has been calibrated against real Brisbane traffic counts. The car-park queue is represented by SUMO's insertion queue, a reasonable stand-in but not a model of a car park.</p>
   <p>What this means for use: the twin is right for "shape of the impact" questions - does staggering help, where does it choke, how much does mode share buy - and wrong for forecasts. Nobody should read "p90 of 89.5 minutes" as a prediction of a night in 2032. They should read "staggering cuts the p90 by a factor of six under identical assumptions," because that is a comparison, and the shared errors largely cancel.</p>
-  <p>The upgrade path to defensible numbers is the same one every scenario on our list shares: the 2032 transport plan's mode-split targets and event-mode street closures as inputs, TransLink's station capacities for the transit side, real traffic counts to calibrate the background, and a sweep of seeds to put bands on every number. None of that changes the machine. All of it changes the first column of the authored-versus-computed table above.</p>
+  <p>The upgrade path to defensible numbers is the same one every scenario on my list shares: the 2032 transport plan's mode-split targets and event-mode street closures as inputs, TransLink's station capacities for the transit side, real traffic counts to calibrate the background, and a sweep of seeds to put bands on every number. None of that changes the machine. All of it changes the first column of the authored-versus-computed table above.</p>
 
   <div class="callout">
     <span class="k">Be-aware</span>
-    <p>Every state of the controls is a real, precomputed SUMO run. Results are directional and uncalibrated: synthetic demand, one seed, mesoscopic engine, no calibration. What is SUMO's is defensible with no assumptions beyond the demand being synthetic; what is ours is labelled as ours.</p>
+    <p>Every state of the controls is a real, precomputed SUMO run. Results are directional and uncalibrated: synthetic demand, one seed, mesoscopic engine, no calibration. What is SUMO's is defensible with no assumptions beyond the demand being synthetic; what is mine is labelled as mine.</p>
   </div>
 </section>
 
 <section>
-  <h2>What we took from it</h2>
-  <p>For me, the hands-on goal was met more completely than I expected. The stack is real and it is small: a map extract, a cropping tool, a simulator with a Python toolchain, and a few hundred lines of our own code to author demand, analyse output and bake the page. The whole loop from raw map to interactive comparison fits in a working session. I am reasonably sure that I will be able to leverage the network and pipeline used here for other scenarios like the flood evacuation, the EV chargers etc. as well.</p>
-  <p>For Pranav's question - is there something here to build on - the build sharpened rather than answered it. The valuable object was never the map. It was the precomputed grid with its provenance attached: which runs, which assumptions, which checks passed. That is what a planner could argue with. The map is how you look at it. A product in this space that sells the map without the ledger is selling a demo; a product that sells the ledger has to earn calibration data from the very agencies it wants as customers. That tension, more than any tooling gap, is what we keep coming back to.</p>
-  <p>And the smallest lesson is the one we would put first for anyone starting: pick the metric before you pick the policy. The same twelve runs make staggered release look like a triumph on one tile and a problem on the next. A twin does not resolve that. It makes it visible, which is the most a model should claim.</p>
+  <h2>What I took from it</h2>
+  <p>For me, the hands-on goal was met more completely than I expected. The stack is real and it is small: a map extract, a cropping tool, a simulator with a Python toolchain, and a few hundred lines of my own code to author demand, analyse output and bake the page. The whole loop from raw map to interactive comparison fits in a working session. I am reasonably sure that I will be able to leverage the network and pipeline used here for other scenarios like the flood evacuation, the EV chargers etc. as well.</p>
+  <p>For the startup question - is there something here to build on - the build sharpened rather than answered it. The valuable object was never the map. It was the precomputed grid with its provenance attached: which runs, which assumptions, which checks passed. That is what a planner could argue with. The map is how you look at it. A product in this space that sells the map without the ledger is selling a demo; a product that sells the ledger has to earn calibration data from the very agencies it wants as customers. That tension, more than any tooling gap, is what I keep coming back to.</p>
+  <p>And the smallest lesson is the one I would put first for anyone starting: pick the metric before you pick the policy. The same twelve runs make staggered release look like a triumph on one tile and a problem on the next. A twin does not resolve that. It makes it visible, which is the most a model should claim.</p>
 </section>
 
 <div class="sources">
