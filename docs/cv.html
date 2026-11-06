@@ -15,7 +15,7 @@
      reading a CV out of order, and contact details are kept in the body rather than
      a page header for the same reason. */
 
-  @page { size: A4; margin: 9mm 13mm; }
+  @page { size: A4; margin: 8mm 12mm; }
 
   :root {
     --ink: #111111;
@@ -27,8 +27,8 @@
 
   body {
     font-family: Georgia, "Times New Roman", serif;
-    font-size: 10pt;
-    line-height: 1.28;
+    font-size: 9.6pt;
+    line-height: 1.24;
     color: var(--ink);
     background: #ffffff;
     max-width: 190mm;
@@ -53,7 +53,7 @@
     font-size: 9.5pt;
     color: var(--soft);
     line-height: 1.5;
-    margin-bottom: 6pt;
+    margin-bottom: 4pt;
   }
   .contact a { color: var(--ink); text-decoration: none; }
 
@@ -63,12 +63,12 @@
     text-transform: uppercase;
     border-bottom: 1px solid var(--rule);
     padding-bottom: 2pt;
-    margin: 6pt 0 3pt;
+    margin: 5pt 0 2pt;
   }
 
   .summary { margin-bottom: 2pt; }
 
-  .role { margin-bottom: 5pt; page-break-inside: avoid; }
+  .role { margin-bottom: 3.5pt; page-break-inside: avoid; }
   .role:last-child { margin-bottom: 2pt; }
 
   .role-head {
@@ -83,11 +83,11 @@
   .role-where { font-size: 9.5pt; color: var(--soft); font-style: italic; margin-bottom: 2pt; }
 
   ul { margin: 0 0 0 16pt; }
-  li { margin-bottom: 1pt; }
+  li { margin-bottom: 0.5pt; }
 
   .thesis { margin: 2pt 0 3pt; }
   .thesis a { color: var(--ink); text-decoration: none; }
-  .skills p { margin-bottom: 2pt; }
+  .skills p { margin-bottom: 1pt; }
   .skills b { font-weight: bold; }
 
   .writing li { margin-bottom: 2pt; }
@@ -97,7 +97,7 @@
 <body>
 
 <h1>Praneet Dhoolia</h1>
-<p class="title">AI Engineer, Hardware Enthusiast</p>
+<p class="title">AI Engineer</p>
 <p class="contact">
   Brisbane, Queensland, Australia<br>
   praneet.dhoolia@gmail.com &middot;
@@ -107,106 +107,127 @@
 </p>
 
 <h2>Summary</h2>
-<p class="summary">AI engineer with a Bachelor of Engineering (Honours) in Software Engineering
-from the University of Queensland, where my thesis built a multi-stage research agent that beats
-published baselines on four tool-use benchmarks. Founded and led engineering for an AI agent
-platform, taking it from prototype to paying pilots and A$100K ARR. Currently tutoring pattern
-recognition and deep learning at UQ, and writing about agent design and city digital twins at
-praneetdhoolia.github.io.</p>
-
-<h2>Skills</h2>
-<div class="skills">
-  <p><b>Languages:</b> Python, Java</p>
-  <p><b>Machine learning:</b> PyTorch, TensorFlow, pattern recognition, retrieval-augmented
-    generation (RAG)</p>
-  <p><b>AI systems:</b> LangGraph, Model Context Protocol (MCP), multi-agent systems, prompt
-    engineering, agent benchmarking and evaluation</p>
-  <p><b>Web and infrastructure:</b> FastAPI, Next.js, Playwright, Docker, Milvus vector database,
-    Apify</p>
-</div>
-
-<h2>Education</h2>
-<div class="role">
-  <div class="role-head">
-    <span class="role-title">Bachelor of Engineering (Honours), Software Engineering</span>
-    <span class="role-when">Feb 2022 - Jun 2026</span>
-  </div>
-  <p class="role-where">The University of Queensland, St Lucia, Queensland, Australia</p>
-  <p class="thesis"><b>Honours thesis:</b> <a href="https://praneetdhoolia.github.io/docs/thesis.pdf">Foundations
-    of Agent-to-Agent Communication in a Software-Mediated Research Agent</a>. Supervised by
-    Dr Shakes Chandra. praneetdhoolia.github.io/docs/thesis.pdf</p>
-  <ul>
-    <li>Designed a five-stage LLM research agent, a planner, tool dispatcher, tool executor,
-      assessor and synthesiser, communicating through a typed state object as a LangGraph graph,
-      served from a FastAPI streaming backend behind a Next.js interface.</li>
-    <li>Integrated more than a dozen external tools over MCP, including Tavily search, a Playwright
-      headless browser, an E2B sandboxed Python notebook, Wolfram Alpha and arXiv.</li>
-    <li>Evaluated on six benchmarks: 62.0% on SimpleQA against 28.9% for Claude 3.5 Sonnet, 87.0%
-      on GAIA (Level 1 and 2), and 61.45% on DRACO against 52.1% for OpenAI o3.</li>
-  </ul>
-</div>
+<p class="summary">AI engineer who takes LLM agent systems from prototype to production: agent design,
+tool integration over MCP, evaluation and cloud deployment. Founded and led engineering at G&ouml;del,
+an agent platform on AWS with three paying clients and A$100K ARR. My UQ honours thesis built a research
+agent that beats or matches published baselines on four benchmarks. Now building a city-scale transport
+twin with AI coding agents and tutoring deep learning at UQ.</p>
 
 <h2>Experience</h2>
 
 <div class="role">
   <div class="role-head">
-    <span class="role-title">Tutor, The University of Queensland</span>
-    <span class="role-when">Jul 2026 - present</span>
-  </div>
-  <p class="role-where">St Lucia, Queensland, Australia</p>
-  <ul>
-    <li>Tutor COMP3710, Pattern Recognition and Analysis, teaching deep learning practice in
-      Python, PyTorch and TensorFlow.</li>
-  </ul>
-</div>
-
-<div class="role">
-  <div class="role-head">
     <span class="role-title">Founder and CTO, G&ouml;del</span>
-    <span class="role-when">Apr 2025 - Dec 2025</span>
+    <span class="role-when">Apr 2025 &ndash; Dec 2025</span>
   </div>
   <p class="role-where">godel.sh</p>
   <ul>
-    <li>Built a platform for creating G&ouml;del agents (arXiv:2410.04444), from a from-scratch
-      prototype through to customer pilots.</li>
-    <li>Gave those agents access to any software-based tool through the Model Context Protocol,
-      removing the need for a bespoke integration per tool.</li>
-    <li>Led full-stack development and the engineering team, clearing A$100K ARR through
-      org-based usage.</li>
+    <li>Led a three-person team building a platform for LangGraph-based G&ouml;del agents
+      (arXiv:2410.04444) from scratch to pilots, giving agents any software tool through the Model
+      Context Protocol instead of a bespoke integration per tool.</li>
+    <li>Won three paying clients and A$100K ARR through org-based usage: mail reception and CRM
+      automation; a content marketing pipeline with automated outreach and feedback; and
+      access-controlled handoff of knowledge from chats, meetings, client feedback and decisions.</li>
+    <li>Ran it on AWS (ECS, EC2, Lambda, S3, DynamoDB), provisioned with Terraform and CDK,
+      shipped via GitHub Actions.</li>
   </ul>
 </div>
 
 <div class="role">
   <div class="role-head">
     <span class="role-title">AI Engineering Intern, AGAILE Inc.</span>
-    <span class="role-when">Jan 2025 - Mar 2025</span>
+    <span class="role-when">Jan 2025 &ndash; Mar 2025</span>
   </div>
-  <p class="role-where">Delaware, United States</p>
+  <p class="role-where">Delaware, United States (remote)</p>
   <ul>
-    <li>Prototyped a question-answering solution with LangGraph.</li>
-    <li>Crawled website data with Apify and indexed it into a Milvus vector database running on
-      Docker.</li>
-    <li>Answered questions over that index using retrieval-augmented generation.</li>
+    <li>Prototyped a LangGraph question-answering assistant: crawled sites with Apify into a Milvus
+      vector database on Docker, answered with RAG, and deployed it to LangGraph Cloud behind a chat
+      client.</li>
   </ul>
 </div>
 
 <div class="role">
   <div class="role-head">
     <span class="role-title">AI Solutions Intern, Segment X</span>
-    <span class="role-when">Jul 2024 - Dec 2024</span>
+    <span class="role-when">Jul 2024 &ndash; Dec 2024</span>
   </div>
   <p class="role-where">St Lucia, Queensland, Australia</p>
+  <ul>
+    <li>Built LLM and RAG prototypes, data pipelines and workflow automations for client use cases,
+      deployed on cloud infrastructure.</li>
+  </ul>
 </div>
 
 <div class="role">
   <div class="role-head">
     <span class="role-title">Tutor, The University of Queensland</span>
-    <span class="role-when">Jul 2023 - Dec 2023</span>
+    <span class="role-when">Jul 2026 &ndash; present &middot; Jul 2023 &ndash; Dec 2023</span>
   </div>
   <p class="role-where">St Lucia, Queensland, Australia</p>
   <ul>
-    <li>Tutored CSSE2002, Programming in the Large, covering Java and software design.</li>
+    <li>COMP3710 Pattern Recognition and Analysis (2026): deep learning in PyTorch and TensorFlow.
+      CSSE2002 Programming in the Large (2023): Java and software design.</li>
   </ul>
+</div>
+
+<h2>Projects</h2>
+
+<div class="role">
+  <div class="role-head">
+    <span class="role-title">City digital twin</span>
+    <span class="role-when">Aug 2026 &ndash; present</span>
+  </div>
+  <p class="role-where">github.com/praneetdhoolia/city-digital-twin &middot; praneetdhoolia.github.io/digital-twins</p>
+  <ul>
+    <li>Built a transport twin of Greater Newcastle: 600,000 census-based synthetic residents
+      travelling by twelve modes on real roads and timetables (OpenStreetMap, GTFS), simulated in
+      MATSim with my own Java extensions, and scored against the real city.</li>
+    <li>Stood up Mumbai (27 million residents) on the same framework in days; built both with AI
+      coding agents (Claude Code) over 709 commits, with repository-enforced checks and cost-gated runs.</li>
+    <li>Prepared a proposal for an Indian state government: a 3D map deck (MapLibre GL, deck.gl)
+      replaying the twin's trips.</li>
+  </ul>
+</div>
+
+<div class="role">
+  <div class="role-head">
+    <span class="role-title">Contributor, langgraph-mcp <span class="role-where">&middot; github.com/esxr/langgraph-mcp</span></span>
+    <span class="role-when">Dec 2024 &ndash; Jan 2025</span>
+  </div>
+  <ul>
+    <li>Co-built an open-source assistant (580+ GitHub stars) that routes requests across MCP servers:
+      wrote its router graph, MCP session wrapper, assistant graph and Milvus retriever.</li>
+  </ul>
+</div>
+
+<h2>Education</h2>
+<div class="role">
+  <div class="role-head">
+    <span class="role-title">Bachelor of Engineering (Honours), Software Engineering</span>
+    <span class="role-when">Feb 2022 &ndash; Jun 2026</span>
+  </div>
+  <p class="role-where">The University of Queensland, St Lucia, Queensland, Australia</p>
+  <p class="thesis"><b>Honours thesis:</b> <a href="https://praneetdhoolia.github.io/docs/thesis.pdf">Foundations
+    of Agent-to-Agent Communication in a Software-Mediated Research Agent</a>
+    (praneetdhoolia.github.io/docs/thesis.pdf). Supervised by Dr Shakes Chandra.</p>
+  <ul>
+    <li>Designed a five-stage LangGraph research agent (planner, dispatcher, executor, assessor,
+      synthesiser) with a streaming FastAPI backend, a Next.js interface and a dozen MCP tools.</li>
+    <li>Scored 62.0% on SimpleQA (Claude 3.5 Sonnet: 28.9%), 87.0% on GAIA Levels 1 and 2, 61.45% on
+      DRACO (OpenAI o3: 52.1%) and 68.0% on MCP-Atlas (GPT-5.2: 67.6%).</li>
+  </ul>
+</div>
+
+<h2>Skills</h2>
+<div class="skills">
+  <p><b>AI systems:</b> LangGraph, Model Context Protocol (MCP), multi-agent systems, RAG, prompt
+    engineering, agent evaluation</p>
+  <p><b>Cloud and deployment:</b> AWS (Bedrock, EC2, ECS, Lambda, S3, DynamoDB), GCP (Cloud Run,
+    BigQuery), Azure (App Service, Functions), Docker, Kubernetes, Terraform, GitHub Actions,
+    LangGraph Cloud</p>
+  <p><b>Languages, ML and web:</b> Python, Java, PyTorch, TensorFlow, FastAPI, Next.js, Playwright,
+    Milvus, Apify</p>
+  <p><b>Simulation and geospatial:</b> MATSim, SUMO, OpenStreetMap, GTFS, MapLibre GL, deck.gl</p>
 </div>
 
 </body>
